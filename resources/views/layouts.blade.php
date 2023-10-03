@@ -6,9 +6,23 @@
     <meta name='keywords' content='{{ $metaKey ?? $_SERVER['HTTP_HOST'] }}'/>
     <meta name='description' content='{{ $metaDesc ?? $_SERVER['HTTP_HOST'] }}'/>
     @section('styles')
-        <link href="{{ asset('/css/style.css') }}" rel="stylesheet">
+        <link href="{{ asset('/css/template.css') }}" rel="stylesheet">
     @show
     @section('scripts')
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var toggleMenu = document.querySelector(".toggleMenu");
+                var nav = document.querySelector(".nav");
+                toggleMenu.addEventListener("click", function(event) {
+                    event.preventDefault(); // Предотвращаем переход по ссылке
+                    if (nav.style.display === "block") {
+                        nav.style.display = "none";
+                    } else {
+                        nav.style.display = "block";
+                    }
+                });
+            });
+        </script>
     @show
     @section('robots')
     @show
@@ -16,21 +30,31 @@
 <body>
 <div class="old">
     <div class="container">
-        <a href="https://detskysad.com/">
+        <div class="composition"></div>
+        <a href="https://test.med-otzyv.com/">
             <div class="logo">
                 <div class="logo1">Отзывы</div>
                 <div class="logo2">о детских садах</div>
             </div>
         </a>
 
-        <div class="counter"><div class="count-inner"><p class="counter-title">Уже отзывов</p>
+        <div class="counter">
+            <div class="count-inner">
+                <p class="counter-title">Уже отзывов</p>
                 <div class="all-count">
-                    <p class="response" id="response">{{$allReviews}}</p></div>
+                    <p class="response" id="response">{{$totalCount ?? ''}}</p>
+                </div>
             </div>
         </div>
         <div class="login">
+            @if(Auth::check() && Auth::user()->hasVerifiedEmail())
+                <a href="/profile" id="auth_topbar_config">Личный кабинет</a>
+                <a href="/log-out" id="auth_topbar_ajax_logout">Выход</a>
+            @else
+                <a href="/login" id="auth_topbar_login">Авторизация</a>
+                <a href="/register" id="auth_topbar_register">Регистрация</a>
+            @endif
         </div>
-        <div class="composition"></div>
         <div class="clear-fix"></div>
         <div class="poisk">
             <div class="yandex-search">
@@ -56,7 +80,32 @@
     </div>
     <a class="toggleMenu" href="#">☰</a>
     <div id="menu2">
-
+        <ul class="nav">
+            <li>
+                <a href="/">Главная</a>
+            </li>
+            <li>
+                <a href="/detskie-sady/14-privat/131-chastnye-detskie-sady">Частные детские сады</a>
+            </li>
+            <li>
+                <a href="/obmen-mest">Обмен мест в садиках</a>
+            </li>
+            <li>
+                <a href="/rabota-vsadu">Работа в детском саду</a>
+            </li>
+            <li>
+                <a href="/zanyatiya-v-detskom-sadu">Занятия в детском саду</a>
+            </li>
+            <li>
+                <a href="/metro">Детские сады у метро</a>
+            </li>
+            <li>
+                <a href="/dobavit-sad">Добавить садик/центр</a>
+            </li>
+            <li>
+                <a href="/svyaz">Обратная связь</a>
+            </li>
+        </ul>
     </div>
     <div class="clear-fix"></div>
     <div class="menubg"></div>
@@ -76,6 +125,7 @@
                     {{ session('error') }}
                 </div>
             @endif
+            @yield('content')
         </div>
     </div>
     <div class="clear-fix"></div>
@@ -84,7 +134,7 @@
         <div class="container">
             @yield('debug')
         </div>
-        <script type="text/javascript" >
+{{--        <script type="text/javascript" >
             (function (d, w, c) {
                 (w[c] = w[c] || []).push(function() {
                     try {
@@ -107,7 +157,7 @@
                 } else { f(); }
             })(document, window, "yandex_metrika_callbacks");
         </script>
-        <noscript><div><img src="https://mc.yandex.ru/watch/11397493" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+        <noscript><div><img src="https://mc.yandex.ru/watch/11397493" style="position:absolute; left:-9999px;" alt="" /></div></noscript>--}}
     </footer>
 </div>
 </body>

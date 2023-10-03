@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -41,4 +41,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function isAdmin()
+    {
+        if(Auth::check()){
+            $user = Auth::user();
+            return UserRole::where('user_id', $user->id)->where('role_id', 1)->exists();
+        }else{
+            return false;
+        }
+    }
+    public static function isAgent()
+    {
+        if(Auth::check()){
+            $user = Auth::user();
+            return UserRole::where('user_id', $user->id)->where('role_id', 2)->exists();
+        }else{
+            return false;
+        }
+    }
 }
