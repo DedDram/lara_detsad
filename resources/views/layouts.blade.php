@@ -133,6 +133,9 @@
         <div class="bg-footer"></div>
         <div class="container">
             @yield('debug')
+            @if (Auth::check())
+                {!! Debugbar::render() !!}
+            @endif
         </div>
 {{--        <script type="text/javascript" >
             (function (d, w, c) {

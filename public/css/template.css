@@ -859,8 +859,9 @@ background-color: #ccc!important;
 .vmid {
 color: #36f !important;
 font-weight: inherit !important;}
-.ymaps-2-1-76-places-pane,.ymaps-2-1-77-places-pane {
-z-index: 2500 !important;}
+[class^="ymaps-2-1-"][class$="-places-pane"] {
+    z-index: 2500 !important;
+}
 
 @media screen and (max-width:768px) {
     .nav {display: none;}

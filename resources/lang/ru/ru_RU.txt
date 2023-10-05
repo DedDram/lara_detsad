@@ -1,0 +1,17 @@
+{
+	"oPaginate": {
+		"sFirst": "«",
+		"sLast": "»",
+		"sNext": ">",
+		"sPrevious": "<"
+	},
+	"sProcessing": "Действую...",
+	"sLengthMenu": "Кол-во _MENU_ строк",
+	"sZeroRecords": "Ничего не найдено",
+	"sInfo": "Показано с _START_ по _END_ из _TOTAL_ строк",
+	"sInfoEmtpy": "Показано с 0 по 0 из 0 строк",
+	"sInfoFiltered": "(выбрано из _MAX_)",
+	"sInfoPostFix": "",
+	"sSearch": "Поиск: (начните вводить название)",
+	"sUrl": ""
+}

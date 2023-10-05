@@ -34,9 +34,18 @@ Auth::routes(['verify' => true]);
 
 //Садики
 Route::get('/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);
+Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}', [DetSadController::class, 'category'])->where(['section_id' => '[0-9]+','category_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+', 'category_alias' => '[a-z0-9-]+']);
+Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{district}', [DetSadController::class, 'category'])->where(['section_id' => '[0-9]+','category_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+', 'category_alias' => '[a-z0-9-]+', 'district' => '[a-z][a-z0-9-]+']);
+Route::get('/street/{category_id}-{category_alias}', [DetSadController::class, 'streets'])->where(['category_id' => '[0-9]+','category_alias' => '[a-z0-9-]+']);
+Route::get('/street/{category_id}-{category_alias}/{street_alias}', [DetSadController::class, 'street'])->where(['category_id' => '[0-9]+','category_alias' => '[a-z0-9-]+', 'street_alias' => '[a-z0-9-]+']);
+
 //Садики старые url
 Route::middleware('redirect.old')->group(function () {
+    Route::get('/detskie-sady/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}', [DetSadController::class, 'category'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+']);
+    Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{district}', [DetSadController::class, 'category'])->where(['section_id' => '[0-9]+','category_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+', 'category_alias' => '[a-z0-9-]+', 'district' => '[a-z][a-z0-9-]+']);
+
+
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{vuz_id}-{vuz_alias}', [DetSadController::class, 'vuz'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'vuz_id' => '[0-9]+', 'vuz_alias' => '[a-z0-9-]+']);
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{vuz_id}-{vuz_alias}/agent', [DetSadController::class, 'vuzAgent'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'vuz_id' => '[0-9]+', 'vuz_alias' => '[a-z0-9-]+']);
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{vuz_id}-{vuz_alias}/gallery', [DetSadController::class, 'gallery'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'vuz_id' => '[0-9]+', 'vuz_alias' => '[a-z0-9-]+']);

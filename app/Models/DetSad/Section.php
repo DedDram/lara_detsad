@@ -1,29 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\DetSad;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use stdClass;
 
-class DetSadSections
+class Section extends Model
 {
-    public function getSection($sectionId): ?object
-    {
-        return  DB::table('i1il4_detsad_sections')
-            ->select('*')
-            ->where('id',$sectionId)
-            ->first();
-    }
+    protected $table = 'i1il4_detsad_sections';
+    protected $primaryKey = 'id';
+    protected $fillable = ['name', 'title', 'alias', 'text'];
 
-    function getCategories($sectionId): ?object
-    {
-        return DB::table('i1il4_detsad_categories')
-            ->select('*')
-            ->where('section_id', $sectionId)
-            ->get();
-    }
-
-    function getAddress($sectionId, $sectionAlias): array
+    public static function getAddress($sectionId, $sectionAlias): array
     {
         $result = array();
         $address = DB::table('i1il4_detsad_items as t1')

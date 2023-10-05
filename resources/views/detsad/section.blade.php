@@ -16,7 +16,7 @@
     <div id="map" style="width:100%; height: 400px; margin: 5px 0;"></div>
 
     <div>
-        {{$section->text}}
+        {!! $section->text !!}
     </div>
     <ul>
         @foreach ($categories as $category)
