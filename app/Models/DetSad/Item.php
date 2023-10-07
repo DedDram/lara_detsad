@@ -52,4 +52,65 @@ class Item extends Model
         return $this->belongsTo(Section::class, 'section_id');
     }
 
+    public static function getAddress($sadId): ?object
+    {
+        return DB::table('i1il4_detsad_address')
+            ->select('*')
+            ->where('item_id', '=', $sadId)
+            ->orderBy('id')
+            ->get();
+    }
+
+    public static function getStatistics($sadId): ?object
+    {
+        return DB::table('i1il4_detsad_stat')->select('*')
+            ->where('item_id', '=', $sadId)
+            ->orderBy('id')
+            ->first();
+    }
+
+    public static function getFields($sadId): ?object
+    {
+        return DB::table('i1il4_detsad_fields_value AS t1')
+            ->select('t1.item_id', 't1.text AS field_text', 't1.type_id', 't2.text AS type_text')
+            ->join('i1il4_detsad_fields_type AS t2', 't1.type_id', '=', 't2.id')
+            ->where('t1.item_id', '=', $sadId)
+            ->orderBy('t2.ordering', 'ASC')
+            ->get();
+    }
+
+    public static function getUrlSadik(int $sadId): ?object
+    {
+        return DB::table('i1il4_detsad_items as t1')
+            ->select(DB::raw("CONCAT('/', t3.id, '-', t3.alias, '/', t2.id, '-', t2.alias, '/', t1.id, '-', t1.alias) as url"), "t1.name")
+            ->join('i1il4_detsad_categories as t2', 't2.id', '=', 't1.category_id')
+            ->join('i1il4_detsad_sections as t3', 't3.id', '=', 't1.section_id')
+            ->where('t1.id', $sadId)
+            ->first();
+    }
+
+    public static function getSadikAgent(int $sadId): ?object
+    {
+        return DB::table('users')
+            ->select('*')
+            ->where('vuz_id', $sadId)
+            ->first();
+    }
+
+    public static function getGallery(int $sadId): ?object
+    {
+        return DB::table('i1il4_detsad_images')
+            ->select('*')
+            ->where('item_id', $sadId)
+            ->where('verified', '1')
+            ->orderBy('id', 'DESC')
+            ->get();
+    }
+
+    public static function getCountImage(int $sadId): ?int
+    {
+        return DB::table('i1il4_detsad_images')
+            ->where('item_id', $sadId)
+            ->count();
+    }
 }

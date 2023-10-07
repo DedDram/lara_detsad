@@ -38,14 +38,8 @@
             </div>
         </a>
 
-        <div class="counter">
-            <div class="count-inner">
-                <p class="counter-title">Уже отзывов</p>
-                <div class="all-count">
-                    <p class="response" id="response">{{$totalCount ?? ''}}</p>
-                </div>
-            </div>
-        </div>
+        <x-comments-count />
+
         <div class="login">
             @if(Auth::check() && Auth::user()->hasVerifiedEmail())
                 <a href="/profile" id="auth_topbar_config">Личный кабинет</a>

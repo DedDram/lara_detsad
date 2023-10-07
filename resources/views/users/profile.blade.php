@@ -34,17 +34,17 @@
     </form>
     @if($agent)
     <div style="margin-top: 3%">
-        <h3>Вы представитель ВУЗа</h3>
+        <h3>Вы представитель садика</h3>
         <a href="{{$agent->url}}">{{$agent->name}}</a>
     </div>
     @endif
     <div style="margin-top: 3%">
-        <h3>Ваши отзывы</h3>
+        <h3>5 ваших последних отзывов</h3>
         @if($comments->isEmpty())
             Вы пока не написали ни одного отзыва...
         @else
             @foreach($comments as $comment)
-               <div> <a href="{{(\App\Models\Vuz\Vuz::getUrlVuz($comment->object_id))->url}}">{{$comment->created}}</a>  - {{Str::limit(strip_tags($comment->description), 150).'...'}}</div>
+               <div> <a href="{{(\App\Models\DetSad\Item::getUrlSadik($comment->object_id))->url}}">{{$comment->created}}</a>  - {{Str::limit(strip_tags($comment->description), 150).'...'}}</div>
             @endforeach
         @endif
     </div>
