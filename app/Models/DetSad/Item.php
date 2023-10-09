@@ -37,11 +37,37 @@ class Item extends Model
         'sid'
     ];
 
-    public function addresses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias,$sectionName,$categoryName,  $sadId)
     {
-        return $this->hasMany(Address::class, 'item_id');
-    }
 
+        if($sectionId >1 && $sectionId < 12){
+            $addresses = DB::table('i1il4_detsad_address AS address')
+                ->select('address.*')
+                ->where('item_id', $sadId)
+                ->orderBy('address.id')
+                ->get();
+            foreach($addresses as $address){
+                    $address->district_link = '<a href="/'.$sectionId.'-'.$sectionAlias.'">'.$sectionName.'</a> / <a href="/'.$sectionId.'-'.$sectionAlias.'/'.$categoryId.'-'.$categoryAlias.'">'.$categoryName.'</a>';
+            }
+        }else{
+            $addresses = DB::table('i1il4_detsad_address AS address')
+                ->select('address.*')
+                ->leftJoin('i1il4_detsad_districts AS districts', function ($join) {
+                    $join->on('districts.alias', '=', 'address.district')
+                        ->where('districts.parent', '=', 'address.locality');
+                })
+                ->where('item_id', $sadId)
+                ->orderBy('address.id')
+                ->get();
+
+            foreach($addresses as $address){
+                if($address->district){
+                    $address->district_link = '<a href="/'.$sectionId.'-'.$sectionAlias.'/'.$categoryId.'-'.$categoryAlias.'/'.$address->district.'">'.$address->d_name.'</a>';
+                }
+            }
+        }
+        return $addresses;
+    }
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -50,15 +76,6 @@ class Item extends Model
     public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
-    }
-
-    public static function getAddress($sadId): ?object
-    {
-        return DB::table('i1il4_detsad_address')
-            ->select('*')
-            ->where('item_id', '=', $sadId)
-            ->orderBy('id')
-            ->get();
     }
 
     public static function getStatistics($sadId): ?object
@@ -89,12 +106,28 @@ class Item extends Model
             ->first();
     }
 
-    public static function getSadikAgent(int $sadId): ?object
+    public static function getAgent(int $sadId)
     {
-        return DB::table('users')
+        $agent = DB::table('i1il4_detsad_agents')
             ->select('*')
-            ->where('vuz_id', $sadId)
+            ->where('item_id', $sadId)
+            ->where('verified', '1')
             ->first();
+
+        if($agent !== null)
+        {
+            if(!empty($agent->position) && !empty($agent->name) && !empty($agent->phone))
+            {
+                $agent->info = "<strong>Должность:</strong> ".$agent->position."<br><strong>ФИО:</strong> ".$agent->name."<br><strong>Телефон:</strong> ".$agent->phone;
+            }
+            if(!empty($agent->photo_src))
+            {
+                $agent->img = '<img src="/images/detsad/'.$sadId.'/'.$agent->photo_src.'">';
+            }else{
+                $agent->img = '<img src="/images/no_avatar.gif">';
+            }
+        }
+        return $agent;
     }
 
     public static function getGallery(int $sadId): ?object

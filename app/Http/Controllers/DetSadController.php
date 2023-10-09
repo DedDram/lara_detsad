@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StringHelper;
 use App\Models\DetSad\AdsCity;
 use App\Models\DetSad\Category;
 use App\Models\DetSad\Item;
@@ -159,6 +160,7 @@ class DetSadController
         $sadik = Item::query()
             ->with('category', 'section') // Включаем категорию и секцию
             ->find($sadId);
+
         if ($sadik !== null) {
             if ($sectionId . '-' . $sectionAlias != $sadik->section->id . '-' . $sadik->section->alias ||
                 $categoryId . '-' . $categoryAlias != $sadik->category->id . '-' . $sadik->category->alias ||
@@ -184,12 +186,40 @@ class DetSadController
             $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
         }
         $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
+        $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section->name, $sadik->category->name, $sadId);
+        $countImage = Item::getCountImage($sadId);
+        $statistics = Item::getStatistics($sadId);
+        $fields = Item::getFields($sadId);
+        $comments = StringHelper::declension($sadik->comments, ['отзыв', 'отзыва', 'отзывов']);
+        $agent =  Item::getAgent($sadId);
+        if($agent !== null){
+            $countAgent = 1;
+        }else{
+            $countAgent = 0;
+        }
+        if (count($addresses) == 1 && $addresses[0]->locality == 'Москва') {
+            $street = ' ' . $addresses[0]->street_address;
+        } else {
+            $street = '';
+        }
+
+        $title = $sadik->name.$street.' - '.$comments;
+        $metaDesc = $sadik->title.' ❤️ описание садика ✎ телефоны ☎️ адреса, ОТЗЫВЫ, рейтинг ✅';
+        $metaKey = $sadik->title.', телефон, адрес, отзывы';
 
         return view('detsad.sadik',
             [
                 'url' => $url,
                 'item' => $sadik,
-                'url' => $url,
+                'countImage' => $countImage,
+                'addresses' => $addresses,
+                'fields' => $fields,
+                'statistics' => $statistics,
+                'comments' => $comments,
+                'countAgent' => $countAgent,
+                'title' => $title,
+                'metaDesc' => $metaDesc,
+                'metaKey' => $metaKey,
             ]);
     }
 

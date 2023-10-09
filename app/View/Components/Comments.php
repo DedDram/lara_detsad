@@ -2,12 +2,12 @@
 
 namespace App\View\Components;
 
-use App\Models\Comments\Comments;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Comments\Blacklist;
 use Illuminate\View\Component;
 
-class CommentsCount extends Component
+class Comments extends Component
 {
+    protected string $ip;
     /**
      * Create a new component instance.
      *
@@ -15,7 +15,7 @@ class CommentsCount extends Component
      */
     public function __construct()
     {
-        //
+        $this->ip = $_SERVER['REMOTE_ADDR'];
     }
 
     /**
@@ -25,9 +25,7 @@ class CommentsCount extends Component
      */
     public function render()
     {
-        $totalCount = Cache::remember('total_comments_count', now()->addMinutes(60), function () {
-            return Comments::totalCommentsCount();
-        });
-        return view('components.comments-count', ['totalCount' => $totalCount]);
+        $blacklist = Blacklist::getBlacklist($this->ip);
+        return view('components.comments');
     }
 }

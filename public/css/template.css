@@ -867,3 +867,66 @@ font-weight: inherit !important;}
     .nav {display: none;}
     .toggleMenu {display:inline-block;}
 }
+.redtext {
+    font-weight:700;
+    font-size:120%;
+    color: red;
+}
+@media only screen and (max-device-width: 375px) {
+    .iphone5 {display: none !important;}
+}
+@media only screen and (max-device-width: 768px) and (min-device-width: 320px){
+    .created {
+        display: none!important;
+    }
+}
+table.table-3 {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: 5px;
+}
+table.table-3 tr {
+    background-color: #f8f8f8;
+}
+table.table-3 th{
+    color:rgb(102, 204, 0);
+}
+table.table-3 th,
+table.table-3 td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+table.table-3 td {
+    text-align: center;
+}
+@media screen and (max-width: 600px) {
+    table.table-3 {
+        border: 0;
+    }
+    table.table-3 thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+    table.table-3 tr {
+        border-bottom: 1px solid #ddd;
+        display: block;
+    }
+    table.table-3 td {
+        display: block;
+        text-align: right;
+    }
+    table.table-3 td::before {
+        content: attr(data-label);
+        float: left;
+    }
+    table.table-3 td:last-child {
+        border-bottom: 0;
+    }
+}

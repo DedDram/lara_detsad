@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AgentNotification;
-use App\Models\Comments;
+use App\Models\Comments\Comments;
 use App\Models\DetSad\CommentsSadik;
 use App\Models\DetSad\Item;
 use App\Models\User;
