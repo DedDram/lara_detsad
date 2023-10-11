@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StringHelper;
+use App\Models\Comments\Comments;
 use App\Models\DetSad\AdsCity;
 use App\Models\DetSad\Category;
 use App\Models\DetSad\Item;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
-use stdClass;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class DetSadController
 {
@@ -190,7 +192,7 @@ class DetSadController
         $countImage = Item::getCountImage($sadId);
         $statistics = Item::getStatistics($sadId);
         $fields = Item::getFields($sadId);
-        $comments = StringHelper::declension($sadik->comments, ['отзыв', 'отзыва', 'отзывов']);
+        $commentsTitle = StringHelper::declension($sadik->comments, ['отзыв', 'отзыва', 'отзывов']);
         $agent =  Item::getAgent($sadId);
         if($agent !== null){
             $countAgent = 1;
@@ -202,8 +204,24 @@ class DetSadController
         } else {
             $street = '';
         }
+        $items = Comments::getItems(request(), 'com_detsad', $sadik->id, 10);
+        $user = Auth::user();
+        //(показ только плохих или только хороших комментов + JS
+        $procentGood = $procentNeutrally = $procentBad = $modulePosition = $good = $neutrally = $bad = 0;
+        if($items->isNotEmpty()){
+            $modulePosition = floor($items->total() / 2);
+            $procentGood = ($items[0]->good * 100) / ($items[0]->good + $items[0]->neutrally + $items[0]->bad);
+            $procentNeutrally = ($items[0]->neutrally * 100) / ($items[0]->good + $items[0]->neutrally + $items[0]->bad);
+            $procentBad = ($items[0]->bad * 100) / ($items[0]->good + $items[0]->neutrally + $items[0]->bad);
+            $good = $items[0]->good;
+            $neutrally = $items[0]->neutrally;
+            $bad = $items[0]->bad;
+        }
+        $request = Request::instance();
+        $num = $request->input('num');
+        $ratingCount = explode(" ", $commentsTitle);
 
-        $title = $sadik->name.$street.' - '.$comments;
+        $title = $sadik->name.$street.' - '.$commentsTitle;
         $metaDesc = $sadik->title.' ❤️ описание садика ✎ телефоны ☎️ адреса, ОТЗЫВЫ, рейтинг ✅';
         $metaKey = $sadik->title.', телефон, адрес, отзывы';
 
@@ -211,15 +229,28 @@ class DetSadController
             [
                 'url' => $url,
                 'item' => $sadik,
+                'user' => $user,
                 'countImage' => $countImage,
                 'addresses' => $addresses,
                 'fields' => $fields,
                 'statistics' => $statistics,
-                'comments' => $comments,
+                'ratingCount' => $ratingCount,
                 'countAgent' => $countAgent,
                 'title' => $title,
                 'metaDesc' => $metaDesc,
                 'metaKey' => $metaKey,
+                'object_group' => 'com_detsad',
+                'object_id' => $sadik->id,
+                'items' => $items,
+                'countComments' => $items->total(),
+                'num' => $num,
+                'good' => $good,
+                'neutrally' => $neutrally,
+                'bad' => $bad,
+                'procentGood' => $procentGood,
+                'procentNeutrally' => $procentNeutrally,
+                'procentBad' => $procentBad,
+                'modulePosition' => $modulePosition,
             ]);
     }
 

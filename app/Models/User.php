@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
@@ -45,19 +44,19 @@ class User extends Authenticatable
     public static function isAdmin()
     {
         if(Auth::check()){
-            $user = Auth::user();
-            return UserRole::where('user_id', $user->id)->where('role_id', 1)->exists();
-        }else{
-            return false;
+            if(Auth::user()->users_group == 1){
+                return true;
+            }
         }
+        return false;
     }
     public static function isAgent()
     {
         if(Auth::check()){
-            $user = Auth::user();
-            return UserRole::where('user_id', $user->id)->where('role_id', 2)->exists();
-        }else{
-            return false;
+            if(Auth::user()->users_group == 2){
+                return true;
+            }
         }
+        return false;
     }
 }

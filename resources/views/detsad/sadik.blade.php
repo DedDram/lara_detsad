@@ -2,12 +2,19 @@
 @section('styles')
     @parent
     <link href="{{ asset('/css/sadik.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/comments.css') }}" rel="stylesheet">
+    <link href="{{ asset('/css/comments.form.css') }}" rel="stylesheet">
 @endsection
 @section('scripts')
     @parent
     <script
         src="https://api-maps.yandex.ru/2.1/?apikey=067bbf35-de27-4de2-bb1c-72d958556cad&load=package.full&lang=ru-RU"></script>
     <script src="{{ asset('/js/map.js') }}"></script>
+    <script src="{{ asset('/js/comments.js') }}"></script>
+    <script src="{{ asset('/js/jquery.form.js') }}"></script>
+    @if(Auth::check() && Auth::user()->isAdmin())
+    <script src="{{ asset('/js/moderation.js') }}"></script>
+    @endif
 @endsection
 @section('content')
     <div itemscope itemtype="http://schema.org/School">
@@ -18,10 +25,8 @@
             </div>
             <div class="stars" style="float: left;"><label></label><span style="width: {{$item->average*20}}%"></span>
             </div>
-            @php
-                $arr1 = explode(" ", $comments);
-            @endphp
-            <div style="float: left; margin: 8px 0 0 5px;"><span itemprop="ratingCount">{{$arr1[0]}}</span> {{$arr1[1]}}
+            <div style="float: left; margin: 8px 0 0 5px;"><span
+                    itemprop="ratingCount">{{$ratingCount[0]}}</span> {{$ratingCount[1]}}
             </div>
 
             <meta itemprop="itemReviewed" content="{{$item->name}}">
@@ -230,11 +235,24 @@
 
             </div>
         </div>
-
         <div itemscope itemtype="https://schema.org/Review">
             <meta itemprop="itemReviewed" itemscope itemtype="https://schema.org/Organization">
             <meta itemprop="itemReviewed" content="{{$item->name}}">
-            <!-- scomments -->
+            <x-comments
+                :object_group="$object_group"
+                :object_id="$item->id"
+                :items="$items"
+                :countComments="$countComments"
+                :good="$good"
+                :neutrally="$neutrally"
+                :bad="$bad"
+                :procentGood="$procentGood"
+                :procentNeutrally="$procentNeutrally"
+                :procentBad="$procentBad"
+                :modulePosition="$modulePosition"
+                :num="$num"
+                :user="$user"
+            />
         </div>
     </div>
 @endsection

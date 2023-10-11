@@ -1,0 +1,262 @@
+.scomments-form {
+	margin-top: 9px;
+}
+.scomments-form textarea {
+ width: 100%; 
+ height: 150px;
+ border: 1px solid #ccc;
+}
+/* */
+
+@media screen and (max-width: 480px) {
+    .scomments-form .mob-spike {
+        font-size: small;
+		padding-left: 20px;
+    }
+	.scomments-form .colLeft {
+      width: 180px;
+       }
+.scomments-form textarea {
+ width: 98%; 
+   }
+ .subscribe
+              {
+        font-size: 14px !important;
+    }
+ .scomments-form label {
+     font-size: 14px;
+	 }
+}
+
+/* */
+
+/* Blockquote */
+
+.scomments-form blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 5px 12px;
+  padding: 10px 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
+.scomments-form blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+
+/**/
+
+.scomments-form blockquote a {
+  color: #777;
+  text-decoration: none;
+  border: none;
+}
+
+.scomments-form blockquote a:active, .scomments-form blockquote a:focus, .scomments-form blockquote a:hover {
+  color: #cc0000;
+}
+
+.scomments-form blockquote a:link, .scomments-form blockquote a:visited, .scomments-form blockquote a:hover {
+  outline: none;
+}
+
+/**/
+
+.scomments-form #guest_name {
+  border: 1px solid #aaa;
+  margin-top: 3px;
+  padding: 3px;
+  width: 172px;
+}
+
+/* */
+
+.scomments-form .colClear {
+  clear: both;
+  border: 1px dotted #ccc;
+  margin: 10px 0;
+}
+
+.scomments-form .colLeft {
+  width: 180px;
+  float: left;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.scomments-form .colLeft p {
+  margin: 0;
+  padding: 0;
+  color: #777;
+  font-size: 14px;
+  padding-left: 4px;
+}
+
+
+.scomments-form .colRight li h4 {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: normal;
+  color: #444;
+  line-height: 18px;
+}
+
+.scomments-form .colRight ul, .scomments-form .colRight li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: #777;
+}
+
+.scomments-form .colRight li {
+  font-size: 11px;
+  line-height: 14px;
+  margin-bottom: 10px;
+}
+
+.scomments-form .colRight li h4>b {
+  color: #0681CB;
+  padding-right: 4px;
+}
+
+.scomments-form .colRight a:hover {
+  color: #FF1E1E;
+}
+
+.scomments-form .colRight a {
+  color: #1E90FF;
+}
+
+/* */
+
+.scomments-form #slider {
+  margin: 15px 20px 0 20px;
+}
+
+.scomments-form .row-slide img {
+  height: 92px;
+}
+
+.scomments-form .remove-slide {
+  position: absolute;
+  margin: 4px;
+  width: 16px;
+  height: 16px;
+  background-image: url('/media/com_comments/html/images/remove.png');
+}
+
+.scomments-form .row-slide {
+  margin-right: 15px;
+  height: 92px;
+}
+
+/* */
+
+.scomments-form #msg {
+  padding: 7px 7px 6px 7px;
+  margin-bottom: 14px;
+  display: none;
+  border-radius: 4px;
+}
+
+.scomments-form .msg-error {
+	border: 1px solid #cd0a0a;
+    background: #fef1ec;
+    color: #cd0a0a;
+}
+
+.scomments-form .msg-success {
+    border: 1px solid #f1486f;
+    background: #ffedfc;
+    color: #363636;
+}
+
+/* */
+
+.scomments-form #percent {
+  display: none;
+  padding-left: 20px;
+  background: url('/media/com_comments/html/images/loader.gif') left center no-repeat;
+}
+
+.scomments-form .loader {
+  display: none;
+  background: url('/media/com_comments/html/images/loader.gif') left center no-repeat;
+  padding-left: 20px;
+}
+
+.scomments-form form {
+  margin: 0;
+  padding: 0;
+}
+
+.scomments-form label {
+  display: block;
+  margin: 0 0 2px 0;
+  padding-left: 3px;
+  color: #A9A9A9;
+}
+
+.scomments-form h4 {
+  margin: 11px;		
+}
+
+.scomments-form .notice {
+  background-color: #FFDCC6;
+  color: #E63D00;
+  padding: 10px;
+  border-radius: 3px;
+  border: 2px solid #FF4400;
+  margin-top: 17px;
+}
+
+.scomments-form #submit {
+  width: 100%;
+  margin: 15px 0 0 0;
+  border: 1px solid #b8dc3c;
+  background-color: #b8dc3c;
+  color: #fff;
+  padding: 7px 0;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: large;
+}
+
+.scomments-form #submit:hover {
+  background-color: #a6cc27;
+}
+
+.scomments-form .field {
+  border: 1px solid #aaa;
+  margin: 3px 0;
+  padding: 3px;
+  width: 172px;
+  border-radius: 4px;
+}
+
+.scomments-form .starSelect {
+    background-color: #FFF;
+    text-indent: 0.01px;
+    text-overflow: '';
+    height: 35px;
+    line-height: 15px;
+}
+
+.scomments-form header {
+  color: #fff;
+  padding: 7px 10px 7px 10px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  background-position: 9px center;
+  background-repeat: no-repeat;
+  background-color: #b8dc3c;
+}
+

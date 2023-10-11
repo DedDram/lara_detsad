@@ -1,0 +1,396 @@
+.scomments-widget {
+  margin: 0;
+  height: 100%;
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  color: #273337;
+  padding: 0;
+}
+
+.scomments-widget-box {
+  background-color: #fff;
+  margin: 0 20px 20px 20px;
+  padding: 20px;
+  box-shadow: 0 0 10px #949494;
+}
+
+.scomments {
+  color: #3c452d;
+}
+
+.scomments-item {
+  margin: 10px 0;
+  padding: 12px 8px 12px 8px;
+  border: 1px solid #ccc;
+}
+
+.scomments-vote {
+  float: right;
+}
+
+.scomments-country {
+  color: #777;
+}
+
+.scomments-date {
+  color: #777;
+}
+
+.scomments-doctor-name {
+  color: #3366ff;
+  font: bold 1em Verdana,Arial,Sans-Serif
+}
+
+.scomments-user-name {
+  color: #36f;
+  font: bold 1em Verdana, Arial, Sans-Serif;
+}
+
+.scomments-guest-name {
+  color: #3c452d;
+  font: bold 1em Verdana, Arial, Sans-Serif;
+}
+
+.scomments-doctor-pro {
+  color: #3c452d;
+  font: bold 1em Verdana, Arial, Sans-Serif;
+}
+
+/* Blockquote */
+
+blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 5px 12px;
+  padding: 10px 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
+blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+
+/**/
+
+.scomments-item-images-toogle {
+  text-align: center;
+  padding: 10px;
+  background-color: #fff5cc;
+  margin-bottom: 5px;
+  display: block;
+}
+  
+.scomments-item-images {
+  display: none;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.scomments-item-images img {
+  height: 112px;
+  margin: 5px 5px 5px 0;
+}
+
+/**/
+
+.scomments-add {
+    background-color: #f8f8f8;
+    background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#dedede));
+    background-image: -moz-linear-gradient(top,white,#dedede);
+    background-image: -o-linear-gradient(top,white,#dedede);
+    background-image: -ms-linear-gradient(top,white,#dedede);
+    background-image: linear-gradient(top,white,#dedede);
+    border: #CCC solid 1px;
+    border-radius: 3px;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    text-transform: uppercase;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+  color: #e86500;
+  padding: 7px 0;
+  border-radius: 3px;
+  display: block;
+  text-align: center;
+  text-decoration: none !important;
+  font-size: 18px;
+  width: 99%;
+}
+}
+.scomments-add:hover {
+  background-color: #5A77D2;
+}
+
+/**/
+
+.scomments a {
+  color: #777;
+  text-decoration: none;
+  border: none;
+}
+
+.scomments a:active, .scomments a:focus, .scomments a:hover {
+  color: #cc0000;
+}
+
+.scomments a:link, .scomments a:visited, .scomments a:hover {
+  outline: none;
+}
+
+/**/
+
+.scomments-item {
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  border-radius: 7px;
+  width: 98%;
+}
+
+.scomments-text {
+  margin: 7px 0 10px 0;
+  padding-right: 24px;
+}
+
+/**/
+
+.scomments-marker {
+    margin-left: 7px;
+    margin-right: 6px;
+    position: relative;
+    width: 5px;
+    height: 5px;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	border-bottom-right-radius: 0.3em;
+	border-top-right-radius: 0.3em;
+    font-size: 4px;
+    display: inline-block;
+}
+
+.scomments-marker:after{
+    position: absolute;
+    content: "";
+    top: 0.3em;
+    left: 0em;
+    width: 0em;
+    height: 0em;
+    border-top: 0.9em solid rgba(44, 44, 44, 0);
+    border-bottom: 0.9em solid transparent;
+    border-left: 1.4em solid #ccc;
+    -webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);  
+}
+
+.scomments-marker:before{
+    border: 0.5em solid #ccc;
+	content: "";
+	position: absolute;
+    top: -0.8em;
+    left: -1.40em;
+	display: block;
+	width: 1.1em;
+	height: 1.1em;
+	border-radius: 50%;
+}
+
+/**/
+
+.comments-avatar-doctor {
+  margin-top: 3px;
+  float: left;
+}
+
+.comments-avatar-doctor img {
+  width: 28px;
+}
+
+.comments-avatar-registered {
+  margin-top: 9px;
+  float: left;
+  font-size: 18px;
+  top: 0.5em;
+  border-radius: 0.7em 0.7em 0 0;
+  background: #8aa3f0;
+  width: 1.5em;
+  height: 0.8em;
+  position: relative;
+}
+
+.comments-avatar-registered::before {
+  position: absolute;
+  content: "";
+  top: -0.9em;
+  left: 0.38em;
+  width: 0.8em;
+  height: 0.85em;
+  border-radius: 50%;
+  background: #FFDEAD;
+}
+
+.comments-avatar-guest {
+  margin-top: 9px;
+  float: left;
+  font-size: 18px;
+  top: 0.5em;
+  border-radius: 0.7em 0.7em 0 0;
+  background: #ccc;
+  width: 1.5em;
+  height: 0.8em;
+  position: relative;
+}
+.comments-avatar-guest::before {
+  position: absolute;
+  content: "";
+  top: -0.9em;
+  left: 0.38em;
+  width: 0.8em;
+  height: 0.85em;
+  border-radius: 50%;
+  background: #ccc;
+}
+.good_comm .comments-avatar-guest::before,.good_comm .comments-avatar-registered::before {
+  background: #8af78f !important;
+}
+.bad_comm .comments-avatar-guest::before,.bad_comm .comments-avatar-registered::before {
+  background: #f44336 !important;
+}
+@media only screen and (max-device-width: 568px) and (min-device-width: 320px){
+.checked_comm {
+    display: block;
+}
+}
+/**/
+
+.comments-content {
+  margin-left: 34px;
+}
+
+/**/
+
+.scomments-button-edit {
+  margin-left: 10px;
+  float: right;
+}
+
+.scomments-button-quote {
+    text-align: right;
+}
+
+/**/
+
+.scomments-control {
+  margin-top: 5px;
+  padding-top: 7px;
+  border-top: 1px solid #ccc;
+}
+  
+.scomments-control a {
+  display: inline-block;
+  margin: 0 2px 0 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  background-image: url(../images/toolbar.gif);
+}
+
+.scomments-control-msg {
+  display: none;
+  margin: 0 0 10px 0;
+  color: red;
+}
+
+.scomments-control-edit {
+  background-position: 0 0;
+}
+
+.scomments-control-delete {
+  background-position: 0 -16px;
+}
+
+.scomments-control-unpublish {
+  background-position: 0 -32px;
+}
+
+.scomments-control-publish {
+  background-position: 0 -48px;
+}
+
+.scomments-control-blacklist {
+  background-position: 0 -80px;
+}
+
+.scomments-control-ip {
+  vertical-align: top;
+  margin: 0 5px 0 12px;
+}
+
+/**/
+
+.scomments-vote {
+  margin: -5px 0 0 0;
+  text-transform: uppercase;
+}
+
+.scomments-vote-poor span {
+  color: #CC0000;
+  margin-left: 5px;
+}
+
+.scomments-vote-good span {
+  color: #339900;
+  margin-left: 5px;
+}
+
+.scomments-vote a {
+  margin-left: 10px;
+  display: inline-block;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 20px;
+  position: relative;
+  background-color: #F8F8F8;
+  background-image: -webkit-gradient(linear,left top,left bottom,from(white),to(#DEDEDE));
+  background-image: -moz-linear-gradient(top,white,#DEDEDE);
+  background-image: -o-linear-gradient(top,white,#DEDEDE);
+  background-image: -ms-linear-gradient(top,white,#DEDEDE);
+  background-image: linear-gradient(top,white,#DEDEDE);
+  border: #CCC solid 1px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  color: #849B9F;
+  font-weight: bold;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+  text-transform: uppercase;
+  text-decoration: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+  font-size: 10px;
+  padding: 0px 5px;
+  line-height: 19px;
+}
+
+.pagination {margin:10px 0 0 0;padding:0;text-align:center;}
+.pagination .pagenav {font-size:13px;font-family:Arial,sans-serif;margin:-1px 2px -1px 2px;height:15px;padding:5px 15px 5px 15px;cursor:pointer;vertical-align:top;display:inline-block;}
+.pagination a.pagenav {color:#777;background-color:#eee;border:1px solid #d6dadd;text-decoration:none;}
+.pagination span.pagenav {border:1px solid #d6dadd;font-weight:bold;color:inherit;background-color:white;border-bottom-color: white;}

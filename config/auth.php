@@ -95,6 +95,12 @@ return [
         ],
     ],
 
+    'remember' => [
+        'provider' => 'users',
+        'table' => 'password_resets',
+        'expire' => 5256000,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout

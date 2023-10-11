@@ -1,23 +1,42 @@
 <?php
 
 namespace App\View\Components;
-
-use App\Models\Comments\Blacklist;
+use App\Models\User;
 use Illuminate\View\Component;
-
 class Comments extends Component
 {
-    protected string $ip;
-    /**
-     * Create a new component instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->ip = $_SERVER['REMOTE_ADDR'];
-    }
+    public string $object_group;
+    public ?int $object_id;
 
+    public ?object  $items;
+    public ?int $countComments;
+    public ?int $good;
+    public ?int $neutrally;
+    public ?int $bad;
+    public ?float $procentGood;
+    public ?float $procentNeutrally;
+    public ?float $procentBad;
+    public ?int $modulePosition;
+    public ?int $num;
+
+    public ?User $user;
+
+    public function __construct($objectGroup, $objectId, $items, $countComments, $good, $neutrally, $bad, $procentGood, $procentNeutrally, $procentBad, $modulePosition, $num, $user)
+    {
+        $this->object_group = $objectGroup;
+        $this->object_id = $objectId;
+        $this->items = $items;
+        $this->countComments = $countComments;
+        $this->good = $good;
+        $this->neutrally = $neutrally;
+        $this->bad = $bad;
+        $this->procentGood = $procentGood;
+        $this->procentNeutrally = $procentNeutrally;
+        $this->procentBad = $procentBad;
+        $this->modulePosition = $modulePosition;
+        $this->num = $num;
+        $this->user = $user;
+    }
     /**
      * Get the view / contents that represent the component.
      *
@@ -25,7 +44,6 @@ class Comments extends Component
      */
     public function render()
     {
-        $blacklist = Blacklist::getBlacklist($this->ip);
         return view('components.comments');
     }
 }
