@@ -1,25 +1,17 @@
 @extends('layouts')
 @section('scripts')
     @parent
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=067bbf35-de27-4de2-bb1c-72d958556cad&load=package.full&lang=ru-RU"></script>
-    <script src="{{ mix('js/app.js') }}"></script>
+    <script src="{{ mix('/vue.js') }}" defer></script>
+    <script src="{{ mix('js/yandex-map-vue.js') }}" defer></script>
+    <link rel="preconnect" href="//api-maps.yandex.ru">
+    <link rel="dns-prefetch" href="//api-maps.yandex.ru">
 @endsection
 @section('content')
-    <script type="text/javascript">
-            var items = @json($address);
-            ymaps.ready(function () {
-            new Vue({
-                el: '#yandex-map',
-                mounted() {
-                    this.$refs.map.initMap();
-                    this.$refs.map.setClusterer(items);
-                    this.$refs.map.setCenter([items[0].geo_lat, items[0].geo_long], 8);
-                },
-            });
-        });
-    </script>
-    <div id="yandex-map">
-        <yandex-map ref="map"></yandex-map>
+    <div id="app">
+        <script>
+            window.address = @json($address);
+        </script>
+        <yandex-map></yandex-map>
     </div>
     <div>
         {!! $section->text !!}
@@ -33,4 +25,5 @@
         @endforeach
     </ul>
 @endsection
+
 

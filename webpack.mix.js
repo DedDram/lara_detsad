@@ -10,6 +10,19 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
-
-mix.js('resources/js/app.js', 'public/js')
-    .sourceMaps()
+mix.js('resources/js/yandex-map-vue.js', 'public/js')
+    .js('resources/js/search-sadik-in-table.js', 'public/js')
+    .vue()
+    .webpackConfig({
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        name: 'vue',
+                        chunks: 'initial',
+                    },
+                },
+            },
+        },
+    });
