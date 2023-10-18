@@ -12,6 +12,7 @@ const mix = require('laravel-mix');
  */
 mix.js('resources/js/yandex-map-vue.js', 'public/js')
     .js('resources/js/search-sadik-in-table.js', 'public/js')
+    .js('resources/js/map-sadik.js', 'public/js')
     .vue()
     .webpackConfig({
         optimization: {

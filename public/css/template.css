@@ -592,9 +592,6 @@ font-weight: bold;
 
 /* Map toogle */
 
-.map-wrapper {
-    display: none;
-}
 
 .map-wrapper-toogle {
   text-align: center;

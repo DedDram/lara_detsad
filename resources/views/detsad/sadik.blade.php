@@ -7,13 +7,15 @@
 @endsection
 @section('scripts')
     @parent
-    <script
+{{--    <script
         src="https://api-maps.yandex.ru/2.1/?apikey=067bbf35-de27-4de2-bb1c-72d958556cad&load=package.full&lang=ru-RU"></script>
     <script src="{{ asset('/js/map.js') }}"></script>
     <script src="{{ asset('/js/comments.js') }}"></script>
-    <script src="{{ asset('/js/jquery.form.js') }}"></script>
+    <script src="{{ asset('/js/jquery.form.js') }}"></script>--}}
+    <script src="{{ mix('/vue.js') }}" defer></script>
+    <script src="{{ mix('/js/map-sadik.js') }}" defer></script>
     @if(Auth::check() && Auth::user()->isAdmin())
-    <script src="{{ asset('/js/moderation.js') }}"></script>
+    {{--<script src="{{ asset('/js/moderation.js') }}"></script>--}}
     @endif
 @endsection
 @section('content')
@@ -34,8 +36,9 @@
             <meta itemprop="bestRating" content="5"/>
         </div>
 
-        <div class="map-wrapper"></div>
-        <a href="#" class="map-wrapper-toogle">Открыть карту</a>
+        <div id="map-sadik">
+            <map-sadik></map-sadik>
+        </div>
 
         @if (!empty($statistics->infoUp))
             <table class="table-3">
@@ -83,8 +86,7 @@
 
 
         <script type="text/javascript">
-            var item_id = {{$item->id}};
-            var items = @json($addresses);
+            window.address = @json($addresses);
         </script>
 
         {{$item->text ?? ''}}
