@@ -1,8 +1,7 @@
 @extends('layouts')
 @section('scripts')
     @parent
-    <script src="{{ mix('/vue.js') }}" defer></script>
-    <script src="{{ mix('js/yandex-map-vue.js') }}" defer></script>
+    <script src="{{ mix('js/yandex-map.js') }}" defer></script>
     <link rel="preconnect" href="//api-maps.yandex.ru">
     <link rel="dns-prefetch" href="//api-maps.yandex.ru">
 @endsection
@@ -11,7 +10,8 @@
         <script>
             window.address = @json($address);
         </script>
-        <yandex-map></yandex-map>
+        <div id="yandex-map" style="width: 100%; height: 400px;"></div>
+        <div id="cluster-count"></div>
     </div>
     <div>
         {!! $section->text !!}

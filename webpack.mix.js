@@ -10,20 +10,8 @@ const mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
-mix.js('resources/js/yandex-map-vue.js', 'public/js')
-    .js('resources/js/search-sadik-in-table.js', 'public/js')
-    .js('resources/js/map-sadik.js', 'public/js')
-    .vue()
-    .webpackConfig({
-        optimization: {
-            splitChunks: {
-                cacheGroups: {
-                    vendor: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name: 'vue',
-                        chunks: 'initial',
-                    },
-                },
-            },
-        },
-    });
+mix.js('resources/js/yandex-map.js', 'public/js/yandex-map.js')
+mix.js('resources/js/search-sadik-in-table.js', 'public/js/search-sadik-in-table.js')
+mix.js('resources/js/map-sadik.js', 'public/js/map-sadik.js')
+mix.js('resources/js/recaptcha.js', 'public/js/recaptcha.js')
+mix.js('resources/js/simpleModal.js', 'public/js/simpleModal.js')

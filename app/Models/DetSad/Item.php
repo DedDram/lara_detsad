@@ -4,6 +4,7 @@ namespace App\Models\DetSad;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use ReCaptcha\ReCaptcha;
 
 class Item extends Model
 {
@@ -37,19 +38,19 @@ class Item extends Model
         'sid'
     ];
 
-    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias,$sectionName,$categoryName,  $sadId)
+    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sectionName, $categoryName, $sadId)
     {
 
-        if($sectionId >1 && $sectionId < 12){
+        if ($sectionId > 1 && $sectionId < 12) {
             $addresses = DB::table('i1il4_detsad_address AS address')
                 ->select('address.*')
                 ->where('item_id', $sadId)
                 ->orderBy('address.id')
                 ->get();
-            foreach($addresses as $address){
-                    $address->district_link = '<a href="/'.$sectionId.'-'.$sectionAlias.'">'.$sectionName.'</a> / <a href="/'.$sectionId.'-'.$sectionAlias.'/'.$categoryId.'-'.$categoryAlias.'">'.$categoryName.'</a>';
+            foreach ($addresses as $address) {
+                $address->district_link = '<a href="/' . $sectionId . '-' . $sectionAlias . '">' . $sectionName . '</a> / <a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '">' . $categoryName . '</a>';
             }
-        }else{
+        } else {
             $addresses = DB::table('i1il4_detsad_address AS address')
                 ->select('address.*')
                 ->leftJoin('i1il4_detsad_districts AS districts', function ($join) {
@@ -60,14 +61,15 @@ class Item extends Model
                 ->orderBy('address.id')
                 ->get();
 
-            foreach($addresses as $address){
-                if($address->district){
-                    $address->district_link = '<a href="/'.$sectionId.'-'.$sectionAlias.'/'.$categoryId.'-'.$categoryAlias.'/'.$address->district.'">'.$address->d_name.'</a>';
+            foreach ($addresses as $address) {
+                if ($address->district) {
+                    $address->district_link = '<a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '/' . $address->district . '">' . $address->d_name . '</a>';
                 }
             }
         }
         return $addresses;
     }
+
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -114,16 +116,13 @@ class Item extends Model
             ->where('verified', '1')
             ->first();
 
-        if($agent !== null)
-        {
-            if(!empty($agent->position) && !empty($agent->name) && !empty($agent->phone))
-            {
-                $agent->info = "<strong>Должность:</strong> ".$agent->position."<br><strong>ФИО:</strong> ".$agent->name."<br><strong>Телефон:</strong> ".$agent->phone;
+        if ($agent !== null) {
+            if (!empty($agent->position) && !empty($agent->name) && !empty($agent->phone)) {
+                $agent->info = "<strong>Должность:</strong> " . $agent->position . "<br><strong>ФИО:</strong> " . $agent->name . "<br><strong>Телефон:</strong> " . $agent->phone;
             }
-            if(!empty($agent->photo_src))
-            {
-                $agent->img = '<img src="/images/detsad/'.$sadId.'/'.$agent->photo_src.'">';
-            }else{
+            if (!empty($agent->photo_src)) {
+                $agent->img = '<img src="/images/detsad/' . $sadId . '/' . $agent->photo_src . '">';
+            } else {
                 $agent->img = '<img src="/images/no_avatar.gif">';
             }
         }
@@ -145,5 +144,28 @@ class Item extends Model
         return DB::table('i1il4_detsad_images')
             ->where('item_id', $sadId)
             ->count();
+    }
+
+    public static function showTelephoneOrEmail($request): array
+    {
+        $recaptcha = new ReCaptcha('6LdECbcoAAAAAAdNzZnIrlu1Mb-m46jbLx-7Nslo');
+
+        $response = $recaptcha->verify($request->input('code'), $request->ip());
+
+        if ($response->isSuccess()) {
+            $row = DB::table('i1il4_detsad_fields_value')
+                ->select('text')
+                ->where('item_id', $request->input('item_id'))
+                ->where('type_id', $request->input('type_id'))
+                ->first();
+
+            if (!is_null($row)) {
+                return array($row->text);
+            }
+            return array();
+        } else {
+            return $response->getErrorCodes();
+        }
+
     }
 }

@@ -1,4 +1,8 @@
 @extends('layouts')
+@section('meta')
+    @parent
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
 @section('styles')
     @parent
     <link href="{{ asset('/css/sadik.css') }}" rel="stylesheet">
@@ -7,15 +11,11 @@
 @endsection
 @section('scripts')
     @parent
-{{--    <script
-        src="https://api-maps.yandex.ru/2.1/?apikey=067bbf35-de27-4de2-bb1c-72d958556cad&load=package.full&lang=ru-RU"></script>
-    <script src="{{ asset('/js/map.js') }}"></script>
-    <script src="{{ asset('/js/comments.js') }}"></script>
-    <script src="{{ asset('/js/jquery.form.js') }}"></script>--}}
-    <script src="{{ mix('/vue.js') }}" defer></script>
     <script src="{{ mix('/js/map-sadik.js') }}" defer></script>
+    <script src="{{ mix('/js/recaptcha.js') }}" defer></script>
+    <script src="{{ mix('/js/simpleModal.js') }}" defer></script>
     @if(Auth::check() && Auth::user()->isAdmin())
-    {{--<script src="{{ asset('/js/moderation.js') }}"></script>--}}
+        {{--<script src="{{ asset('/js/moderation.js') }}"></script>--}}
     @endif
 @endsection
 @section('content')
@@ -36,8 +36,9 @@
             <meta itemprop="bestRating" content="5"/>
         </div>
 
-        <div id="map-sadik">
-            <map-sadik></map-sadik>
+        <a href="#" class="map-wrapper-toogle" id="mapToggle">Открыть карту</a>
+        <div class="map-wrapper" id="mapWrapper">
+            <div id="map-container" style="width: 100%; height: 200px;display: none"></div>
         </div>
 
         @if (!empty($statistics->infoUp))
@@ -104,7 +105,7 @@
             @endif
         </ul>
 
-        <div style="margin-bottom: 10px;">
+        <div style="margin-bottom: 10px;" id="data">
             <div style="overflow: hidden;">
                 @if(!empty($item->preview_src))
                     <span itemscope itemtype="https://schema.org/ImageObject"><img class="preview-border"
@@ -228,7 +229,7 @@
             <!-- user2 -->
 
             <div style="padding-top: 9px; text-align: left;">
-                <a href="index.php?option=com_post&view=all&format=raw&link=<?php echo $url; ?>&id=<?php echo $item->id; ?>"
+                <a href="/post/error?id=<?php echo $item->id; ?>"
                    class="simplemodal find_error_btn" data-width="450" data-height="430"
                    style="vertical-align: middle;">Ошибка в описании?</a>
 

@@ -10,10 +10,18 @@ use App\Models\DetSad\Item;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
-
+use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Http\Request;
 class DetSadController
 {
+    public function getResponse(Request $request)
+    {
+        $task = $request->input('task');
+        if(!empty($task) && ($task == 'telephone' || $task == 'mail'))
+        {
+            return Item::showTelephoneOrEmail($request);
+        }
+    }
     public function section($sectionId, $sectionAlias)
     {
         $section = Section::query()->find($sectionId);
@@ -217,7 +225,7 @@ class DetSadController
             $neutrally = $items[0]->neutrally;
             $bad = $items[0]->bad;
         }
-        $request = Request::instance();
+        $request = FacadesRequest::instance();
         $num = $request->input('num');
         $ratingCount = explode(" ", $commentsTitle);
 

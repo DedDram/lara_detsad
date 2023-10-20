@@ -5,6 +5,8 @@
     <title>{{ $title ?? $_SERVER['HTTP_HOST'] }}</title>
     <meta name='keywords' content='{{ $metaKey ?? $_SERVER['HTTP_HOST'] }}'/>
     <meta name='description' content='{{ $metaDesc ?? $_SERVER['HTTP_HOST'] }}'/>
+    @section('meta')
+    @show
     @section('styles')
         <link href="{{ asset('/css/template.css') }}" rel="stylesheet">
     @show
