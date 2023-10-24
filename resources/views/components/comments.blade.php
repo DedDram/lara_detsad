@@ -120,31 +120,39 @@
                                 <div class="scomments-item-images"></div>
                             @endif
 
-                            @if(!empty($user->id) && !empty($item->edit) && $user->id == $item->user_id)
-                                <div class="scomments-button-edit"><a href="/comments-edit?item_id={{$item->id}}"
-                                                                      class="scomments-form-toogle">Редактировать
-                                        коментарий</a></div>
+                            @if (Auth::check() && !empty($item->edit) && auth()->id() == $item->user_id)
+                                <div class="scomments-button-edit"><a class="scomments-control-edit" data-task="edit"
+                                                                      data-object-group="{{$item->object_group}}"
+                                                                      data-object-id="{{$item->object_id}}"
+                                                                      data-item-id="{{$item->id}}" href="#">/
+                                        Редактировать отзыв</a>
+                                </div>
                             @endif
-
                             <div class="scomments-button-quote"><a
-                                    href="/comments-response?object_group={{$object_group}}&object_id={{$object_id}}&item_id={{$item->id}}&num={{$item->n}}"
-                                    class="scomments-form-toogle">Ответить</a></div>
-                            @if(Auth::check() && Auth::user()->isAdmin())
+                                    href="?num={{$item->n}}"
+                                    class="scomments-form-toogle scomments-reply">Ответить</a></div>
+                            @if (Auth::check() && Auth::user()->isAdmin())
                                 <div class="scomments-control">
                                     <div class="scomments-control-msg"></div>
-                                    <a class="scomments-form-toogle scomments-control-edit"
-                                       href="/comments-edit?item_id={{$item->id}}"></a>
+                                    <a class="scomments-control-edit" data-task="edit"
+                                       data-object-group="{{$item->object_group}}"
+                                       data-object-id="{{$item->object_id}}"
+                                       data-item-id="{{$item->id}}" href="#"></a>
                                     <a class="scomments-control-delete" data-task="remove"
-                                       data-object-group="{{$object_group}}" data-object-id="{{$object_id}}"
+                                       data-object-group="{{$item->object_group}}"
+                                       data-object-id="{{$item->object_id}}"
                                        data-item-id="{{$item->id}}" href="#"></a>
                                     <a class="scomments-control-unpublish" data-task="unpublish"
-                                       data-object-group="{{$object_group}}" data-object-id="{{$object_id}}"
+                                       data-object-group="{{$item->object_group}}"
+                                       data-object-id="{{$item->object_id}}"
                                        data-item-id="{{$item->id}}" href="#"></a>
                                     <a class="scomments-control-publish" data-task="publish"
-                                       data-object-group="{{$object_group}}" data-object-id="{{$object_id}}"
+                                       data-object-group="{{$item->object_group}}"
+                                       data-object-id="{{$item->object_id}}"
                                        data-item-id="{{$item->id}}" href="#"></a>
                                     <a class="scomments-control-blacklist" data-task="blacklist"
-                                       data-object-group="{{$object_group}}" data-object-id="{{$object_id}}"
+                                       data-object-group="{{$item->object_group}}"
+                                       data-object-id="{{$item->object_id}}"
                                        data-item-id="{{$item->id}}" href="#"></a>
                                     <span class="scomments-control-ip">{{$item->ip}}</span>
                                 </div>
@@ -163,92 +171,115 @@
     @endif
 @endif
 <div class="scomments-anchor"></div>
-<div class="scomments-form" id="#ADD">
-    @if(!empty($blacklist))
-        <h3>Доступ с данного IP заблокирован</h3>
-        <p>Если вы считаете, что это произошло по ошибке - напишите на info@detskysad.com и укажите свой ip</p>
+<div class="scomments-form" id="ADD">
+    @if (!empty($blacklist))
+        <h3>Администратор заблокировал возможность написания отзывов с этого IP - {{$_SERVER['REMOTE_ADDR']}}</h3>
+        <p>Если вы считаете, что это произошло по ошибке - напишите на info@v-u-z.ru и укажите свой ip</p>
     @else
-        <header>Добавить отзыв</header>
-        <div id="msg"></div>
-        <div id="wrapper">
-            <form id="myform" method="post">
-                @if(empty($rate))
-                    <div class="colLeft mob-spike">
-                        <label>Проголосуйте</label>
-                        <p>Вы еще не голосовали</p>
-                    </div>
-                    <div class="colRight">
-                        <select name="star" class="starSelect">
-                            <option value="0">выберите оценку ▼</option>
-                            <option value="1">Ужасно</option>
-                            <option value="2">Плохо</option>
-                            <option value="3">Удовлетворительно</option>
-                            <option value="4">Хорошо</option>
-                            <option value="5">Отлично</option>
-                        </select>
-                    </div>
-                    <div class="colClear"></div>
-                @endif
-                @if(empty($user->id))
-                    <div class="colLeft">
-                        <input type="text" name="username" id="username" placeholder="Ваше имя" value="" class="field">
-                        <input type="text" name="email" id="email" placeholder="Ваш E-mail" value="" class="field">
-                    </div>
-                    <div class="colRight mob-spike">
-                        <ul>
-                            <li>
-                                <h4>Вы не авторизованы</h4>
-                                Введите ваши данные для обратной связи
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="colClear"></div>
-                @endif
-
-                <ul class="mob-spike">
-                    <li>Пишите развернутые отзывы, максимально описывая Вашу ситуацию.</li>
-                    <li>Отзывы с оскорблениями будут удалены!</li>
-                    <li><span style="color: #f77e02;"><strong>Запрещается копировать отзывы и стихи/поздравления с других сайтов</strong></span>
-                        (неужели сами написать не можете?) - <strong>они будут удалены</strong>!
-                    </li>
-                </ul>
-                    <textarea id="description" name="description" style="width: 99%; height: 150px;"></textarea>
-
-                @if(Auth::check())
-                    <div style="margin: 10px 0;">
-                        @if(!empty($subscribe))
-                            <input type="checkbox" name="subscribe" value="1" checked="checked"> Вы подписаны на уведомления о новых отзывах
-                        @else
-                            <input type="checkbox" name="subscribe" value="1"> Подписаться на уведомления о новых отзывах
-                        @endif
-                    </div>
-                @endif
-                <input type="hidden" name="task" value="create">
-                <input type="hidden" name="object_group" value="{{$object_group}}">
-                <input type="hidden" name="object_id" value="{{$object_id}}">
-            </form>
-            <div class="colClear"></div>
-            <div id="slider">
-                @if(!empty($images))
-                    @foreach($images as $image)
-                        <div class="row-slide">
-                            <a href="#" data-id="{{$image->id}}" class="remove-slide"></a>
-                            <img src="/images/comments/{{$image->thumb}}" alt="">
+        @if (!empty($comments->reviews))
+            <h3>Отзывы анонимных пользователей отключены</h3>
+            <p>{{$comments->reviews}}</p>
+        @else
+            <header>Добавить отзыв</header>
+            <div id="msg"></div>
+            <div id="wrapper">
+                <form id="myform" method="post" action="/post/comment">
+                    @if (empty($comments->rate))
+                        <div class="colLeft mob-spike">
+                            <label>Проголосуйте</label>
+                            <p>Вы еще не голосовали</p>
                         </div>
-                    @endforeach
-                @endif
-            </div>
-            <label>Если хотите, можете добавить к своему отзыву фото</label>
-            <form id="upload" action="/index.php" method="post" enctype="multipart/form-data">
-                <input type="file" name="myfile" id="myfile"> <span id="percent">0%</span>
-                <input type="hidden" name="option" value="com_comments">
-                <input type="hidden" name="view" value="images">
-                <input type="hidden" name="format" value="json">
-                <input type="hidden" name="task" value="add">
-            </form>
+                        <div class="colRight">
+                            <select name="star" class="starSelect">
+                                <option value="0">выберите оценку ▼</option>
+                                <option value="1">Ужасно</option>
+                                <option value="2">Плохо</option>
+                                <option value="3">Удовлетворительно</option>
+                                <option value="4">Хорошо</option>
+                                <option value="5">Отлично</option>
+                            </select>
+                        </div>
+                        <div class="colClear"></div>
+                    @endif
 
-            <input type="submit" name="submit" id="submit" value="Опубликовать отзыв">
-        </div>
+                    @if(!Auth::check())
+                        <div class="colLeft">
+                            <input type="text" name="username" id="username" placeholder="Ваше имя" value=""
+                                   class="field">
+                            <input type="text" name="email" id="email" placeholder="Ваш E-mail" value="" class="field">
+                        </div>
+                        <div class="colRight mob-spike">
+                            <ul>
+                                <li>
+                                    <h4>Вы не авторизованы</h4>
+                                    Введите ваши данные для обратной связи
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="colClear"></div>
+                    @endif
+                    <ul class="mob-spike">
+                        <li>Пишите развернутые отзывы, максимально описывая Вашу ситуацию.</li>
+                        <li>Отзывы с оскорблениями будут удалены!</li>
+                        <li>Запрещается копировать отзывы и стихи с других сайтов - они будут удалены!</li>
+                        @if(Auth::check())
+                            <li>С момента написания отзыва, у вас будет 15 минут, в течение которых вы сможете его
+                                отредактировать.
+                            </li>
+                        @endif
+                        @if(Auth::check() && Auth::user()->isAgent())
+                            <li><b>Не нужно писать шаблонные отзывы</b>, например "Спасибо за ваш отзыв...", отвечайте
+                                только когда это действительно необходимо.
+                            </li>
+                        @endif
+                    </ul>
+                    <textarea id="description" name="description" style="width: 99%; height: 150px;"></textarea>
+                    @if(Auth::check())
+                        <div style="margin: 10px 0;">
+                            @if (!empty($comments->subscribe))
+                                <input type="checkbox" name="subscribe" value="1"
+                                       checked="checked"> Вы подписаны на уведомления о новых отзывах
+                            @else
+                                <input type="checkbox" name="subscribe"
+                                       value="1"> Подписаться на уведомления о новых отзывах
+                            @endif
+                        </div>
+                    @endif
+                    @php
+                        $attach = md5(uniqid('1'));
+                    @endphp
+                    <input type="hidden" id="task1" name="task" value="create">
+                    <input type="hidden" name="item_id" value="">
+                    <input type="hidden" name="object_group" value="{{$object_group}}">
+                    <input type="hidden" name="object_id" value="{{$object_id}}">
+                    <input type="hidden" name="attach" value="{{$attach}}">
+                </form>
+                <div class="colClear"></div>
+                <div id="slider">
+                    @if (!empty($comments->images))
+                        @foreach ($comments->images as $image)
+                            <div class="row-slide">
+                                <a href="#" data-id="{{$image->id}}" data-attach="{{$attach}}"
+                                   class="remove-slide"></a>
+                                <img src="/images/comments/{{$image->thumb}}">
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+                <label>Если хотите, можете добавить к своему отзыву фото</label>
+                <form id="upload" action="/post/comment" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" id="file"> <span id="percent">0%</span>
+                    <input type="hidden" name="option" value="com_comments">
+                    <input type="hidden" name="view" value="images">
+                    <input type="hidden" name="format" value="json">
+                    <input type="hidden" id="task2" name="task" value="add">
+                    <input type="hidden" name="attach" value="{{$attach}}>">
+                    <input type="hidden" name="item_id" value="">
+                </form>
+                <div id="loader" style="text-align: center"></div>
+                <input type="submit" name="submit" id="submit" value="Опубликовать отзыв">
+            </div>
+        @endif
     @endif
 
 

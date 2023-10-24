@@ -14,8 +14,9 @@
     <script src="{{ mix('/js/map-sadik.js') }}" defer></script>
     <script src="{{ mix('/js/recaptcha.js') }}" defer></script>
     <script src="{{ mix('/js/simpleModal.js') }}" defer></script>
+    <script src="{{ mix('/js/comments.js') }}" defer></script>
     @if(Auth::check() && Auth::user()->isAdmin())
-        {{--<script src="{{ asset('/js/moderation.js') }}"></script>--}}
+        <script src="{{ asset('/js/moderation.js') }}" defer></script>
     @endif
 @endsection
 @section('content')
@@ -193,35 +194,35 @@
                         @endif
                     @endif
                 @endforeach
+                    <div style="margin-bottom: 13px;">
+                        <span style="color: #E86500; font-weight: bold;">Диплом для сайта садика:</span>
+                        <?php if (in_array($item->section_id, array(1, 2, 17, 20, 21))): ?>
+                        <span class="top_detsad_diploma_cell"><a
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-id=<?php echo $item->id; ?>"
+                                title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
+                        стране), <span class="top_detsad_diploma_cell"><a
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
+                                title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
+                        городу)
+                        <?php endif; ?>
+                        <?php if (in_array($item->section_id, array(3, 4, 5, 6, 7, 8, 9, 10, 11))): ?>
+                        <span class="top_detsad_diploma_cell"><a
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
+                                title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
+                        городу), <span class="top_detsad_diploma_cell"><a
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
+                                title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
+                        району)
+                        <?php endif; ?>
+                        <?php if ($item->section_id == 14): ?>
+                        <span class="top_detsad_diploma_cell"><a
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
+                                title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
+                        округу)
+                        <?php endif; ?>
+                    </div>
             </div>
 
-            <div style="margin-bottom: 13px;">
-                <span style="color: #E86500; font-weight: bold;">Диплом для сайта садика:</span>
-                <?php if (in_array($item->section_id, array(1, 2, 17, 20, 21))): ?>
-                <span class="top_detsad_diploma_cell"><a
-                        href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-id=<?php echo $item->id; ?>"
-                        title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
-                стране), <span class="top_detsad_diploma_cell"><a
-                        href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
-                        title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
-                городу)
-                <?php endif; ?>
-                <?php if (in_array($item->section_id, array(3, 4, 5, 6, 7, 8, 9, 10, 11))): ?>
-                <span class="top_detsad_diploma_cell"><a
-                        href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
-                        title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
-                городу), <span class="top_detsad_diploma_cell"><a
-                        href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
-                        title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
-                району)
-                <?php endif; ?>
-                <?php if ($item->section_id == 14): ?>
-                <span class="top_detsad_diploma_cell"><a
-                        href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
-                        title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
-                округу)
-                <?php endif; ?>
-            </div>
 
 
             <div id="panel-m"></div>

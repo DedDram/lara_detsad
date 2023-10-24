@@ -15,3 +15,5 @@ mix.js('resources/js/search-sadik-in-table.js', 'public/js/search-sadik-in-table
 mix.js('resources/js/map-sadik.js', 'public/js/map-sadik.js')
 mix.js('resources/js/recaptcha.js', 'public/js/recaptcha.js')
 mix.js('resources/js/simpleModal.js', 'public/js/simpleModal.js')
+mix.js('resources/js/moderation.js', 'public/js/moderation.js')
+mix.js('resources/js/comments.js', 'public/js/comments.js')

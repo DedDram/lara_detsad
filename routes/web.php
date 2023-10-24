@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\DetSadController;
 use App\Http\Controllers\ErrorController;
+use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -54,3 +55,5 @@ Route::middleware('redirect.old')->group(function () {
 
 //Нашли ошибку
 Route::any('/post/error', [ErrorController::class, 'getResponse']);
+//Комменты
+Route::post('/post/comment', [PostCommentsController::class, 'getResponse']);
