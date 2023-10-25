@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var description = document.getElementById('description');
         var task1 = document.getElementById('task1');
         var task2 = document.getElementById('task2');
+        var item_id_form = document.querySelector('#myform input[name="item_id"]');
         description.value = text;
         var el = document.getElementById('slider');
         var xhr = new XMLHttpRequest();
@@ -47,8 +48,9 @@ document.addEventListener("DOMContentLoaded", function () {
         form.querySelector('header').textContent = "Редактировать отзыв";
         task1.value = 'edit';
         task2.value = 'add';
+        item_id_form.value = item_id;
         var formData = new FormData();
-        formData.append('task', 'cut');
+        formData.append('task', 'images');
         formData.append('id', item_id);
 
         xhr.onload = function () {

@@ -29,10 +29,10 @@ class PostCommentsController extends Controller
         if (!empty($request->input('object_group') && ($request->input('object_group') === 'com_content' || $request->input('object_group') === 'com_detsad'))) {
             $this->object_group = $request->input('object_group');
         }
-        if (!empty($_POST['object_id'])) {
+        if (!empty($request->input('object_id'))) {
             $this->object_id = (int) $request->input('object_id');
         }
-        if (!empty($_POST['item_id'])) {
+        if (!empty($request->input('item_id'))) {
             $this->comment_id = (int) $request->input('item_id');
         }
         $this->comments = new Comments;
@@ -62,8 +62,8 @@ class PostCommentsController extends Controller
         if ($task == 'votes') {
             $data = $this->comments->votes($request);
         }
-        if ($task == 'cut') {
-            $data = $this->comments->cut($request);
+        if ($task == 'images') {
+            $data = $this->comments->getImagesComment($request);
         }
         if ($task == 'add') {
             $data = $this->comments->addImage($request);
@@ -72,13 +72,13 @@ class PostCommentsController extends Controller
             $data = $this->comments->removeImage($request);
         }
 
-        if (Auth::user()) {
+        if (Auth::check()) {
             if (User::isAdmin()) {
                 if ($task == 'publish') {
                     $data = $this->comments->publishItems($this->comment_id);
                 }
                 if ($task == 'unpublish') {
-                    $data = $this->comments->unpublishItems($this->comment_id);
+                    $data = $this->comments->unPublishItems($this->comment_id);
                 }
                 if ($task == 'remove') {
                     $data = $this->comments->remove($this->comment_id);
@@ -91,14 +91,19 @@ class PostCommentsController extends Controller
                 $data = $this->comments->unsubscribe($this->object_group, $this->object_id, Auth::id());
             }
             if ($task == 'edit') {
-                $data = $this->comments->edit($this->comment_id, $request);
+                $validatorData = $this->validateUserData($request);
+                if ($validatorData['status'] === 2) {
+                    return response()->json($validatorData);
+                } else {
+                    $data = $this->comments->edit($this->comment_id, $request);
+                }
             }
         }
 
         return response()->json($data);
     }
 
-    private function validateUserData(Request $request)
+    private function validateUserData(Request $request): array
     {
         $rules = [
             'description' => 'required|string|min:100|latin_characters|no_spam_links',
@@ -129,7 +134,9 @@ class PostCommentsController extends Controller
                 'msg' => $validator->errors()->first(),
             ];
         } else {
-            return true;
+            return [
+                'status' => 1
+            ];
         }
     }
 }

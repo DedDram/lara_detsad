@@ -72,9 +72,7 @@
                             $smile = '😡';
                         @endphp
                     @endif
-
-                    <div
-                        class="scomments-item {{$styleComments}}"{{(!empty($item->status)) ? '': ' style="background-color: #ffebeb;"'}}>
+                        <div class="scomments-item {{$styleComments}}"{!! !empty($item->status) ? '' : ' style="background-color: #ffebeb;"' !!}>
                         @if(!empty($item->registered))
                             <div class="comments-avatar-registered"
                                  title="{{$text_title}} зарегистрированного пользователя"></div>
@@ -173,8 +171,8 @@
 <div class="scomments-anchor"></div>
 <div class="scomments-form" id="ADD">
     @if (!empty($blacklist))
-        <h3>Администратор заблокировал возможность написания отзывов с этого IP - {{$_SERVER['REMOTE_ADDR']}}</h3>
-        <p>Если вы считаете, что это произошло по ошибке - напишите на info@v-u-z.ru и укажите свой ip</p>
+        <h3>Администратор заблокировал возможность написания отзывов с этого IP - {{request()->ip()}}</h3>
+        <p>Если вы считаете, что это произошло по ошибке - напишите на info@detskysad.com и укажите свой ip</p>
     @else
         @if (!empty($comments->reviews))
             <h3>Отзывы анонимных пользователей отключены</h3>

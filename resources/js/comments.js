@@ -13,8 +13,7 @@ const comments = (function () {
                     xhr.open('POST', '/post/comment', true);
                     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
                     const formData = new FormData();
-                    formData.append('view', 'images');
-                    formData.append('task', 'cut');
+                    formData.append('task', 'images');
                     formData.append('id', id);
                     xhr.onload = function () {
                         if (xhr.status === 200) {
@@ -71,7 +70,7 @@ const comments = (function () {
                     const link = this.getAttribute('href').replace(/\?num=/g, '#');
                     const description = document.getElementById('description');
                     text2 = text2.replace(/(\r\n|\n|\r|<br>|<br \/>|)/gm, "");
-                    description.value = '<blockquote>' + link + text2 + '</blockquote';
+                    description.value = '<blockquote>' + link + text2 + '</blockquote>';
                     window.scrollTo({
                         top: description.offsetTop,
                         behavior: "smooth"

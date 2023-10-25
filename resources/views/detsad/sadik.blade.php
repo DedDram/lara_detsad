@@ -31,17 +31,14 @@
             <div style="float: left; margin: 8px 0 0 5px;"><span
                     itemprop="ratingCount">{{$ratingCount[0]}}</span> {{$ratingCount[1]}}
             </div>
-
             <meta itemprop="itemReviewed" content="{{$item->name}}">
             <meta itemprop="worstRating" content="1"/>
             <meta itemprop="bestRating" content="5"/>
         </div>
-
         <a href="#" class="map-wrapper-toogle" id="mapToggle">Открыть карту</a>
         <div class="map-wrapper" id="mapWrapper">
             <div id="map-container" style="width: 100%; height: 200px;display: none"></div>
         </div>
-
         @if (!empty($statistics->infoUp))
             <table class="table-3">
                 <thead>
@@ -110,15 +107,16 @@
             <div style="overflow: hidden;">
                 @if(!empty($item->preview_src))
                     <span itemscope itemtype="https://schema.org/ImageObject"><img class="preview-border"
+                                                                                   style="width: {{$widthImage}}px;height: {{$heightImage}}px"
                                                                                    alt="{{$item->preview_alt}}"
                                                                                    title="{{$item->preview_title}}"
                                                                                    src="/images/detsad/{{$item->id}}/{{$item->preview_src}}"
                                                                                    itemprop="contentUrl"></span>
                 @else
                     <span class="zaglushka">
-                            <a href="/index.php?option=com_detsad&view=gallery&format=raw&tpl=form&item_id={{$item->id}}"
-                               class="simplemodal" data-width="540" data-height="320">
-                            <img class="foto" style="float: right;" src="/images/detsad.jpg">
+                            <a href="/add-photo?item_id={{$item->id}}&task=photo"
+                               class="simplemodal" data-width="450" data-height="430">
+                            <img class="foto" style="float: right;width: {{$widthImage}}px;height: {{$heightImage}}px" src="/images/detsad.jpg">
                             </a>
                             </span>
                 @endif
@@ -196,46 +194,40 @@
                 @endforeach
                     <div style="margin-bottom: 13px;">
                         <span style="color: #E86500; font-weight: bold;">Диплом для сайта садика:</span>
-                        <?php if (in_array($item->section_id, array(1, 2, 17, 20, 21))): ?>
+                        @if (in_array($item->section_id, array(1, 2, 17, 20, 21)))
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-id=<?php echo $item->id; ?>"
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         стране), <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         городу)
-                        <?php endif; ?>
-                        <?php if (in_array($item->section_id, array(3, 4, 5, 6, 7, 8, 9, 10, 11))): ?>
+                        @endif
+                        @if (in_array($item->section_id, array(3, 4, 5, 6, 7, 8, 9, 10, 11)))
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id=<?php echo $item->id; ?>"
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         городу), <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         району)
-                        <?php endif; ?>
-                        <?php if ($item->section_id == 14): ?>
+                        @endif
+                        @if ($item->section_id == 14)
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id=<?php echo $item->id; ?>"
+                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         округу)
-                        <?php endif; ?>
+                        @endif
                     </div>
             </div>
-
-
-
             <div id="panel-m"></div>
-
             <!-- user2 -->
-
             <div style="padding-top: 9px; text-align: left;">
-                <a href="/post/error?id=<?php echo $item->id; ?>"
+                <a href="/post/error?id={{$item->id}}"
                    class="simplemodal find_error_btn" data-width="450" data-height="430"
                    style="vertical-align: middle;">Ошибка в описании?</a>
-
                 <span
-                    class="scomments-date created">Данные обновлены: <?php echo explode(' ', $item->modified)[0]; ?></span><br>
+                    class="scomments-date created">Данные обновлены: {{explode(' ', $item->modified)[0]}}</span><br>
 
             </div>
         </div>

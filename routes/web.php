@@ -42,6 +42,7 @@ Route::get('/street/{category_id}-{category_alias}', [DetSadController::class, '
 Route::get('/street/{category_id}-{category_alias}/{street_alias}', [DetSadController::class, 'street'])->where(['category_id' => '[0-9]+','category_alias' => '[a-z0-9-]+', 'street_alias' => '[a-z0-9-]+']);
 Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}', [DetSadController::class, 'sadik'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
 Route::post('/detsad-post', [DetSadController::class, 'getResponse']);
+Route::any('/add-photo', [DetSadController::class, 'getResponse']);
 //Садики старые url
 Route::middleware('redirect.old')->group(function () {
     Route::get('/detskie-sady/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);

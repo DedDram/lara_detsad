@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Blacklist extends Model
 {
-    protected $table = 'i1il4_comments_items';
+    protected $table = 'i1il4_comments_blacklist';
     protected $primaryKey = 'id';
     protected $fillable = ['created', 'ip'];
 
 
-    public static function getBlacklist(string $ip)
+    public static function getBlacklist(string $ip): bool
     {
-        return self::where('ip', $ip)
+        $count = self::where('ip', $ip)
             ->where('created', '>', now()->subDay())
-            ->exists();
+            ->count();
+        return $count > 0;
     }
 
 }

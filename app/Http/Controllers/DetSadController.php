@@ -10,8 +10,11 @@ use App\Models\DetSad\Item;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
+
 class DetSadController
 {
     public function getResponse(Request $request)
@@ -21,6 +24,35 @@ class DetSadController
         {
             return Item::showTelephoneOrEmail($request);
         }
+        if(!empty($task) && ($task == 'photo')){
+            if ($request->isMethod('get')) {
+                return view('detsad.addPhoto', ['item_id'=> $request->query('item_id')]);
+            } else {
+                $id = $request->input('item_id');
+                $file = $request->file('file');
+
+                $messageText = 'Добавлено фото к садику id=' . $id;
+                $subject = 'Добавлено фото к садику id=' . $id;
+
+                Mail::send([], [], function ($message) use ($subject, $messageText, $file) {
+                    $message->to(config('mail.from.address'))
+                        ->subject($subject)
+                        ->setBody($messageText, 'text/html');
+
+                    if ($file) {
+                        // Прикрепляем файл к письму
+                        $message->attach($file->getRealPath(), [
+                            'as' => $file->getClientOriginalName(),
+                            'mime' => $file->getMimeType(),
+                        ]);
+                    }
+                });
+
+                $data = ['msg' => 'Ваше сообщение успешно отправлено'];
+                return response()->json($data);
+            }
+        }
+
     }
     public function section($sectionId, $sectionAlias)
     {
@@ -228,6 +260,22 @@ class DetSadController
         $request = FacadesRequest::instance();
         $num = $request->input('num');
         $ratingCount = explode(" ", $commentsTitle);
+        if(!empty($sadik->preview_src)){
+            $imagePath = '/images/detsad/' . $sadik->id . '/' . $sadik->preview_src;
+            $fullPath = public_path($imagePath);
+
+            if (file_exists($fullPath)) {
+                $image = Image::make($fullPath);
+                $widthImage = $image->width();
+                $heightImage = $image->height();
+            } else{
+                $widthImage = 220;
+                $heightImage = 165;
+            }
+        }else{
+            $widthImage = 220;
+            $heightImage = 165;
+        }
 
         $title = $sadik->name.$street.' - '.$commentsTitle;
         $metaDesc = $sadik->title.' ❤️ описание садика ✎ телефоны ☎️ адреса, ОТЗЫВЫ, рейтинг ✅';
@@ -238,6 +286,8 @@ class DetSadController
                 'url' => $url,
                 'item' => $sadik,
                 'user' => $user,
+                'widthImage' => $widthImage,
+                'heightImage' => $heightImage,
                 'countImage' => $countImage,
                 'addresses' => $addresses,
                 'fields' => $fields,

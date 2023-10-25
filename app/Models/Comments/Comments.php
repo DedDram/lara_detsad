@@ -25,7 +25,7 @@ class Comments extends Model
         parent::__construct($attributes);
 
         // Получаем текущего авторизованного пользователя (если он есть)
-        if(Auth::check()){
+        if (Auth::check()) {
             $this->user = Auth::user();
             $this->user_id = Auth::id();
         } else {
@@ -34,6 +34,7 @@ class Comments extends Model
 
         $this->dir = 'public/images/comments';
     }
+
     public static function getCommentUser(int $user_id)
     {
         return self::where('user_id', $user_id)
@@ -98,9 +99,9 @@ class Comments extends Model
         return $items;
     }
 
-    private static function getBlacklist(): bool
+    private static function getBlacklist($request): bool
     {
-        $ip = ip2long($_SERVER['REMOTE_ADDR']);
+        $ip = $request->ip();
         $blacklist = DB::table('i1il4_comments_blacklist')
             ->select(DB::raw('COUNT(*) as ban'))
             ->where('ip', '=', $ip)
@@ -115,10 +116,10 @@ class Comments extends Model
 
     public function create($request): array
     {
-        $rate = (int) $request->input('star');
+        $rate = (int)$request->input('star');
         if (empty($this->user)) {
             $username = self::input($request->input('username'));
-            $email = (string) $request->input('email');
+            $email = (string)$request->input('email');
         } else {
             $username = $this->user->name;
             $email = $this->user->email;
@@ -126,11 +127,11 @@ class Comments extends Model
         if (!empty($request->input('subscribe'))) {
             $subscribe = $request->input('subscribe');
         }
-        $description = (string) $request->input('description');
-        $attach = (string) $request->input('attach');
+        $description = (string)$request->input('description');
+        $attach = (string)$request->input('attach');
 
         // Проголосовать можно один раз
-        $temp = $this->getRate();
+        $temp = $this->getRate($request);
         if (empty($temp->itog) && ($rate < 1 || $rate > 5)) {
             return array(
                 'status' => 2,
@@ -138,7 +139,7 @@ class Comments extends Model
             );
         }
         // Проверка отзыва
-        $comment = self::_clearComment($description);
+        $description = self::_clearComment($description);
 
         // Фильтр
         $username = self::input($username);
@@ -148,19 +149,19 @@ class Comments extends Model
         //удаляем <br> в начале отзыва
         $description = preg_replace('~^(<br>|<br />|<br/>){1,}(.*)$~ms', '$2', $description);
 
-        try {
+        //try {
             $item = [
                 'created' => now(),
-                'object_group' => $this->object_group,
-                'object_id' => $this->object_id,
+                'object_group' => $request->input('object_group'),
+                'object_id' => $request->input('object_id'),
                 'user_id' => $this->user_id,
-                'ip' => $this->ip,
+                'ip' => $request->ip(),
                 'username' => $username,
                 'rate' => $rate,
                 'description' => $description,
                 'email' => $email,
             ];
-            DB::table('i1il4_comments_items')->insert($item);
+            self::insert($item);
             // Получить последний вставленный ID
             $item_id = DB::getPdo()->lastInsertId();
 
@@ -176,22 +177,22 @@ class Comments extends Model
                         ->where('item_id', $item_id)
                         ->count()
                 ]);
-        } catch (QueryException $e) {
+        /*} catch (QueryException $e) {
             return array(
                 'status' => 2,
                 'msg' => 'Удалите из отзыва специальные символы (смайлики и т.п.), оставьте просто текст.'
             );
-        }
+        }*/
         if (!empty($this->user_id)) {
             // Публикуем
             self::publishItems($item_id);
             // Подписываемся
             if (!empty($subscribe)) {
-                self::subscribe($this->object_group, $this->object_id, $this->user_id);
+                self::subscribe($request->input('object_group'), $request->input('object_id'), $this->user_id);
             }
         }
         // Уведомление админу
-        self::setNotification($this->object_group, $this->object_id, $item_id, 2);
+        self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
 
         if (!empty($this->user_id)) {
             return array(
@@ -206,59 +207,45 @@ class Comments extends Model
         }
     }
 
-    public function edit(int $comment_id,Request $request): array
+    public function edit(int $comment_id, Request $request): array
     {
-        $description = (string) $request->input('description');
-        $attach = (string) $request->input('attach');
-        if (!empty($this->user_id)) {
-            $temp = DB::table('i1il4_comments_items')
-                ->select('*')
+        $description = (string)$request->input('description');
+        $attach = (string)$request->input('attach');
+
+        $result = DB::table('i1il4_comments_items')
+            ->select('*')
+            ->where('id', '=', $comment_id)
+            ->where('user_id', '=', $this->user_id)
+            ->where(DB::raw('DATE_ADD(created, INTERVAL 15 MINUTE)'), '>', 'NOW()')
+            ->first();
+
+        if ($result !== null || User::isAdmin()) {
+            // Проверка отзыва
+            $description = self::_clearComment($description);
+            $description = self::input($description);
+
+            DB::table('i1il4_comments_items')
                 ->where('id', '=', $comment_id)
-                ->where('user_id', '=', $this->user_id)
-                ->where(DB::raw('DATE_ADD(created, INTERVAL 15 MINUTE)'), '>', 'NOW()')
-                ->first();
-
-            if (!empty($temp) || User::isAdmin()) {
-                // Проверка отзыва
-                $comment = self::_clearComment($description);
-                if (!empty($comment)) {
-                    if (strlen($comment) < 50) {
-                        return array(
-                            'status' => 2,
-                            'msg' => 'Минимальная длина отзыва - 50 символов'
-                        );
-                    }
-                } else {
-                    return array(
-                        'status' => 2,
-                        'msg' => 'Пожалуйста, введите текст отзыва'
-                    );
-                }
-                $description = self::input($description);
-
-                DB::table('i1il4_comments_items')
-                    ->where('id', '=', $comment_id)
-                    ->update(['description' => $description]);
-                DB::table('i1il4_comments_images')
-                    ->where('item_id', '=', 0)
-                    ->where('attach', '=', $attach)
-                    ->update(['item_id' => $comment_id]);
-                DB::table('i1il4_comments_items')
-                    ->where('id', '=', $comment_id)
-                    ->update(['images' => DB::table('i1il4_comments_images')->where('item_id', '=', $comment_id)->count()]);
-                return array(
-                    'status' => 1,
-                    'msg' => 'Спасибо, ваш отзыв сохранен, перезагрузите страницу.'
-                );
-            }
+                ->update(['description' => $description]);
+            DB::table('i1il4_comments_images')
+                ->where('item_id', '=', 0)
+                ->where('attach', '=', $attach)
+                ->update(['item_id' => $comment_id]);
+            DB::table('i1il4_comments_items')
+                ->where('id', '=', $comment_id)
+                ->update(['images' => DB::table('i1il4_comments_images')->where('item_id', '=', $comment_id)->count()]);
+            return array(
+                'status' => 1,
+                'msg' => 'Спасибо, ваш отзыв сохранен, перезагрузите страницу.'
+            );
         }
         return array(
-            'status' => 1,
-            'msg' => 'Ошибка доступа'
+            'status' => 2,
+            'msg' => 'Ошибка сохранения!'
         );
     }
 
-    public function unpublishItems(int $comment_id): array
+    public function unPublishItems(int $comment_id): array
     {
         if (!empty($comment_id)) {
             $items = DB::table('i1il4_comments_items')
@@ -309,7 +296,7 @@ class Comments extends Model
                 self::setNotification($item->object_group, $item->object_id, $item->id, 1);
                 // Добавляем страницу на переобход роботом
                 $temp = self::getItem($item->object_group, $item->object_id);
-                self::YandexWebmasterOverride('https://v-u-z.ru' . $temp['url']);
+                self::YandexWebmasterOverride(env('APP_URL') . $temp['url']);
             }
             return array(
                 'msg' => 'Комментарий опубликован'
@@ -320,22 +307,23 @@ class Comments extends Model
         );
     }
 
-    public function blacklist($comment_id): array
+    public function blacklist(int $comment_id): array
     {
         if (!empty($comment_id)) {
             $comment = DB::table('i1il4_comments_items')
                 ->where('id', $comment_id)
                 ->select('ip')
                 ->first();
-
-            DB::table('i1il4_comments_blacklist')
-                ->updateOrInsert(
-                    ['ip' => $comment->ip],
-                    ['created' => now()]
+            if($comment->ip !== null){
+                DB::table('i1il4_comments_blacklist')
+                    ->updateOrInsert(
+                        ['ip' => $comment->ip],
+                        ['created' => now()]
+                    );
+                return array(
+                    'msg' => 'IP добавлен в черный список'
                 );
-            return array(
-                'msg' => 'IP добавлен в черный список'
-            );
+            }
         }
         return array(
             'msg' => 'Ошибка добавления IP добавлен в черный список'
@@ -356,7 +344,7 @@ class Comments extends Model
             // Чистим рассылку
             self::_clearNotifications($comment_id);
 
-            // Удаляем комментарии
+            // Удаляем комментарий
             DB::table('i1il4_comments_items')
                 ->where('id', $comment_id)
                 ->delete();
@@ -374,7 +362,7 @@ class Comments extends Model
             );
         }
         return array(
-            'msg' => 'Ошибка'
+            'msg' => 'Ошибка удаления'
         );
     }
 
@@ -390,20 +378,20 @@ class Comments extends Model
         );
     }
 
-    private function getRate(): ?object
+    private function getRate($request): ?object
     {
         if (!empty($this->user)) {
             return DB::table('i1il4_comments_items')
                 ->select(DB::raw('COUNT(*) as itog'))
-                ->where('object_group', '=', $this->object_group)
-                ->where('object_id', '=', $this->object_id)
+                ->where('object_group', '=', $request->input('object_group'))
+                ->where('object_id', '=', $request->input('object_id'))
                 ->where('user_id', '=', $this->user_id)
                 ->first();
         } else {
             return DB::table('i1il4_comments_items')
                 ->select(DB::raw('COUNT(*) as itog'))
-                ->where('object_group', '=', $this->object_group)
-                ->where('object_id', '=', $this->object_id)
+                ->where('object_group', '=', $request->input('object_group'))
+                ->where('object_id', '=', $request->input('object_id'))
                 ->where('ip', '=', $this->ip)
                 ->where(DB::raw('DATE_ADD(created, INTERVAL 1 DAY)'), '>', now())
                 ->first();
@@ -557,8 +545,8 @@ class Comments extends Model
                 ->get();
             if (!empty($images)) {
                 foreach ($images as $image) {
-                    unlink(storage_path('app/'.$this->dir . '/' . $image->thumb));
-                    unlink(storage_path('app/'.$this->dir . '/' . $image->original));
+                    unlink(storage_path('app/' . $this->dir . '/' . $image->thumb));
+                    unlink(storage_path('app/' . $this->dir . '/' . $image->original));
                 }
                 DB::table('i1il4_comments_images')
                     ->where('item_id', '=', $comment_id)
@@ -589,8 +577,8 @@ class Comments extends Model
             $vote = -1;
         }
 
-        if ($object_group == 'com_vuz') {
-            DB::table('i1il4_vuz_items')
+        if ($object_group == 'com_detsad') {
+            DB::table('i1il4_detsad_items')
                 ->where('id', $object_id)
                 ->update([
                     'rate' => DB::raw("rate + $rate"),
@@ -614,20 +602,20 @@ class Comments extends Model
     private function getItem(string $object_group, int $object_id): ?array
     {
         $item = [];
-        if ($object_group == 'com_vuz') {
-            $vuz = DB::table('i1il4_vuz_items  AS t1')
+        if ($object_group == 'com_detsad') {
+            $detsad = DB::table('i1il4_detsad_items  AS t1')
                 ->select([
                     't1.*',
                     DB::raw('CONCAT_WS("-", t1.id, t1.alias) AS item_alias'),
                     DB::raw('CONCAT_WS("-", t2.id, t2.alias) AS category_alias'),
                     DB::raw('CONCAT_WS("-", t3.id, t3.alias) AS section_alias')
                 ])
-                ->join('i1il4_vuz_categories AS t2', 't1.category_id', '=', 't2.id')
-                ->join('i1il4_vuz_sections AS t3', 't1.section_id', '=', 't3.id')
+                ->join('i1il4_detsad_categories AS t2', 't1.category_id', '=', 't2.id')
+                ->join('i1il4_detsad_sections AS t3', 't1.section_id', '=', 't3.id')
                 ->where('t1.id', '=', $object_id)
                 ->first();
-            $item['title'] = $vuz->title;
-            $item['url'] = '/' . $vuz->category_alias . '/' . $vuz->item_alias;
+            $item['title'] = $detsad->title;
+            $item['url'] = '/' . $detsad->category_alias . '/' . $detsad->item_alias;
         }
 
         if ($object_group == 'com_content') {
@@ -644,40 +632,39 @@ class Comments extends Model
         return $item;
     }
 
-    public function vote(): array
+    public function vote($request): array
     {
-        $item_id = (int)$_POST['id'];
-        $value = (string)$_POST['value'];
+        $item_id = (int) $request->input('id');
+        $value = (string) $request->input('value');
 
-        $temp = DB::table('i1il4_comments_votes')
-            ->select(DB::raw('COUNT(*) as itog'))
+        $result = DB::table('i1il4_comments_votes')
+            ->select(DB::raw('*'))
             ->where('item_id', '=', $item_id)
-            ->where('ip', '=', $this->ip)
-            ->first();
-
-        if (empty($temp->itog)) {
+            ->where('ip', '=', $request->ip())
+            ->first();;
+        if ($result === null) {
             if ($value == 'up') {
                 DB::table('i1il4_comments_votes')
-                    ->insert(['item_id' => $item_id, 'ip' => $this->ip, 'value' => 1]);
+                    ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => 1]);
             }
             if ($value == 'down') {
                 DB::table('i1il4_comments_votes')
-                    ->insert(['item_id' => $item_id, 'ip' => $this->ip, 'value' => -1]);
+                    ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => -1]);
             }
-            if ($value == 'up' || $value == 'down') {
-                DB::table('i1il4_comments_items')
-                    ->where('id', $item_id)
-                    ->update([
-                        'isgood' => DB::table('i1il4_comments_votes')
-                            ->where('item_id', $item_id)
-                            ->where('value', '>', 0)
-                            ->sum('value'),
-                        'ispoor' => DB::table('i1il4_comments_votes')
-                            ->where('item_id', $item_id)
-                            ->where('value', '<', 0)
-                            ->sum(DB::raw('-value')),
-                    ]);
-            }
+
+            DB::table('i1il4_comments_items')
+                ->where('id', $item_id)
+                ->update([
+                    'isgood' => DB::table('i1il4_comments_votes')
+                        ->where('item_id', $item_id)
+                        ->where('value', '>', 0)
+                        ->sum('value'),
+                    'ispoor' => DB::table('i1il4_comments_votes')
+                        ->where('item_id', $item_id)
+                        ->where('value', '<', 0)
+                        ->sum(DB::raw('-value')),
+                ]);
+
             return array(
                 'msg' => 'Спасибо, Ваш голос принят!'
             );
@@ -690,15 +677,15 @@ class Comments extends Model
 
     public function votes($request): ?object
     {
-        $votes = (string) $request->input('votes');
-        $object_id = (int) $request->input('objectid');
-        $object_group = (string) $request->input('objectgroup');
+        $votes = (string)$request->input('votes');
+        $object_id = (int)$request->input('objectid');
+        $object_group = (string)$request->input('objectgroup');
         if (empty($object_group)) {
             $object_group = 'com_content';
         }
 
         $query = DB::table('i1il4_comments_items as t1')
-            ->select('t1.*', 't1.username AS guest_name','t2.name AS user_name', 't2.id AS registered')
+            ->select('t1.*', 't1.username AS guest_name', 't2.name AS user_name', 't2.id AS registered')
             ->leftJoin('users AS t2', 't1.user_id', '=', 't2.id')
             ->where('t1.object_group', '=', $object_group)
             ->where('t1.object_id', '=', $object_id)
@@ -720,9 +707,9 @@ class Comments extends Model
     /**
      * Показ и загрузка фото к отзывам
      */
-    public function cut(): ?object
+    public function getImagesComment($request): ?object
     {
-        $item_id = (int)$_POST['id'];
+        $item_id = (int) $request->input('id');
         return DB::table('i1il4_comments_images')
             ->select('*')
             ->where('item_id', $item_id)
@@ -744,12 +731,12 @@ class Comments extends Model
                 // Сохраняем оригинальное изображение
                 $file->storeAs($this->dir, $originalFileName);
                 // Создаем и обрабатываем миниатюру
-                $image = Image::make(storage_path('app/'.$this->dir . '/' . $originalFileName));
+                $image = Image::make(storage_path('app/' . $this->dir . '/' . $originalFileName));
                 $image->resize(200, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });
-                $image->save(storage_path('app/'.$this->dir . '/' . $thumbFileName));
+                $image->save(storage_path('app/' . $this->dir . '/' . $thumbFileName));
 
                 // Сохраняем информацию в базе данных
                 DB::table('i1il4_comments_images')->insert([
@@ -820,8 +807,8 @@ class Comments extends Model
 
     private function removeImages(int $id_img, object $item): void
     {
-        unlink(storage_path('app/'.$this->dir . '/' . $item->thumb));
-        unlink(storage_path('app/'.$this->dir . '/' . $item->original));
+        unlink(storage_path('app/' . $this->dir . '/' . $item->thumb));
+        unlink(storage_path('app/' . $this->dir . '/' . $item->original));
 
         DB::table('i1il4_comments_images')
             ->where('id', $id_img)
