@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('simplemodal')) {
+        if (e.target.closest('.simplemodal')) {
             e.preventDefault();
             let url = e.target.getAttribute('href');
+            if(!url){
+                let linkElement = e.target.closest('a');
+                if (linkElement) {
+                    url = linkElement.getAttribute('href');
+                }
+            }
             let width = e.target.getAttribute('data-width') + "px";
             let height = e.target.getAttribute('data-height') + "px";
             let win_width = (window.innerWidth > 0) ? window.innerWidth : screen.width;

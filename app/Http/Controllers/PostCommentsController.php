@@ -65,7 +65,7 @@ class PostCommentsController extends Controller
         if ($task == 'images') {
             $data = $this->comments->getImagesComment($request);
         }
-        if ($task == 'add') {
+        if ($task == 'addImage') {
             $data = $this->comments->addImage($request);
         }
         if ($task == 'removeImage') {

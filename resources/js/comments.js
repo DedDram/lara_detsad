@@ -204,40 +204,10 @@ const comments = (function () {
                 }
             });
 
-            /*клик по кнопке выбора файла (дополнительная загрузка 2х скриптов)*/
-            document.addEventListener("click", function (e) {
-                if (e.target.id === "file") {
-                    fetch("/js/slick.js")
-                        .then(response => response.text())
-                        .then(script => {
-                            const scriptElement = document.createElement("script");
-                            scriptElement.innerHTML = script;
-                            document.body.appendChild(scriptElement);
-                            return fetch("/js/jquery.form.js");
-                        })
-                        .then(response => response.text())
-                        .then(script => {
-                            const scriptElement = document.createElement("script");
-                            scriptElement.innerHTML = script;
-                            document.body.appendChild(scriptElement);
-                        })
-                        .then(() => {
-                            const slider = document.getElementById('slider');
-                            slider.style.display = 'block';
-                            const slides = slider.querySelectorAll('.row-slide');
-                            slides.forEach(function (slide) {
-                                slider.slick('slickAdd', slide);
-                            });
-                        })
-                        .catch(error => {
-                            console.error("Error loading scripts:", error);
-                        });
-                }
-            });
-
             document.addEventListener("click", function (e) {
                 if (e.target.id === "submit") {
                     e.preventDefault();
+                    e.stopPropagation();
                     document.querySelector('#myform').submit();
                 }
             });
@@ -245,7 +215,46 @@ const comments = (function () {
             document.addEventListener("change", function (e) {
                 if (e.target.closest('#upload') && e.target.type === "file") {
                     e.preventDefault();
-                    document.querySelector('#upload').submit();
+                    e.stopPropagation();
+                    const fileInput = document.getElementById("file");
+                    const slider = document.getElementById("slider");
+                    const msg = document.getElementById("msg");
+                    const attachInput = document.querySelector('input[name="attach"]');
+                    const uploadForm = new FormData();
+                    uploadForm.append("file", fileInput.files[0]);
+                    uploadForm.append('task', 'addImage');
+                    uploadForm.append('attach', attachInput.value);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/post/comment", true);
+                    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                    xhr.upload.addEventListener("progress", function (e) {
+                        if (e.lengthComputable) {
+                            const percent = (e.loaded / e.total) * 100;
+                            document.getElementById("percent").innerHTML = percent.toFixed(0) + "%";
+                        }
+                    });
+
+                    xhr.onload = function () {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.status === 1) {
+                                // Создаем элемент карусели и добавляем его внутрь #slider
+                                const newSlide = document.createElement("div");
+                                newSlide.className = "row-slide";
+                                newSlide.innerHTML = '<a href="#" data-id="' + response.id + '" data-attach="' + response.attach + '" class="remove-slide"></a><img src="/images/comments/' + response.thumb + '">';
+                                slider.appendChild(newSlide);
+                            } else if (response.status === 2) {
+                                msg.className = "msg-error";
+                                msg.innerHTML = response.msg;
+                                msg.style.display = "block";
+                            }
+                            // Очищаем форму и скрываем индикатор процента
+                            document.getElementById("upload").reset();
+                            document.getElementById("percent").style.display = "none";
+                        }
+                    };
+
+                    xhr.send(uploadForm);
                 }
             });
 
@@ -293,51 +302,6 @@ const comments = (function () {
                         xhr.send(data);
                     });
                 }
-
-
-            /*загрузка фото к отзыву*/
-            document.addEventListener("submit", function (e) {
-                if (e.target.id === "upload") {
-                    e.preventDefault();
-                    const data = new FormData(document.querySelector('#upload'));
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/post/comment', true);
-                    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4) {
-                            document.querySelector('#msg').style.display = 'none';
-                            document.querySelector('#percent').innerHTML = '0%';
-                            document.querySelector('#percent').style.display = 'block';
-                        }
-                    };
-                    xhr.upload.addEventListener("progress", function (event) {
-                        if (event.lengthComputable) {
-                            const percentComplete = (event.loaded / event.total) * 100;
-                            document.querySelector('#percent').innerHTML = percentComplete + '%';
-                        }
-                    });
-                    xhr.onload = function () {
-                        if (xhr.status === 200) {
-                            const data = JSON.parse(xhr.responseText);
-                            if (data.status === 1) {
-                                const slider = document.getElementById('slider');
-                                slider.style.display = 'block';
-                                slider.slick('slickAdd', '<div class="row-slide"><a href="#" data-id="' + data.id + '" data-attach="' + data.attach + '" class="remove-slide"></a><img src="/storage/images/comments/' + data.thumb + '"></div>');
-                            }
-                            if (data.status === 2) {
-                                const msg = document.querySelector('#msg');
-                                msg.className = 'msg-error';
-                                msg.innerHTML = data.msg;
-                                msg.style.display = 'block';
-                            }
-                            document.querySelector('#upload').reset();
-                            document.querySelector('#percent').innerHTML = '100%';
-                            document.querySelector('#percent').style.display = 'none';
-                        }
-                    };
-                    xhr.send(data);
-                }
-            });
 
             /*удаление фото из отзыва*/
             document.addEventListener("click", function (e) {

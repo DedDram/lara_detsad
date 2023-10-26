@@ -17,7 +17,7 @@ class Comments extends Model
     protected $fillable = ['object_group', 'object_id', 'created', 'ip', 'user_id', 'rate', 'country', 'status', 'username', 'email', 'isgood', 'ispoor', 'description', 'images'];
 
     protected object $user;
-
+    protected string $dir;
     protected int $user_id;
 
     public function __construct(array $attributes = [])
@@ -32,7 +32,7 @@ class Comments extends Model
             $this->user_id = 0;
         }
 
-        $this->dir = 'public/images/comments';
+        $this->dir = 'images/comments';
     }
 
     public static function getCommentUser(int $user_id)
@@ -545,8 +545,8 @@ class Comments extends Model
                 ->get();
             if (!empty($images)) {
                 foreach ($images as $image) {
-                    unlink(storage_path('app/' . $this->dir . '/' . $image->thumb));
-                    unlink(storage_path('app/' . $this->dir . '/' . $image->original));
+                    unlink(public_path( $this->dir . '/' . $image->thumb));
+                    unlink(public_path($this->dir . '/' . $image->original));
                 }
                 DB::table('i1il4_comments_images')
                     ->where('item_id', '=', $comment_id)
@@ -723,20 +723,19 @@ class Comments extends Model
         if ($request->hasFile('file') && $request->has('attach')) {
             $file = $request->file('file');
             $attach = $request->input('attach');
-
             if ($file->isValid()) {
                 $originalFileName = md5(uniqid(rand(), 1)) . '.' . $file->getClientOriginalExtension();
                 $thumbFileName = md5(uniqid(rand(), 1)) . '_thumb.' . $file->getClientOriginalExtension();
 
                 // Сохраняем оригинальное изображение
-                $file->storeAs($this->dir, $originalFileName);
+                $file->move(public_path($this->dir), $originalFileName);
                 // Создаем и обрабатываем миниатюру
-                $image = Image::make(storage_path('app/' . $this->dir . '/' . $originalFileName));
+                $image = Image::make(public_path($this->dir . '/' . $originalFileName));
                 $image->resize(200, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });
-                $image->save(storage_path('app/' . $this->dir . '/' . $thumbFileName));
+                $image->save(public_path($this->dir . '/' . $thumbFileName));
 
                 // Сохраняем информацию в базе данных
                 DB::table('i1il4_comments_images')->insert([
@@ -807,8 +806,8 @@ class Comments extends Model
 
     private function removeImages(int $id_img, object $item): void
     {
-        unlink(storage_path('app/' . $this->dir . '/' . $item->thumb));
-        unlink(storage_path('app/' . $this->dir . '/' . $item->original));
+        unlink(public_path($this->dir . '/' . $item->thumb));
+        unlink(public_path($this->dir . '/' . $item->original));
 
         DB::table('i1il4_comments_images')
             ->where('id', $id_img)
