@@ -35,7 +35,6 @@ class PostCommentsController extends Controller
         if (!empty($request->input('item_id'))) {
             $this->comment_id = (int) $request->input('item_id');
         }
-        $this->comments = new Comments;
     }
 
     public function getResponse(Request $request): \Illuminate\Http\JsonResponse
@@ -53,49 +52,49 @@ class PostCommentsController extends Controller
             if ($validatorData['status'] === 2) {
                 return response()->json($validatorData);
             } else {
-                $data = $this->comments->create($request);
+                $data = (new Comments)->create($request);
             }
         }
         if ($task == 'vote') {
-            $data = $this->comments->vote($request);
+            $data = (new Comments)->vote($request);
         }
         if ($task == 'votes') {
-            $data = $this->comments->votes($request);
+            $data = (new Comments)->votes($request);
         }
         if ($task == 'images') {
-            $data = $this->comments->getImagesComment($request);
+            $data = (new Comments)->getImagesComment($request);
         }
         if ($task == 'addImage') {
-            $data = $this->comments->addImage($request);
+            $data = (new Comments)->addImage($request);
         }
         if ($task == 'removeImage') {
-            $data = $this->comments->removeImage($request);
+            $data = (new Comments)->removeImage($request);
         }
 
         if (Auth::check()) {
             if (User::isAdmin()) {
                 if ($task == 'publish') {
-                    $data = $this->comments->publishItems($this->comment_id);
+                    $data = (new Comments)->publishItems($this->comment_id);
                 }
                 if ($task == 'unpublish') {
-                    $data = $this->comments->unPublishItems($this->comment_id);
+                    $data = (new Comments)->unPublishItems($this->comment_id);
                 }
                 if ($task == 'remove') {
-                    $data = $this->comments->remove($this->comment_id);
+                    $data = (new Comments)->remove($this->comment_id);
                 }
                 if ($task == 'blacklist') {
-                    $data = $this->comments->blacklist($this->comment_id);
+                    $data = (new Comments)->blacklist($this->comment_id);
                 }
             }
             if ($task == 'unsubscribe') {
-                $data = $this->comments->unsubscribe($this->object_group, $this->object_id, Auth::id());
+                $data = (new Comments)->unsubscribe($this->object_group, $this->object_id, Auth::id());
             }
             if ($task == 'edit') {
                 $validatorData = $this->validateUserData($request);
                 if ($validatorData['status'] === 2) {
                     return response()->json($validatorData);
                 } else {
-                    $data = $this->comments->edit($this->comment_id, $request);
+                    $data = (new Comments)->edit($this->comment_id, $request);
                 }
             }
         }

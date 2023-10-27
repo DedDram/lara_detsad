@@ -731,10 +731,23 @@ class Comments extends Model
                 $file->move(public_path($this->dir), $originalFileName);
                 // Создаем и обрабатываем миниатюру
                 $image = Image::make(public_path($this->dir . '/' . $originalFileName));
+
+                // Проверяем ширину изображения и обрезаем, если она больше 800 пикселей
+                if ($image->width() > 800) {
+                    $image->resize(800, null, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                    // ПереСохраняем оригинальное изображение
+                    $image->save(public_path($this->dir . '/' . $originalFileName));
+                }
+
+                // Создаем миниатюру
                 $image->resize(200, 200, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 });
+
+                // Сохраняем миниатюру
                 $image->save(public_path($this->dir . '/' . $thumbFileName));
 
                 // Сохраняем информацию в базе данных
@@ -768,30 +781,16 @@ class Comments extends Model
         }
     }
 
-    public function removeImage(): array
+    public function removeImage($request): array
     {
-        $id_img = (int)$_POST['id_img'];
-        $attach = (string)$_POST['attach'];
+        $id_img = (int) $request->input('id_img');
 
         $item = DB::table('i1il4_comments_images')
             ->select('*')
             ->where('id', $id_img)
             ->first();
 
-        if (!empty($user_id) && !empty($item->item_id)) {
-            $temp = DB::table('i1il4_comments_images')
-                ->where('id', $item->item_id)
-                ->where('user_id', $user_id)
-                ->count();
-        } else {
-            $temp = DB::table('i1il4_comments_images')
-                ->where('item_id', 0)
-                ->where('id', $id_img)
-                ->where('attach', $attach)
-                ->count();
-        }
-
-        if (!empty($temp)) {
+        if ($item !== null) {
             self::removeImages($id_img, $item);
 
             return array(

@@ -21,17 +21,21 @@ const comments = (function () {
                             const rows = JSON.parse(xhr.responseText);
                             rows.forEach(function (row) {
                                 const a = document.createElement('a');
-                                a.href = '/storage/images/comments/' + row.original;
+                                a.href = '/images/comments/' + row.original;
                                 a.className = 'simplemodal';
                                 a.setAttribute('data-width', '800');
                                 a.setAttribute('data-height', '500');
-                                a.innerHTML = '<img src="/storage/images/comments/' + row.thumb + '">';
+                                a.innerHTML = '<img src="/images/comments/' + row.thumb + '">';
                                 el.appendChild(a);
                             });
+                            if (el.style.display === "none" || el.style.display === "") {
+                                el.style.display = "block";
+                            } else {
+                                el.style.display = "none";
+                            }
                         }
                     };
                     xhr.send(formData);
-                    el.style.display = el.style.display === "none" ? "block" : "none";
                 });
             });
 
@@ -227,12 +231,8 @@ const comments = (function () {
                     const xhr = new XMLHttpRequest();
                     xhr.open("POST", "/post/comment", true);
                     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-                    xhr.upload.addEventListener("progress", function (e) {
-                        if (e.lengthComputable) {
-                            const percent = (e.loaded / e.total) * 100;
-                            document.getElementById("percent").innerHTML = percent.toFixed(0) + "%";
-                        }
-                    });
+                    document.querySelector('#loader').innerHTML = '<img src="/images/loader.gif">';
+                    document.querySelector('#loader').style.display = 'block';
 
                     xhr.onload = function () {
                         if (xhr.status === 200) {
@@ -248,9 +248,9 @@ const comments = (function () {
                                 msg.innerHTML = response.msg;
                                 msg.style.display = "block";
                             }
-                            // Очищаем форму и скрываем индикатор процента
+                            // Очищаем форму и скрываем loader
                             document.getElementById("upload").reset();
-                            document.getElementById("percent").style.display = "none";
+                            document.querySelector('#loader').style.display = "none";
                         }
                     };
 
@@ -265,7 +265,6 @@ const comments = (function () {
                     submitButton.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log('click2');
                         const data = new FormData(form);
                         const xhr = new XMLHttpRequest();
                         xhr.open('POST', '/post/comment', true);
@@ -287,15 +286,16 @@ const comments = (function () {
                                     msg.style.display = 'block';
                                     form.reset();
                                     form.style.display = 'none';
-                                    document.querySelector('#loader').style.display = 'none';
+                                    document.querySelector('#slider').style.display = 'none';
+                                    document.querySelector('#upload').style.display = 'none';
                                 }
                                 if (data.status === 2) {
                                     const msg = document.querySelector('#msg');
                                     msg.className = 'msg-error';
                                     msg.innerHTML = data.msg;
                                     msg.style.display = 'block';
-                                    document.querySelector('#loader').style.display = 'none';
                                 }
+                                document.querySelector('#loader').style.display = 'none';
                                 _private.scroll();
                             }
                         };
@@ -317,7 +317,6 @@ const comments = (function () {
                     const formData = new FormData();
                     formData.append('task', 'removeImage');
                     formData.append('id_img', id_img);
-                    formData.append('attach', attach);
                     xhr.onreadystatechange = function () {
                         if (xhr.readyState === 4) {
                             document.querySelector('#percent').innerHTML = '';
