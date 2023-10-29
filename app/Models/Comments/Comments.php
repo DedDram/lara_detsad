@@ -2,6 +2,8 @@
 
 namespace App\Models\Comments;
 
+use App\Jobs\AfterCreatCommentGeoLocation;
+use App\Jobs\AfterCreatCommentNotifications;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -99,20 +101,6 @@ class Comments extends Model
         return $items;
     }
 
-    private static function getBlacklist($request): bool
-    {
-        $ip = $request->ip();
-        $blacklist = DB::table('i1il4_comments_blacklist')
-            ->select(DB::raw('COUNT(*) as ban'))
-            ->where('ip', '=', $ip)
-            ->where('created', '>', DB::raw('DATE_SUB(NOW(), INTERVAL 1 DAY)'))
-            ->first();
-        if (!empty($blacklist->ban)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public function create($request): array
     {
@@ -149,40 +137,33 @@ class Comments extends Model
         //удаляем <br> в начале отзыва
         $description = preg_replace('~^(<br>|<br />|<br/>){1,}(.*)$~ms', '$2', $description);
 
-        //try {
-            $item = [
-                'created' => now(),
-                'object_group' => $request->input('object_group'),
-                'object_id' => $request->input('object_id'),
-                'user_id' => $this->user_id,
-                'ip' => $request->ip(),
-                'username' => $username,
-                'rate' => $rate,
-                'description' => $description,
-                'email' => $email,
-            ];
-            self::insert($item);
-            // Получить последний вставленный ID
-            $item_id = DB::getPdo()->lastInsertId();
+        $item = [
+            'created' => now(),
+            'object_group' => $request->input('object_group'),
+            'object_id' => $request->input('object_id'),
+            'user_id' => $this->user_id,
+            'ip' => $request->ip(),
+            'username' => $username,
+            'rate' => $rate,
+            'description' => $description,
+            'email' => $email,
+        ];
+        self::insert($item);
+        // Получить последний вставленный ID
+        $item_id = DB::getPdo()->lastInsertId();
 
-            DB::table('i1il4_comments_images')
-                ->where('item_id', 0)
-                ->where('attach', $attach)
-                ->update(['item_id' => $item_id]);
+        DB::table('i1il4_comments_images')
+            ->where('item_id', 0)
+            ->where('attach', $attach)
+            ->update(['item_id' => $item_id]);
 
-            DB::table('i1il4_comments_items')
-                ->where('id', $item_id)
-                ->update([
-                    'images' => DB::table('i1il4_comments_images')
-                        ->where('item_id', $item_id)
-                        ->count()
-                ]);
-        /*} catch (QueryException $e) {
-            return array(
-                'status' => 2,
-                'msg' => 'Удалите из отзыва специальные символы (смайлики и т.п.), оставьте просто текст.'
-            );
-        }*/
+        DB::table('i1il4_comments_items')
+            ->where('id', $item_id)
+            ->update([
+                'images' => DB::table('i1il4_comments_images')
+                    ->where('item_id', $item_id)
+                    ->count()
+            ]);
         if (!empty($this->user_id)) {
             // Публикуем
             self::publishItems($item_id);
@@ -193,6 +174,10 @@ class Comments extends Model
         }
         // Уведомление админу
         self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
+        // Добавления задания в очередь (рассылки-уведомления)
+        dispatch(new AfterCreatCommentNotifications());
+        // Добавления задания в очередь (геолокация)
+        dispatch(new AfterCreatCommentGeoLocation());
 
         if (!empty($this->user_id)) {
             return array(
@@ -314,7 +299,7 @@ class Comments extends Model
                 ->where('id', $comment_id)
                 ->select('ip')
                 ->first();
-            if($comment->ip !== null){
+            if ($comment->ip !== null) {
                 DB::table('i1il4_comments_blacklist')
                     ->updateOrInsert(
                         ['ip' => $comment->ip],
@@ -545,7 +530,7 @@ class Comments extends Model
                 ->get();
             if (!empty($images)) {
                 foreach ($images as $image) {
-                    unlink(public_path( $this->dir . '/' . $image->thumb));
+                    unlink(public_path($this->dir . '/' . $image->thumb));
                     unlink(public_path($this->dir . '/' . $image->original));
                 }
                 DB::table('i1il4_comments_images')
@@ -634,8 +619,8 @@ class Comments extends Model
 
     public function vote($request): array
     {
-        $item_id = (int) $request->input('id');
-        $value = (string) $request->input('value');
+        $item_id = (int)$request->input('id');
+        $value = (string)$request->input('value');
 
         $result = DB::table('i1il4_comments_votes')
             ->select(DB::raw('*'))
@@ -709,7 +694,7 @@ class Comments extends Model
      */
     public function getImagesComment($request): ?object
     {
-        $item_id = (int) $request->input('id');
+        $item_id = (int)$request->input('id');
         return DB::table('i1il4_comments_images')
             ->select('*')
             ->where('item_id', $item_id)
@@ -783,7 +768,7 @@ class Comments extends Model
 
     public function removeImage($request): array
     {
-        $id_img = (int) $request->input('id_img');
+        $id_img = (int)$request->input('id_img');
 
         $item = DB::table('i1il4_comments_images')
             ->select('*')

@@ -170,7 +170,7 @@
 @endif
 <div class="scomments-anchor"></div>
 <div class="scomments-form" id="ADD">
-    @if (!empty($blacklist))
+    @if (!empty($items[0]->blacklist))
         <h3>Администратор заблокировал возможность написания отзывов с этого IP - {{request()->ip()}}</h3>
         <p>Если вы считаете, что это произошло по ошибке - напишите на info@detskysad.com и укажите свой ip</p>
     @else
