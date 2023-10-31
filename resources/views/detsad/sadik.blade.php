@@ -20,6 +20,34 @@
     @endif
 @endsection
 @section('content')
+    @if (Auth::check() && (session('unpublish') || session('publish') || session('remove') || session('blacklist') || session('unsubscribe')))
+        @if (Auth::user()->isAdmin())
+            <div id="system-message">
+                <div class="alert alert-message">
+                    <div>
+                        @if(session('unpublish'))
+                            <div class="alert-message">{{ session('unpublish') }}</div>
+                        @elseif (session('publish'))
+                            <div class="alert-message">{{ session('publish') }}</div>
+                        @elseif (session('remove'))
+                            <div class="alert-message">{{ session('remove') }}</div>
+                        @elseif (session('blacklist'))
+                            <div class="alert-message">{{ session('blacklist') }}</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+        @if (session('unsubscribe'))
+            <div id="system-message">
+                <div class="alert alert-message">
+                    <div>
+                        <div class="alert-message"> {{ session('unsubscribe') }}</div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
     <div itemscope itemtype="http://schema.org/School">
         <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating"
              style="margin-top: 5px; text-align: center; font-size: 14px; font-weight: bold; color: #6c0; overflow: hidden;">

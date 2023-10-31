@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminCommentsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Controller;
@@ -58,3 +59,5 @@ Route::middleware('redirect.old')->group(function () {
 Route::any('/post/error', [ErrorController::class, 'getResponse']);
 //Комменты
 Route::post('/post/comment', [PostCommentsController::class, 'getResponse']);
+Route::get('/admin/comments', [AdminCommentsController::class, 'getResponse']);
+Route::get('/comments', [AdminCommentsController::class, 'getResponse']);

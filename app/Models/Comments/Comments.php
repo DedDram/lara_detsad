@@ -5,7 +5,6 @@ namespace App\Models\Comments;
 use App\Jobs\AfterCreatCommentGeoLocation;
 use App\Jobs\AfterCreatCommentNotifications;
 use App\Models\User;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -174,10 +173,10 @@ class Comments extends Model
         }
         // Уведомление админу
         self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
-        // Добавления задания в очередь (рассылки-уведомления)
-        dispatch(new AfterCreatCommentNotifications());
         // Добавления задания в очередь (геолокация)
         dispatch(new AfterCreatCommentGeoLocation());
+        // Добавления задания в очередь (рассылки-уведомления)
+        dispatch(new AfterCreatCommentNotifications());
 
         if (!empty($this->user_id)) {
             return array(
@@ -274,11 +273,13 @@ class Comments extends Model
                 ->select('*')
                 ->where('id', '=', $comment_id)
                 ->first();
-            if (!empty($items)) {
+            if (!empty($item)) {
                 // Пересчитываем рейтинг
                 self::_rate($item->object_group, $item->object_id, '+' . $item->rate);
                 // Добавляем рассылку
                 self::setNotification($item->object_group, $item->object_id, $item->id, 1);
+                // Добавления задания в очередь (рассылки-уведомления)
+                dispatch(new AfterCreatCommentNotifications());
                 // Добавляем страницу на переобход роботом
                 $temp = self::getItem($item->object_group, $item->object_id);
                 self::YandexWebmasterOverride(env('APP_URL') . $temp['url']);
@@ -419,24 +420,31 @@ class Comments extends Model
     private function setNotification($object_group, $object_id, $item_id, $type)
     {
         $temp = self::getItem($object_group, $object_id);
-        $title = $temp['title'];
+        $title = $temp['name'];
         $url = $temp['url'];
 
         if ($type == 1) {
-            DB::table('i1il4_comments_cron')
-                ->select('item_id', 'user_id', 'type', 'title', 'url')
+            $subscribers = DB::table('i1il4_comments_subscribers')
+                ->select('object_id', 'user_id')
                 ->from('i1il4_comments_subscribers')
                 ->where('object_group', $object_group)
                 ->where('object_id', $object_id)
-                ->updateOrInsert(
-                    [
-                        'item_id' => $item_id,
-                        'user_id' => DB::raw('user_id'),
-                        'type' => $type,
-                        'title' => $title,
-                        'url' => $url
-                    ]
-                );
+                ->get();
+
+            if ($subscribers->isNotEmpty()) {
+                foreach ($subscribers as $subscribe) {
+                    DB::table('i1il4_comments_cron')
+                        ->updateOrInsert(
+                            [
+                                'item_id' => $item_id,
+                                'user_id' => $subscribe->user_id,
+                                'type' => $type,
+                                'title' => $title,
+                                'url' => $url
+                            ]
+                        );
+                }
+            }
         }
         if ($type == 2 || $type == 3) {
             DB::table('i1il4_comments_cron')
@@ -599,8 +607,8 @@ class Comments extends Model
                 ->join('i1il4_detsad_sections AS t3', 't1.section_id', '=', 't3.id')
                 ->where('t1.id', '=', $object_id)
                 ->first();
-            $item['title'] = $detsad->title;
-            $item['url'] = '/' . $detsad->category_alias . '/' . $detsad->item_alias;
+            $item['name'] = $detsad->name;
+            $item['url'] = '/' . $detsad->section_alias . '/' . $detsad->category_alias . '/' . $detsad->item_alias;
         }
 
         if ($object_group == 'com_content') {
@@ -610,7 +618,7 @@ class Comments extends Model
                 ->where('t1.id', '=', $object_id)
                 ->first();
 
-            $item['title'] = preg_replace('@ - отзывы.*@smi', '', $content->title);
+            $item['name'] = preg_replace('@ - отзывы.*@smi', '', $content->title);
 
             $item['url'] = '/' . $content->section_alias . '/' . $object_id . '/' . $content->contentAlias;
         }

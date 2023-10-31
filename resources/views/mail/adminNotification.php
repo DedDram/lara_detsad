@@ -14,10 +14,10 @@
 
 <div>
     <?php if(!empty($item->status)): ?>
-        <a href="<?php echo $siteName; ?>/cron/comments?option=com_comments&view=moderation&format=raw&task=unpublish&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Cнять с публикации</a> |
+        <a href="<?php echo $siteName; ?>/admin/comments?task=unpublish&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Cнять с публикации</a> |
     <?php else: ?>
-        <a href="<?php echo $siteName; ?>/cron/comments?option=com_comments&view=moderation&format=raw&task=publish&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Опубликовать</a> |
+        <a href="<?php echo $siteName; ?>/admin/comments?task=publish&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Опубликовать</a> |
     <?php endif; ?>
-    <a href="<?php echo $siteName; ?>/cron/comments?option=com_comments&view=moderation&format=raw&task=remove&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Удалить</a> |
-    <a href="<?php echo $siteName; ?>/cron/comments?option=com_comments&view=moderation&format=raw&task=blacklist&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Заблокировать IP</a> |
+    <a href="<?php echo $siteName; ?>/admin/comments?task=remove&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Удалить</a> |
+    <a href="<?php echo $siteName; ?>/admin/comments?task=blacklist&object_group=<?php echo $item->object_group; ?>&object_id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>">Заблокировать IP</a> |
 </div>

@@ -3,13 +3,11 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class AfterCreatCommentGeoLocation implements ShouldQueue
 {
@@ -45,7 +43,7 @@ class AfterCreatCommentGeoLocation implements ShouldQueue
         {
             foreach($items as $item)
             {
-                $geo = self::YandexLocation(long2ip($item->ip));
+                $geo = self::YandexLocation($item->ip);
 
                 if(empty($geo->country))
                 {

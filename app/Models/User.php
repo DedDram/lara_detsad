@@ -41,7 +41,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function isAdmin()
+    public static function isAdmin(): bool
     {
         if(Auth::check()){
             if(Auth::user()->users_group == 1){
@@ -50,7 +50,7 @@ class User extends Authenticatable
         }
         return false;
     }
-    public static function isAgent()
+    public static function isAgent(): bool
     {
         if(Auth::check()){
             if(Auth::user()->users_group == 2){

@@ -1,7 +1,3 @@
-<?php
-$item->url = str_replace('/school/', '/schools/', $item->url);
-?>
-
 <div style="margin: 3px 0;">Имя: <span style="color: #3c452d; font: bold 1em Verdana, Arial, Sans-Serif;"><?php echo $item->username; ?></span></div>
 <div style="margin: 3px 0;">Время: <?php echo $item->created; ?></div>
 <div style="margin: 3px 0;">Обсуждение: <a href="<?php echo $siteName; ?><?php echo $item->url; ?>" target="_blank"><?php echo $item->title; ?></a></div>

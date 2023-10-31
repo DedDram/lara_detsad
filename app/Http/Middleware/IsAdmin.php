@@ -7,13 +7,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RedirectOldDetSadUrls
+class IsAdmin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && User::isAdmin()) {
+        if(Auth::check() && User::isAdmin()){
             return $next($request);
+        }else{
+           redirect('/login', 301);
         }
-        return redirect('/login');
+
+
     }
 }
