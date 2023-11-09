@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\DetSadController;
+use App\Http\Controllers\DiplomController;
 use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\UserController;
@@ -61,3 +62,6 @@ Route::any('/post/error', [ErrorController::class, 'getResponse']);
 Route::post('/post/comment', [PostCommentsController::class, 'getResponse']);
 Route::get('/admin/comments', [AdminCommentsController::class, 'getResponse']);
 Route::get('/comments', [AdminCommentsController::class, 'getResponse']);
+//Диплом
+Route::get('/diplom/code', [DiplomController::class, 'code']);
+Route::get('/diplom/default', [DiplomController::class, 'default']);

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class PostCommentsController extends Controller
+class PostCommentsController
 {
     /** @var string */
     protected string $object_group;

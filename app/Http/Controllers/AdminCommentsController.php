@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminCommentsController extends Controller
+class AdminCommentsController
 {
     public function getResponse(Request $request)
     {

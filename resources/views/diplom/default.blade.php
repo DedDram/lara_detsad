@@ -1,0 +1,4 @@
+document.write("<style>.container { width: 550px; } .container__wrapper { overflow: hidden; position: relative; width: 73%; padding-bottom: 100%; } .container__content {position: absolute; top: 0;left: 0; width: 100%; height: 100%;} .container__content{ font-size: 12px; font-weight: bold; color: #0003fe; background: transparent url('{{ $item->tpl }}') no-repeat center center; background-size: cover; } div{text-align: center;} .dip-a{padding-top: 67%;} .dip-b{padding-top: 9%;} .dip-c{padding-top: 3%;} .dip-d{padding-top: 4%;}</style>");
+document.write('<a href="https://test.med-otzyv.com/"><div class="container"><div class="container__wrapper"><div class="container__content"><div class="dip-a">{{ $item->name }}</div><div class="dip-b">занимает {{ $item->n }} место</div><div class="dip-c">в рейтинге лучших садиков {{ $item->section_id == 14 ? $item->okrug : $item->country }} по</div><div class="dip-d">версии портала test.med-otzyv.com</div></div></div></div></a>');
+
+

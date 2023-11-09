@@ -224,25 +224,25 @@
                         <span style="color: #E86500; font-weight: bold;">Диплом для сайта садика:</span>
                         @if (in_array($item->section_id, array(1, 2, 17, 20, 21)))
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-id={{$item->id}}"
+                                href="/diplom/code?id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         стране), <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id={{$item->id}}"
+                                href="/diplom/code?city=1&id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         городу)
                         @endif
                         @if (in_array($item->section_id, array(3, 4, 5, 6, 7, 8, 9, 10, 11)))
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-city=1&topx-id={{$item->id}}"
+                                href="/diplom/code?city=1&id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         городу), <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id={{$item->id}}"
+                                href="/diplom/code?district=1&id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         району)
                         @endif
                         @if ($item->section_id == 14)
                         <span class="top_detsad_diploma_cell"><a
-                                href="/index.php?option=com_detsad&view=diplom&tpl=code&format=raw&topx-district=1&topx-id={{$item->id}}"
+                                href="/diplom/code?district=1&topx-id={{$item->id}}"
                                 title="Получить диплом" class="simplemodal" data-width="580" data-height="680"></a></span> (по
                         округу)
                         @endif

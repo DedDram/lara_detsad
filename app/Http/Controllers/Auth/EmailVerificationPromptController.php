@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 
-class EmailVerificationPromptController extends Controller
+class EmailVerificationPromptController
 {
     /**
      * Display the email verification prompt.
