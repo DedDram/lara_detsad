@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class ConfirmablePasswordController
+class ConfirmablePasswordController extends Controller
 {
     /**
      * Show the confirm password view.

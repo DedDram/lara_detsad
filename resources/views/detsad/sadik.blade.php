@@ -214,7 +214,7 @@
                             @else
                                 <div style="margin-bottom: 13px;">
                                     <span
-                                        style="color: #E86500;font-weight: bold;">{{$field->type_text}}:</span> {{$field->field_text}}
+                                        style="color: #E86500;font-weight: bold;">{{$field->type_text}}:</span> {!! $field->field_text !!}
                                 </div>
                             @endif
                         @endif

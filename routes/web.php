@@ -43,6 +43,11 @@ Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{distri
 Route::get('/street/{category_id}-{category_alias}', [DetSadController::class, 'streets'])->where(['category_id' => '[0-9]+','category_alias' => '[a-z0-9-]+']);
 Route::get('/street/{category_id}-{category_alias}/{street_alias}', [DetSadController::class, 'street'])->where(['category_id' => '[0-9]+','category_alias' => '[a-z0-9-]+', 'street_alias' => '[a-z0-9-]+']);
 Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}', [DetSadController::class, 'sadik'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
+Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/{gallery}', [DetSadController::class, 'sadik'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+', 'gallery' => 'gallery']);
+Route::get('/gallery-add', [DetSadController::class, 'addGallery']);
+Route::post('/post/add-gallery', [DetSadController::class, 'addGalleryPost']);
+Route::get('/remove-image-gallery', [DetSadController::class, 'delImageGallery'])->middleware('admin.or.agent');
+Route::get('/publish-image-gallery', [DetSadController::class, 'PublishImageGallery'])->middleware('is.admin');
 Route::post('/detsad-post', [DetSadController::class, 'getResponse']);
 Route::any('/add-photo', [DetSadController::class, 'getResponse']);
 //Садики старые url
@@ -51,9 +56,9 @@ Route::middleware('redirect.old')->group(function () {
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}', [DetSadController::class, 'category'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+']);
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{district}', [DetSadController::class, 'category'])->where(['section_id' => '[0-9]+','category_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+', 'category_alias' => '[a-z0-9-]+', 'district' => '[a-z][a-z0-9-]+']);
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}', [DetSadController::class, 'sadik'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
+    Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/{gallery}', [DetSadController::class, 'sadik'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+', 'gallery' => 'gallery']);
 
     Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/agent', [DetSadController::class, 'sadAgent'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
-    Route::get('/detskie-sady/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/gallery', [DetSadController::class, 'gallery'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
 });
 
 //Нашли ошибку

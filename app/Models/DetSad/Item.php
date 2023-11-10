@@ -38,26 +38,32 @@ class Item extends Model
         'sid'
     ];
 
-    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sectionName, $categoryName, $sadId)
+    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sectionName, $categoryName, $sadId): object
     {
 
         if ($sectionId > 1 && $sectionId < 12) {
             $addresses = DB::table('i1il4_detsad_address AS address')
-                ->select('address.*')
-                ->where('item_id', $sadId)
+                ->select('address.*', 'items.section_id AS section', 'items.category_id AS cat', 'categories.name AS cat_name', 'categories.alias AS cat_alias', 'sections.name AS section_name', 'sections.alias AS section_alias')
+                ->leftJoin('i1il4_detsad_items AS items', 'address.item_id', '=', 'items.id')
+                ->leftJoin('i1il4_detsad_categories AS categories', 'categories.id', '=', 'items.category_id')
+                ->leftJoin('i1il4_detsad_sections AS sections', 'sections.id', '=', 'items.section_id')
+                ->where('address.item_id', $sadId)
                 ->orderBy('address.id')
                 ->get();
+
             foreach ($addresses as $address) {
                 $address->district_link = '<a href="/' . $sectionId . '-' . $sectionAlias . '">' . $sectionName . '</a> / <a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '">' . $categoryName . '</a>';
             }
         } else {
             $addresses = DB::table('i1il4_detsad_address AS address')
-                ->select('address.*')
+                ->select('address.*', 'items.section_id AS section', 'items.category_id AS cat', 'categories.name AS cat_name', 'categories.alias AS cat_alias', 'sections.name AS section_name', 'sections.alias AS section_alias', 'districts.name AS d_name')
+                ->leftJoin('i1il4_detsad_items AS items', 'address.item_id', '=', 'items.id')
+                ->leftJoin('i1il4_detsad_categories AS categories', 'categories.id', '=', 'items.category_id')
+                ->leftJoin('i1il4_detsad_sections AS sections', 'sections.id', '=', 'items.section_id')
                 ->leftJoin('i1il4_detsad_districts AS districts', function ($join) {
-                    $join->on('districts.alias', '=', 'address.district')
-                        ->where('districts.parent', '=', 'address.locality');
-                })
-                ->where('item_id', $sadId)
+                $join->on('districts.alias', '=', 'address.district')->where('districts.parent', '=', DB::raw('address.locality'));
+            })
+                ->where('address.item_id', $sadId)
                 ->orderBy('address.id')
                 ->get();
 
@@ -67,6 +73,7 @@ class Item extends Model
                 }
             }
         }
+
         return $addresses;
     }
 

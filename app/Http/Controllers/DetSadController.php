@@ -6,6 +6,7 @@ use App\Helpers\StringHelper;
 use App\Models\Comments\Comments;
 use App\Models\DetSad\AdsCity;
 use App\Models\DetSad\Category;
+use App\Models\DetSad\DetsadGallery;
 use App\Models\DetSad\Item;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
@@ -86,7 +87,7 @@ class DetSadController
         } else {
             abort('404');
         }
-        $itemsCollection = Category::getItems($categoryId);
+        $itemsCollection = Category::getItems($categoryId, $district);
         $districts = Category::getDistricts($categoryId);
         if (!empty($district)) {
             $district = Category::getDistrict($categoryId, $district);
@@ -113,6 +114,7 @@ class DetSadController
                 );
             }
         }
+        $itemsCollection = $itemsCollection->sortByDesc('average');
         if (!empty($district)) {
             $distr2 = trim(strrchr($district->name, ' '));
             $distr1 = trim(str_replace(array($distr2, 'территориальный', 'административный'), '', $district->name));
@@ -197,7 +199,7 @@ class DetSadController
             ]);
     }
 
-    public function sadik($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias)
+    public function sadik($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias, $gallery = '')
     {
         $sadik = Item::query()
             ->with('category', 'section') // Включаем категорию и секцию
@@ -228,6 +230,13 @@ class DetSadController
             $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
         }
         $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
+        //вкладка Фото
+
+        if(!empty($gallery)){
+            $gallery = Item::getGallery($sadId);
+            $countImage = count($gallery);
+            return view('detsad.gallery',['url'=>$url, 'gallery' => $gallery, 'object_group' => 'com_detsad', 'countImage' => $countImage, 'title' => 'Фото ' . $sadik->title, 'item' => $sadik]);
+        }
         $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section->name, $sadik->category->name, $sadId);
         $countImage = Item::getCountImage($sadId);
         $statistics = Item::getStatistics($sadId);
@@ -310,6 +319,34 @@ class DetSadController
                 'procentBad' => $procentBad,
                 'modulePosition' => $modulePosition,
             ]);
+    }
+
+
+    public function addGallery(Request $request)
+    {
+        $total = Item::getCountImage($request->query('id'));
+        return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
+    }
+
+    public function addGalleryPost(Request $request)
+    {
+        $gallery = new DetsadGallery();
+        $addImg = $gallery->add($request);
+        return response()->json($addImg);
+    }
+
+    public function delImageGallery(Request $request)
+    {
+        $gallery = new DetsadGallery();
+        $with = $gallery->remove($request);
+        return redirect()->back()->with('success', $with);
+    }
+    public function PublishImageGallery(Request $request)
+    {
+        $gallery = new DetsadGallery();
+        $with = $gallery->publish($request);
+        $linkVuz = Vuz::getUrlVuz($request->query('id'));
+        return redirect()->to(config('app.url').$linkVuz->url.'/gallery')->with('success', $with);
     }
 
     private function checkRedirectCategory($categoryId, $categoryAlias)

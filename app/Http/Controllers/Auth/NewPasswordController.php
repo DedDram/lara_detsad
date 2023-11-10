@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 
-class NewPasswordController
+class NewPasswordController extends Controller
 {
     /**
      * Display the password reset view.

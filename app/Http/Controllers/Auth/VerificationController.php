@@ -10,7 +10,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
-class VerificationController
+class VerificationController extends Controller
 {
 
     public function __construct()

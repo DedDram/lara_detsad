@@ -10,7 +10,7 @@ class DiplomController
 
     public function __construct(Request $request)
     {
-        if((!empty($request->has('city')) || !empty($request->has('district'))) && !empty($request->has('id')))
+        if(!empty($request->has('id')))
         {
             $diplom = new Diplom();
             $id = $request->query('id');
