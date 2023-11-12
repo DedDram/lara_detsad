@@ -11,7 +11,7 @@ class Section extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['name', 'title', 'alias', 'text'];
 
-    public static function getAddress($sectionId, $sectionAlias): array
+    public static function getAddress(int $sectionId, string $sectionAlias): array
     {
         $result = array();
         $address = DB::table('i1il4_detsad_items as t1')

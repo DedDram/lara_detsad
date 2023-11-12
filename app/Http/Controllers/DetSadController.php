@@ -55,7 +55,7 @@ class DetSadController
         }
 
     }
-    public function section($sectionId, $sectionAlias)
+    public function section(int $sectionId, string $sectionAlias)
     {
         $section = Section::query()->find($sectionId);
         if ($section !== null) {
@@ -77,7 +77,7 @@ class DetSadController
             ]);
     }
 
-    public function category($sectionId, $sectionAlias, $categoryId, $categoryAlias, $district = '')
+    public function category(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $district = '')
     {
         $category = Category::getCategory($categoryId);
         if ($category !== null) {
@@ -147,7 +147,7 @@ class DetSadController
             ]);
     }
 
-    public function streets($categoryId, $categoryAlias)
+    public function streets(int $categoryId, string $categoryAlias)
     {
         self::checkRedirectCategory($categoryId, $categoryAlias);
         $streets = Streets::getStreets($categoryId, $categoryAlias);
@@ -163,7 +163,7 @@ class DetSadController
             ]);
     }
 
-    public function street($categoryId, $categoryAlias, $street_alias)
+    public function street(int $categoryId, string $categoryAlias, string $street_alias)
     {
         $category = self::checkRedirectCategory($categoryId, $categoryAlias);
         $street = Streets::getStreet($categoryId, $street_alias);
@@ -199,22 +199,13 @@ class DetSadController
             ]);
     }
 
-    public function sadik($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias, $gallery = '')
+    public function sadik(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
         $sadik = Item::query()
-            ->with('category', 'section') // Включаем категорию и секцию
+            ->with('category', 'section')
             ->find($sadId);
-
-        if ($sadik !== null) {
-            if ($sectionId . '-' . $sectionAlias != $sadik->section->id . '-' . $sadik->section->alias ||
-                $categoryId . '-' . $categoryAlias != $sadik->category->id . '-' . $sadik->category->alias ||
-                $sadAlias != $sadik->alias
-            ) {
-                return redirect()->to('/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias);
-            }
-        } else {
-            abort('404');
-        }
+        //проверка верности алиасов
+        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         if ($sadik->section->id > 1 && $sadik->section->id < 15) {
             $ads_city = 'moskva';
         } else {
@@ -230,13 +221,6 @@ class DetSadController
             $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
         }
         $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
-        //вкладка Фото
-
-        if(!empty($gallery)){
-            $gallery = Item::getGallery($sadId);
-            $countImage = count($gallery);
-            return view('detsad.gallery',['url'=>$url, 'gallery' => $gallery, 'object_group' => 'com_detsad', 'countImage' => $countImage, 'title' => 'Фото ' . $sadik->title, 'item' => $sadik]);
-        }
         $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section->name, $sadik->category->name, $sadId);
         $countImage = Item::getCountImage($sadId);
         $statistics = Item::getStatistics($sadId);
@@ -321,6 +305,28 @@ class DetSadController
             ]);
     }
 
+    public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    {
+        $sadik = Item::query()
+            ->with('category', 'section')
+            ->find($sadId);
+        //проверка верности алиасов
+        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        $gallery = Item::getGallery($sadId);
+        $countImage = count($gallery);
+        $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
+        return view('detsad.gallery',
+            [
+                'url'=>$url,
+                'gallery' => $gallery,
+                'object_group' => 'com_detsad',
+                'countImage' => $countImage,
+                'title' => 'Фото ' . $sadik->title,
+                'item' => $sadik
+            ]);
+
+    }
+
 
     public function addGallery(Request $request)
     {
@@ -328,27 +334,55 @@ class DetSadController
         return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
     }
 
-    public function addGalleryPost(Request $request)
+    public function addGalleryPost(Request $request): \Illuminate\Http\JsonResponse
     {
         $gallery = new DetsadGallery();
         $addImg = $gallery->add($request);
         return response()->json($addImg);
     }
 
-    public function delImageGallery(Request $request)
+    public function delImageGallery(Request $request): \Illuminate\Http\RedirectResponse
     {
         $gallery = new DetsadGallery();
         $with = $gallery->remove($request);
-        return redirect()->back()->with('success', $with);
+        return redirect()->back()->with('removeImgError', $with);
     }
-    public function PublishImageGallery(Request $request)
+    public function PublishImageGallery(Request $request): \Illuminate\Http\RedirectResponse
     {
         $gallery = new DetsadGallery();
         $with = $gallery->publish($request);
-        $linkVuz = Vuz::getUrlVuz($request->query('id'));
-        return redirect()->to(config('app.url').$linkVuz->url.'/gallery')->with('success', $with);
+        $linkSadik = Item::getUrlSadik($request->query('id'));
+        return redirect()->to(config('app.url').$linkSadik->url.'/gallery')->with('publishImgOk', $with);
     }
 
+    public function sadAgent($category_id, $category_alias, $vuz_id, $vuz_alias)
+    {
+        $vuzModel = new Vuz($vuz_id);
+        $item = $vuzModel->getItem();
+        $agent = $vuzModel::getVuzAgent($vuz_id);
+        $url = "/" . $item->category_alias. "/" . $item->item_alias;
+        return view('detsad.agent',['url'=>$url, 'item' => $item, 'agent' => $agent, 'title' => 'Представитель '.$item->name]);
+
+    }
+
+    public function registrationAgentGet(Request $request)
+    {
+        return view('detsad.registrationAgent',['request' => $request]);
+    }
+
+    private function redirectWrongAlias(object $sadik,int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
+    {
+        if (!empty($sadik)) {
+            if ($sectionId . '-' . $sectionAlias != $sadik->section->id . '-' . $sadik->section->alias ||
+                $categoryId . '-' . $categoryAlias != $sadik->category->id . '-' . $sadik->category->alias ||
+                $sadAlias != $sadik->alias
+            ) {
+                redirect()->to('/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias);
+            }
+        } else {
+            abort('404');
+        }
+    }
     private function checkRedirectCategory($categoryId, $categoryAlias)
     {
         $category = Category::getCategory($categoryId);

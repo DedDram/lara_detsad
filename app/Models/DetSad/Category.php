@@ -15,7 +15,7 @@ class Category extends Model
         return $this->belongsTo(Section::class, 'section_id');
     }
 
-    public static function getCategory($categoryId)
+    public static function getCategory(int $categoryId)
     {
         $category = DB::table('i1il4_detsad_categories as t1')
             ->select("t1.*",
@@ -40,7 +40,7 @@ class Category extends Model
         }
         return $category;
     }
-    public static function getDistrict($categoryId, $district)
+    public static function getDistrict(int $categoryId, string $district)
     {
         return DB::table('i1il4_detsad_districts as t1')
             ->select('t1.id', 't1.name', 't1.morfer_name')
@@ -50,7 +50,7 @@ class Category extends Model
             ->first();
     }
 
-    public static function getDistricts($categoryId): \Illuminate\Support\Collection
+    public static function getDistricts(int $categoryId): \Illuminate\Support\Collection
     {
         return DB::table('i1il4_detsad_districts as t1')
             ->select('t1.name', 't1.alias')
@@ -60,7 +60,7 @@ class Category extends Model
             ->get();
     }
 
-    public static function getItems($categoryId, $district = ''): \Illuminate\Support\Collection
+    public static function getItems(int $categoryId, string $district = ''): \Illuminate\Support\Collection
     {
         if(!empty($district)){
            return DB::table('i1il4_detsad_items as t1')

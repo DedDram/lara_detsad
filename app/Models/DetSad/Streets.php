@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 class Streets
 {
-    public static function getStreets($categoryId, $sectionAlias): ?array
+    public static function getStreets(int $categoryId, string $sectionAlias): ?array
     {
         if ($categoryId == 1) {
             $results = DB::table('i1il4_detsad_address AS t1')
@@ -48,7 +48,7 @@ class Streets
         return null;
     }
 
-    public static function getStreet($categoryId, $streetAlias)
+    public static function getStreet(int $categoryId, string $streetAlias)
     {
         if ($categoryId == 1) {
             $street = DB::table('i1il4_detsad_address AS t1')
@@ -75,7 +75,7 @@ class Streets
         return $street;
     }
 
-    public static function getItems($categoryId, $streetAlias): \Illuminate\Support\Collection
+    public static function getItems(int $categoryId, string $streetAlias): \Illuminate\Support\Collection
     {
         if ($categoryId == 1) {
             return DB::table('i1il4_detsad_items as t1')

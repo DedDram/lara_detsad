@@ -35,20 +35,23 @@ class DetsadGallery extends Model
                         ];
                     }
                     // Создаем папку, если её нет
-                    $dir = 'public/images/detsad/' . $item_id;
-                    Storage::makeDirectory($dir);
+                    $dir = public_path('images' . DIRECTORY_SEPARATOR . 'detsad' . DIRECTORY_SEPARATOR . $item_id);
+                    // Проверяем существование директории перед созданием
+                    if (!file_exists($dir)) {
+                        mkdir($dir, 0755, true);
+                    }
 
-                    // Генерируем уникальное имя файла
+                    // Генерируем уникальное имя файла и сохраняем файл
                     $uniqueName = md5(uniqid(rand(), 1));
-                    $originalFilePath = $uploadedFile->storeAs($dir, $uniqueName);
+                    $uploadedFile->move($dir, $uniqueName);
 
-                    // Resize and create a thumbnail
-                    $filePath = $this->resizeAndCreateThumbnail($dir, $uniqueName, $fileExtension);
+                    // Обрезаем и делаем превью
+                    $this->resizeAndCreateThumbnail($dir, $uniqueName, $fileExtension);
 
-                    // Insert image information into the database
+                    // Пишем в базу
                     $image = new DetsadImage();
                     $image->item_id = $item_id;
-                    $image->original = $uniqueName . '.' . $fileExtension;
+                    $image->original_name = $uniqueName . '.' . $fileExtension;
                     $image->thumb = $uniqueName . '_thumb.' . $fileExtension;
                     $image->alt = $description;
                     $image->title = $description;
@@ -58,15 +61,15 @@ class DetsadGallery extends Model
                     // Send email notification
                     $sadikUrl = Item::getUrlSadik($item_id);
 
-                    $messageText = '<div style="overflow: hidden;"><img src="' . config('app.url') . Storage::url($filePath[1]) . '" style="float: left; margin-right: 10px;"/><br>'
-                        . '<strong>ВУЗ:</strong> <a href="' . config('app.url') . $sadikUrl->url . '">' . $sadikUrl->name . '</a><br>'
+                    $messageText = '<div style="overflow: hidden;"><img src="' . config('app.url') . '/images/detsad/' . $item_id . '/'.$uniqueName . '_thumb.' . $fileExtension.'" style="float: left; margin-right: 10px;"/><br>'
+                        . '<strong>Садик:</strong> <a href="' . config('app.url') . $sadikUrl->url . '">' . $sadikUrl->name . '</a><br>'
                         . '<strong>Описание фото:</strong> ' . $description . '</div>'
                         . '<div style="margin-top: 7px;">'
-                        . '<a style="margin-right: 5px;" href="' . config('app.url') . Storage::url($filePath[0]) . '">Оригинал фото</a>'
-                        . '<a style="margin-right: 5px;" href="' . config('app.url') .'/remove-image-gallery?id='. $image->item_id . '&original_name='.$uniqueName . '.' . $fileExtension.'">Удалить фото</a>'
-                        . '<a style="margin-right: 5px;" href="' . config('app.url') .'/publish-image-gallery?id='. $image->item_id . '&original_name='.$uniqueName . '.' . $fileExtension.'">Опубликовать фото</a>'
+                        . '<a style="margin-right: 5px;" href="' . config('app.url') . '/images/detsad/' . $item_id . '/'.$uniqueName . '.' . $fileExtension.'">Оригинал фото</a>'
+                        . '<a style="margin-right: 5px;" href="' . config('app.url') .'/remove-image-gallery?id='. $item_id. '&original_name='.$uniqueName . '.' . $fileExtension.'">Удалить фото</a>'
+                        . '<a style="margin-right: 5px;" href="' . config('app.url') .'/publish-image-gallery?id='. $item_id . '&original_name='.$uniqueName . '.' . $fileExtension.'">Опубликовать фото</a>'
                         . '</div>';
-                    $subject = 'Новое фото добавлено для ВУЗа';
+                    $subject = 'Новое фото добавлено для Садика';
                     //уведомление админу о новом фото
                     Mail::send([], [], function ($message) use ($subject, $messageText) {
                         $message->to(config('mail.from.address'))
@@ -81,7 +84,7 @@ class DetsadGallery extends Model
                 } else {
                     return [
                         'status' => 2,
-                        'msg' => 'Укажите файл для загрузки'
+                        'msg' => 'Выберите файл для загрузки'
                     ];
                 }
             } else {
@@ -98,9 +101,9 @@ class DetsadGallery extends Model
         }
     }
 
-    private function resizeAndCreateThumbnail($dir, $uniqueName, $extension): array
+    private function resizeAndCreateThumbnail($dir, $uniqueName, $extension): void
     {
-        $filePath = storage_path("app/$dir/$uniqueName");
+        $filePath = $dir. DIRECTORY_SEPARATOR .$uniqueName;
 
         // Resize the image
         $image = Image::make($filePath);
@@ -110,65 +113,70 @@ class DetsadGallery extends Model
         });
 
         // Добавьте расширение к имени файла
-        $originalFilePath = "$dir/$uniqueName.$extension";
+        $originalFilePath = $dir. DIRECTORY_SEPARATOR .$uniqueName.'.'.$extension;
 
         // Сохраните изображение с расширением
-        $image->save(storage_path("app/$originalFilePath"));
+        $image->save($originalFilePath);
 
         // Create thumbnail
-        $thumbFilePath = "$dir/$uniqueName" . '_thumb.' . $extension;
+        $thumbFilePath = $dir. DIRECTORY_SEPARATOR .$uniqueName . '_thumb.' . $extension;
 
         $image->resize(200, 200, function ($constraint) {
             $constraint->aspectRatio();
         });
 
         // Сохраните миниатюру с расширением
-        $image->save(storage_path("app/$thumbFilePath"));
+        $image->save($thumbFilePath);
         // Удалите оригинальный файл
         unlink($filePath);
-
-        return [$originalFilePath, $thumbFilePath];
     }
 
-    public function remove(Request $request)
+    public function remove(Request $request): string
     {
         $original_name = $request->query('original_name');
-        $vuz_id = $request->query('id');
+        $sad_id = $request->query('id');
 
-        $image = VuzImage::where('item_id', $vuz_id)
+        $image = DetsadImage::where('item_id', $sad_id)
             ->where('original_name', $original_name)
             ->first();
 
         if (!empty($image)) {
-            if (Auth::user()->isAdmin() || Auth::user()->vuz_id == $vuz_id) {
-                $filePath = "public/images/vuz/{$vuz_id}/{$image->original_name}";
-                $filePath2 = "public/images/vuz/{$vuz_id}/{$image->thumb}";
-                if (Storage::exists($filePath)) {
-                    Storage::delete($filePath);
-                    Storage::delete($filePath2);
+            if (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->sad_id == $sad_id)) {
 
-                    VuzImage::where('item_id', $vuz_id)
+                $filePath = public_path("images/detsad/{$sad_id}/{$image->original_name}");
+                $filePath2 = public_path("images/detsad/{$sad_id}/{$image->thumb}");
+
+                if (file_exists($filePath)) {
+                    DetsadImage::where('item_id', $sad_id)
                         ->where('original_name', $original_name)
                         ->delete();
+
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+
+                    if (file_exists($filePath2)) {
+                        unlink($filePath2);
+                    }
 
                     return 'Фото удалено!';
                 } else {
                     return 'Ошибка удаления';
                 }
             }else{
-                return 'Фото может удалить только админ или представитель этого ВУЗа';
+                return 'Фото может удалить только админ или представитель этого садика';
             }
 
         }
         return 'Фото не найдено!';
     }
 
-    public function publish(Request $request)
+    public function publish(Request $request): string
     {
         $original_name = $request->query('original_name');
         $vuz_id = $request->query('id');
 
-        $image = VuzImage::where('item_id', $vuz_id)
+        $image = DetsadImage::where('item_id', $vuz_id)
             ->where('original_name', $original_name)
             ->first();
 

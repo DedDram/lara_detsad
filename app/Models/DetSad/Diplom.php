@@ -79,7 +79,7 @@ class Diplom extends Model
         return $item;
     }
 
-    private function getRate($rows, $id): int
+    private function getRate(object $rows, int $id): int
     {
         $rate = 0;
         $joined = array();

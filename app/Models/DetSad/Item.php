@@ -38,7 +38,7 @@ class Item extends Model
         'sid'
     ];
 
-    public static function getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sectionName, $categoryName, $sadId): object
+    public static function getAddress(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, int $sadId): object
     {
 
         if ($sectionId > 1 && $sectionId < 12) {
@@ -87,7 +87,7 @@ class Item extends Model
         return $this->belongsTo(Section::class, 'section_id');
     }
 
-    public static function getStatistics($sadId): ?object
+    public static function getStatistics(int $sadId): ?object
     {
         return DB::table('i1il4_detsad_stat')->select('*')
             ->where('item_id', '=', $sadId)
@@ -95,7 +95,7 @@ class Item extends Model
             ->first();
     }
 
-    public static function getFields($sadId): ?object
+    public static function getFields(int $sadId): ?object
     {
         return DB::table('i1il4_detsad_fields_value AS t1')
             ->select('t1.item_id', 't1.text AS field_text', 't1.type_id', 't2.text AS type_text')

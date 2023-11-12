@@ -60,11 +60,11 @@
         <div class="popup-gallery">
                 @foreach ($gallery as $image)
             <div style="position: relative; display: inline-block;">
-                <a href="{{ asset("/images/detsad/{$item->id}/{$image->original}") }}" title="{{ $image->title }}" class="simplemodal" data-width="800" data-height="500">
+                <a href="{{ asset("/images/detsad/{$item->id}/{$image->original_name}") }}" title="{{ $image->title }}" class="simplemodal" data-width="800" data-height="500">
                     <img src="{{ asset("/images/detsad/{$item->id}/{$image->thumb}") }}" alt="{{ $image->title }}">
                 </a>
                 @if (Auth::check() && (Auth::user()->isAdmin() || (Auth::user()->isAgent() && Auth::user()->vuz_id == $item->id)))
-                <a href="/remove-image-gallery?id={{$item->id}}&original_name={{$image->original}}" class="remove-link">
+                <a href="/remove-image-gallery?id={{$item->id}}&original_name={{$image->original_name}}" class="remove-link">
                     <img src="/images/del.png" style="position: absolute; top: 0; right: 0;width: 20px;height: 20px;" class="remove-img" alt="delete">
                 </a>
                 @endif

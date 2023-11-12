@@ -13,7 +13,7 @@ class DetsadImage extends Model
     protected $fillable = [
         'item_id',
         'thumb',
-        'original',
+        'original_name',
         'alt',
         'title',
         'verified',

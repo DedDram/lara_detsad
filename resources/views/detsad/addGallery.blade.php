@@ -6,7 +6,7 @@
 <body>
 <div id="msg"></div>
 @if (!empty($total) && $total>=8)
-<div id="msg">К данной клинике уже добавлено 8 фотографий, это максимум.</div>
+<div id="msg">К данному садику уже добавлено 8 фотографий, это максимум.</div>
 @else
 <form class="add-gallery" method="post" action="/post/add-gallery" enctype="multipart/form-data">
     @csrf
@@ -20,44 +20,61 @@
 </form>
 
 <script>
-    $(document).ready(function() {
-        $(document).on("submit", ".add-gallery", function(e) {
+    document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("submit", function(e) {
             e.preventDefault();
-            let form = $(this);
-            form.ajaxSubmit({
-                beforeSend: function() {
-                    form.find('.percent').html('0%').show();
-                },
-                uploadProgress: function(event, position, total, percentComplete) {
-                    form.find('.percent').html(percentComplete + '%').show();
-                },
-                success: function(data) {
-                    if(data.status === 1) {
-                        $('#msg').attr('class', 'ui-state-highlight ui-corner-all').html(data.msg).show();
-                        $('form').hide();
-                    }
-                    if(data.status === 2) {
-                        $('#msg').attr('class', 'ui-state-error ui-corner-all').html(data.msg).show();
-                    }
-                    form.find('.percent').html('100%').hide();
-                    $('.postform').css('background-color', '#fff');
-                    $('.postform').css('border', '1px solid #aaa');
-                    if(data.fields) {
-                        $(data.fields).css('background-color', '#fef1ec');
-                        $(data.fields).css('border', '1px solid #cd0a0a');
-                    }
-                    if(data.status > 0) {
-                        scrollUp();
-                    }
-                }
-            });
-        });
+            let form = e.target;
+            ajaxSubmit(form);
+        }, false);
     });
+    function ajaxSubmit(form) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(form.method, form.action, true);
+        xhr.upload.onprogress = function(event) {
+            if (event.lengthComputable) {
+                let percentComplete = (event.loaded / event.total) * 100;
+                form.querySelector('.percent').innerHTML = percentComplete + '%';
+                form.querySelector('.percent').style.display = 'block';
+            }
+        };
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                let data = JSON.parse(xhr.responseText);
 
+                if (data.status === 1) {
+                    showMessage('ui-state-highlight', data.msg);
+                    form.style.display = 'none';
+                } else if (data.status === 2) {
+                    showMessage('ui-state-error', data.msg);
+                }
+                form.querySelector('.percent').innerHTML = '100%';
+                form.querySelector('.percent').style.display = 'none';
+                form.querySelector('.postform').style.backgroundColor = '#fff';
+                form.querySelector('.postform').style.border = '1px solid #aaa';
+                if (data.fields) {
+                    data.fields.forEach(function(field) {
+                        field.style.backgroundColor = '#fef1ec';
+                        field.style.border = '1px solid #cd0a0a';
+                    });
+                }
+
+                if (data.status > 0) {
+                    scrollUp();
+                }
+            }
+        };
+        xhr.send(new FormData(form));
+        function showMessage(className, message) {
+            let msgElement = document.getElementById('msg');
+            msgElement.className = className + ' ui-corner-all';
+            msgElement.innerHTML = message;
+            msgElement.style.display = 'block';
+        }
+    }
     function scrollUp() {
-        let curPos = $(document).scrollTop();
-        let scrollTime = curPos/1.73;
-        $("body,html").animate({"scrollTop":0}, scrollTime);
+        let curPos = window.scrollY || document.documentElement.scrollTop;
+        let scrollTime = curPos / 1.73;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
 @endif

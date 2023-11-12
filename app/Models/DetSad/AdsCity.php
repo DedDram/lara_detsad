@@ -14,7 +14,7 @@ class AdsCity extends Model
         'name'
     ];
 
-    public static function getCity($ads_city, $ads_city_ = '')
+    public static function getCity(string $ads_city, string $ads_city_ = '')
     {
         $query = DB::table('i1il4_ads_city')
             ->select('id', 'alias')
