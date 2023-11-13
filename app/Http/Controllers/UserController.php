@@ -16,17 +16,20 @@ class UserController
 {
     public function agent(Request $request)
     {
+
         if ($request->query('activation') && $request->query('user_id')) {
             $user = User::find($request->query('user_id')); // Найдем пользователя по его идентификатору
+            $sadik = Item::find($user->sad_id);
             if ($user) {
                 $user->status = 1; // Обновим поле status
-                $user->save(); // Сохраняем изменения
-
+                $user->save();
+                $sadik->user_id_agent = $user->id; // Обновим поле user_id_agent в таблице садиков
+                $sadik->save();
                 $data = [
                     'url' => 'https://test.med-otzyv.com',
                 ];
 
-                $subject = 'Представитель ВУЗа активирован';
+                $subject = 'Представитель Садика активирован';
                 $message = 'Добро пожаловать на сайт DetskySad.com, ваш аккаунт представителя садика активирован.';
                 $mail = new AgentNotification($subject, $message, $data);
                 $mail->markdown('mail.agentNotification');

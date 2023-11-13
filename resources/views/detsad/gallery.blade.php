@@ -40,11 +40,11 @@
     <ul id="tabs-menu">
         <li class="iphone5"><a href="{{$url}}">О садике</a></li>
         <li class="tabmobile active "><a rel="nofollow" href="{{$url}}/gallery">Фото <span
-                    class="redtext">{{$countImage}}</span></a></li>
+                    class="redtext">{{!empty($item->count_img) ? $item->count_img : 0}}</span></a></li>
         <li class="tabmobile"><a rel="nofollow" href="{{$url}}/agent">Руководство <span
-                    class="redtext">{{$countAgent ?? ''}}</span></a></li>
+                    class="redtext">{{!empty($item->user_id_agent) ? 1 : ''}}</span></a></li>
         <li><a rel="nofollow" href="{{$url}}/geoshow">Сады рядом <span
-                    class="redtext"><?php echo $item->nearby; ?></span></a></li>
+                    class="redtext">{{$item->nearby ?? 0}}</span></a></li>
         @if($item->ads_url)
             <li><a rel="nofollow" href="{{$item->ads_url}}">Обмен</a></li>
         @endif
@@ -63,7 +63,7 @@
                 <a href="{{ asset("/images/detsad/{$item->id}/{$image->original_name}") }}" title="{{ $image->title }}" class="simplemodal" data-width="800" data-height="500">
                     <img src="{{ asset("/images/detsad/{$item->id}/{$image->thumb}") }}" alt="{{ $image->title }}">
                 </a>
-                @if (Auth::check() && (Auth::user()->isAdmin() || (Auth::user()->isAgent() && Auth::user()->vuz_id == $item->id)))
+                @if (Auth::check() && (Auth::user()->isAdmin() || (Auth::user()->isAgent() && Auth::user()->sad_id == $item->id)))
                 <a href="/remove-image-gallery?id={{$item->id}}&original_name={{$image->original_name}}" class="remove-link">
                     <img src="/images/del.png" style="position: absolute; top: 0; right: 0;width: 20px;height: 20px;" class="remove-img" alt="delete">
                 </a>

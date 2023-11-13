@@ -35,7 +35,6 @@ class RegisterController extends Controller
     // Добавьте метод register, даже если он пустой
     public function register(Request $request)
     {
-
         // Создание нового пользователя
         if (empty($request->input('agent'))) {
             $user = User::create([
@@ -45,13 +44,14 @@ class RegisterController extends Controller
                 'status' => 1
             ]);
         } else {
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'status' => 0,
                 'users_group' => 2,
-                'vuz_id' => $request->input('item_id')
+                'sad_id' => $request->input('item_id')
             ]);
         }
 
@@ -76,7 +76,7 @@ class RegisterController extends Controller
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],

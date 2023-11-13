@@ -11,6 +11,7 @@ use App\Models\DetSad\Item;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
@@ -201,37 +202,19 @@ class DetSadController
 
     public function sadik(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $sadik = Item::query()
-            ->with('category', 'section')
-            ->find($sadId);
+        $item = new Item();
+        $sadik = $item->getItem($sadId);
+
         //проверка верности алиасов
         self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        if ($sadik->section->id > 1 && $sadik->section->id < 15) {
-            $ads_city = 'moskva';
-        } else {
-            $ads_city = $sadik->ads_city;
-        }
-        $sadik->ads_url = '';
-        $ads_city_ = '';
-        if (strpos($ads_city, 'j') !== false) {
-            $ads_city_ = str_replace('j', 'y', $ads_city);
-        }
-        $city_ = AdsCity::getCity($ads_city, $ads_city_);
-        if ($city_ !== null) {
-            $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
-        }
-        $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
-        $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section->name, $sadik->category->name, $sadId);
-        $countImage = Item::getCountImage($sadId);
+        $sadik = self::adsCity($sadik, $sectionId);
+
+        $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
+        $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section_name, $sadik->category_name, $sadId);
         $statistics = Item::getStatistics($sadId);
         $fields = Item::getFields($sadId);
         $commentsTitle = StringHelper::declension($sadik->comments, ['отзыв', 'отзыва', 'отзывов']);
-        $agent =  Item::getAgent($sadId);
-        if($agent !== null){
-            $countAgent = 1;
-        }else{
-            $countAgent = 0;
-        }
+
         if (count($addresses) == 1 && $addresses[0]->locality == 'Москва') {
             $street = ' ' . $addresses[0]->street_address;
         } else {
@@ -281,12 +264,11 @@ class DetSadController
                 'user' => $user,
                 'widthImage' => $widthImage,
                 'heightImage' => $heightImage,
-                'countImage' => $countImage,
+                'countImage' => $sadik->count_img,
                 'addresses' => $addresses,
                 'fields' => $fields,
                 'statistics' => $statistics,
                 'ratingCount' => $ratingCount,
-                'countAgent' => $countAgent,
                 'title' => $title,
                 'metaDesc' => $metaDesc,
                 'metaKey' => $metaKey,
@@ -307,20 +289,18 @@ class DetSadController
 
     public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $sadik = Item::query()
-            ->with('category', 'section')
-            ->find($sadId);
+        $item = new Item();
+        $sadik = $item->getItem($sadId);
         //проверка верности алиасов
         self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        $sadik = self::adsCity($sadik, $sectionId);
         $gallery = Item::getGallery($sadId);
-        $countImage = count($gallery);
-        $url = '/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias;
+        $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
         return view('detsad.gallery',
             [
                 'url'=>$url,
                 'gallery' => $gallery,
                 'object_group' => 'com_detsad',
-                'countImage' => $countImage,
                 'title' => 'Фото ' . $sadik->title,
                 'item' => $sadik
             ]);
@@ -355,13 +335,15 @@ class DetSadController
         return redirect()->to(config('app.url').$linkSadik->url.'/gallery')->with('publishImgOk', $with);
     }
 
-    public function sadAgent($category_id, $category_alias, $vuz_id, $vuz_alias)
+    public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $vuzModel = new Vuz($vuz_id);
-        $item = $vuzModel->getItem();
-        $agent = $vuzModel::getVuzAgent($vuz_id);
-        $url = "/" . $item->category_alias. "/" . $item->item_alias;
-        return view('detsad.agent',['url'=>$url, 'item' => $item, 'agent' => $agent, 'title' => 'Представитель '.$item->name]);
+        $item = new Item();
+        $sadik = $item->getItem($sadId);
+        //проверка верности алиасов
+        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        $sadik = self::adsCity($sadik, $sectionId);
+        $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
+        return view('detsad.agent',['url'=>$url, 'item' => $sadik,'title' => 'Представитель '.$sadik->name]);
 
     }
 
@@ -370,14 +352,33 @@ class DetSadController
         return view('detsad.registrationAgent',['request' => $request]);
     }
 
+    private function adsCity(object $sadik, int $sectionId): object
+    {
+        if ($sectionId > 1 && $sectionId < 15) {
+            $ads_city = 'moskva';
+        } else {
+            $ads_city = $sadik->ads_city;
+        }
+        $sadik->ads_url = '';
+        $ads_city_ = '';
+        if (strpos($ads_city, 'j') !== false) {
+            $ads_city_ = str_replace('j', 'y', $ads_city);
+        }
+        $city_ = AdsCity::getCity($ads_city, $ads_city_);
+        if ($city_ !== null) {
+            $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
+        }
+        return $sadik;
+    }
+
     private function redirectWrongAlias(object $sadik,int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
     {
         if (!empty($sadik)) {
-            if ($sectionId . '-' . $sectionAlias != $sadik->section->id . '-' . $sadik->section->alias ||
-                $categoryId . '-' . $categoryAlias != $sadik->category->id . '-' . $sadik->category->alias ||
-                $sadAlias != $sadik->alias
+            if ($sectionId . '-' . $sectionAlias != $sadik->section_alias ||
+                $categoryId . '-' . $categoryAlias != $sadik->category_alias ||
+                $sadAlias != $sadik->item_alias
             ) {
-                redirect()->to('/' . $sadik->section->id . '-' . $sadik->section->alias . '/' . $sadik->category->id . '-' . $sadik->category->alias . '/' . $sadId . '-' . $sadik->alias);
+                redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias);
             }
         } else {
             abort('404');

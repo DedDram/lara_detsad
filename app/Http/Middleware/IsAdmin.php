@@ -14,9 +14,7 @@ class IsAdmin
         if(Auth::check() && User::isAdmin()){
             return $next($request);
         }else{
-           redirect('/login', 301);
+            return redirect('/login', 301);
         }
-
-
     }
 }

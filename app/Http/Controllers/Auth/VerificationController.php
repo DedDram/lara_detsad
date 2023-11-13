@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vuz\Vuz;
+use App\Models\DetSad\Item;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Client\Request;
@@ -27,16 +27,16 @@ class VerificationController extends Controller
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
             if($request->user()->users_group == 2){
-                //уведомление админу о новом представителе вуза
+                //уведомление админу о новом представителе садика
                 $data = [
                     'user' => $request->user(),
-                    'urlVuz' => Vuz::getUrlVuz($request->user()->vuz_id),
+                    'urlSadik' => Item::getUrlSadik($request->user()->sad_id),
                     'siteName' => config('app.url')
                 ];
                 $agent = 'Теперь дождитесь, когда администратор активирует ваш профиль. Как правило это занимает 5-30 минут.';
                 Mail::send('mail.newAgent', $data, function ($message){
                     $message->to(config('mail.from.address'))
-                        ->subject('Новый представитель вуза');
+                        ->subject('Новый представитель садика');
                 });
                 //разлогиниваем агента, чтобы не шарился по личному кабинету пока не позволено.
                 Auth::logout();

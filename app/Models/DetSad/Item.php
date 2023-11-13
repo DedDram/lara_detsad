@@ -22,21 +22,33 @@ class Item extends Model
         'affiliation',
         'text',
         'preview_src',
-        'preview_alt',
-        'preview_title',
-        'preview_border',
-        'rating_plus',
-        'rating_minus',
-        'rating_sum',
         'okrug',
         'rate',
         'vote',
         'average',
         'comments',
         'nearby',
-        'inn',
+        'user_id_agent',
+        'count_img',
         'sid'
     ];
+    public function getItem(int $sadId)
+    {
+        return DB::table('i1il4_detsad_items AS t1')
+            ->select(
+                't1.*',
+                't2.alias as ads_city',
+                't2.name as category_name',
+                't3.name as section_name',
+                DB::raw('CONCAT_WS("-", t1.id, t1.alias) AS item_alias'),
+                DB::raw('CONCAT_WS("-", t2.id, t2.alias) AS category_alias'),
+                DB::raw('CONCAT_WS("-", t3.id, t3.alias) AS section_alias')
+            )
+            ->join('i1il4_detsad_categories AS t2', 't1.category_id', 't2.id')
+            ->join('i1il4_detsad_sections AS t3', 't1.section_id', 't3.id')
+            ->where('t1.id', $sadId)
+            ->first();
+    }
 
     public static function getAddress(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, int $sadId): object
     {
@@ -48,7 +60,6 @@ class Item extends Model
                 ->leftJoin('i1il4_detsad_categories AS categories', 'categories.id', '=', 'items.category_id')
                 ->leftJoin('i1il4_detsad_sections AS sections', 'sections.id', '=', 'items.section_id')
                 ->where('address.item_id', $sadId)
-                ->orderBy('address.id')
                 ->get();
 
             foreach ($addresses as $address) {
@@ -64,7 +75,6 @@ class Item extends Model
                 $join->on('districts.alias', '=', 'address.district')->where('districts.parent', '=', DB::raw('address.locality'));
             })
                 ->where('address.item_id', $sadId)
-                ->orderBy('address.id')
                 ->get();
 
             foreach ($addresses as $address) {
@@ -91,7 +101,6 @@ class Item extends Model
     {
         return DB::table('i1il4_detsad_stat')->select('*')
             ->where('item_id', '=', $sadId)
-            ->orderBy('id')
             ->first();
     }
 
@@ -113,27 +122,6 @@ class Item extends Model
             ->join('i1il4_detsad_sections as t3', 't3.id', '=', 't1.section_id')
             ->where('t1.id', $sadId)
             ->first();
-    }
-
-    public static function getAgent(int $sadId)
-    {
-        $agent = DB::table('i1il4_detsad_agents')
-            ->select('*')
-            ->where('item_id', $sadId)
-            ->where('verified', '1')
-            ->first();
-
-        if ($agent !== null) {
-            if (!empty($agent->position) && !empty($agent->name) && !empty($agent->phone)) {
-                $agent->info = "<strong>Должность:</strong> " . $agent->position . "<br><strong>ФИО:</strong> " . $agent->name . "<br><strong>Телефон:</strong> " . $agent->phone;
-            }
-            if (!empty($agent->photo_src)) {
-                $agent->img = '<img src="/images/detsad/' . $sadId . '/' . $agent->photo_src . '">';
-            } else {
-                $agent->img = '<img src="/images/no_avatar.gif">';
-            }
-        }
-        return $agent;
     }
 
     public static function getGallery(int $sadId): ?object

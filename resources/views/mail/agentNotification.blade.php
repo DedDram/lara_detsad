@@ -3,7 +3,7 @@
 <p>{{ $message }}</p>
 
 @component('mail::button', ['url' => $data['url'] ?? ''])
-Перейти на V-U-Z.ru
+Перейти на DetskySad.com
 @endcomponent
 
 Если кнопа не работает, перейдите по ссылке {{ $data['url'] }}

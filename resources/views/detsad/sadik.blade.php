@@ -121,11 +121,11 @@
         <ul id="tabs-menu">
             <li class="active iphone5"><a href="{{$url}}">О садике</a></li>
             <li class="tabmobile"><a rel="nofollow" href="{{$url}}/gallery">Фото <span
-                        class="redtext">{{$countImage}}</span></a></li>
+                        class="redtext">{{!empty($item->count_img) ? $item->count_img : 0}}</span></a></li>
             <li class="tabmobile"><a rel="nofollow" href="{{$url}}/agent">Руководство <span
-                        class="redtext">{{$countAgent ?? ''}}</span></a></li>
+                        class="redtext">{{!empty($item->user_id_agent) ? 1 : ''}}</span></a></li>
             <li><a rel="nofollow" href="{{$url}}/geoshow">Сады рядом <span
-                        class="redtext"><?php echo $item->nearby; ?></span></a></li>
+                        class="redtext">{{$item->nearby ?? 0}}</span></a></li>
             @if($item->ads_url)
                 <li><a rel="nofollow" href="{{$item->ads_url}}">Обмен</a></li>
             @endif
@@ -136,8 +136,8 @@
                 @if(!empty($item->preview_src))
                     <span itemscope itemtype="https://schema.org/ImageObject"><img class="preview-border"
                                                                                    style="width: {{$widthImage}}px;height: {{$heightImage}}px"
-                                                                                   alt="{{$item->preview_alt}}"
-                                                                                   title="{{$item->preview_title}}"
+                                                                                   alt="{{$item->header}}"
+                                                                                   title="{{$item->header}}"
                                                                                    src="/images/detsad/{{$item->id}}/{{$item->preview_src}}"
                                                                                    itemprop="contentUrl"></span>
                 @else

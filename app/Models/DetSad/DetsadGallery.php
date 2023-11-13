@@ -174,9 +174,9 @@ class DetsadGallery extends Model
     public function publish(Request $request): string
     {
         $original_name = $request->query('original_name');
-        $vuz_id = $request->query('id');
+        $sad_id = $request->query('id');
 
-        $image = DetsadImage::where('item_id', $vuz_id)
+        $image = DetsadImage::where('item_id', $sad_id)
             ->where('original_name', $original_name)
             ->first();
 
