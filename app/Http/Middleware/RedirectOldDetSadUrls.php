@@ -11,9 +11,15 @@ class RedirectOldDetSadUrls
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && User::isAdmin()) {
-            return $next($request);
+        $path = $request->path();
+
+        // Проверяем, начинается ли URL с "/"
+        if (strpos($path, 'detskie-sady/') === 0) {
+            // Если да, то выполните редирект на новый URL
+            $newPath = substr($path, strlen('detskie-sady/'));
+            return redirect('/' . $newPath, 301);
         }
-        return redirect('/login');
+
+        return $next($request);
     }
 }

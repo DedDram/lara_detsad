@@ -3,8 +3,9 @@
 @endif
 @if(!empty($items))
     <div class="scomments">
+        @if(!empty($countComments))
         {{ $items->links('vendor.pagination.custom-pagination') }}
-
+        @endif
 
         <div class="scomments-items">
             @if(!empty($good) || !empty($neutrally)|| !empty($bad))
@@ -161,7 +162,9 @@
                 @endforeach
             </div>
         </div>
-        {{ $items->links('vendor.pagination.custom-pagination') }}
+            @if(!empty($countComments))
+                {{ $items->links('vendor.pagination.custom-pagination') }}
+            @endif
     </div>
     <div style="margin-top: 5px;"></div>
     @if($countComments >= 5)

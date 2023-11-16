@@ -202,14 +202,13 @@ class DetSadController
 
     public function sadik(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $item = new Item();
-        $sadik = $item->getItem($sadId);
-
-        //проверка верности алиасов
-        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        $sadik = self::adsCity($sadik, $sectionId);
-
+        $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        // Проверка на редирект
+        if ($sadik instanceof \Illuminate\Http\RedirectResponse) {
+            return $sadik;
+        }
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
+
         $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section_name, $sadik->category_name, $sadId);
         $statistics = Item::getStatistics($sadId);
         $fields = Item::getFields($sadId);
@@ -289,13 +288,9 @@ class DetSadController
 
     public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $item = new Item();
-        $sadik = $item->getItem($sadId);
-        //проверка верности алиасов
-        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        $sadik = self::adsCity($sadik, $sectionId);
-        $gallery = Item::getGallery($sadId);
+        $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
+        $gallery = Item::getGallery($sadId);
         return view('detsad.gallery',
             [
                 'url'=>$url,
@@ -337,19 +332,52 @@ class DetSadController
 
     public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
-        $item = new Item();
-        $sadik = $item->getItem($sadId);
-        //проверка верности алиасов
-        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        $sadik = self::adsCity($sadik, $sectionId);
+        $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
         return view('detsad.agent',['url'=>$url, 'item' => $sadik,'title' => 'Представитель '.$sadik->name]);
 
+    }
+    public function sadGeoShow(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    {
+        $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
+        $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section_name, $sadik->category_name, $sadId);
+        return view('detsad.geoshow',
+            [
+                'url'=>$url,
+                'item' => $sadik,
+                'address'=>$addresses,
+                'title' => 'Садики рядом с детским садом '.$sadik->title
+            ]);
     }
 
     public function registrationAgentGet(Request $request)
     {
         return view('detsad.registrationAgent',['request' => $request]);
+    }
+
+    private function getSadikItem(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): object
+    {
+        $item = new Item();
+        $sadik = $item->getItem($sadId);
+        //проверка верности алиасов
+        self::redirectWrongAlias($sadik, $sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
+        return self::adsCity($sadik, $sectionId);
+    }
+
+    private function redirectWrongAlias(object $sadik, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
+    {
+        if (!empty($sadik)) {
+            if ($sectionId . '-' . $sectionAlias != $sadik->section_alias ||
+                $categoryId . '-' . $categoryAlias != $sadik->category_alias ||
+                $sadId . '-' . $sadAlias != $sadik->item_alias
+            ) {
+                redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias)->send();
+                exit();
+            }
+        } else {
+            abort(404);
+        }
     }
 
     private function adsCity(object $sadik, int $sectionId): object
@@ -371,25 +399,12 @@ class DetSadController
         return $sadik;
     }
 
-    private function redirectWrongAlias(object $sadik,int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
-    {
-        if (!empty($sadik)) {
-            if ($sectionId . '-' . $sectionAlias != $sadik->section_alias ||
-                $categoryId . '-' . $categoryAlias != $sadik->category_alias ||
-                $sadAlias != $sadik->item_alias
-            ) {
-                redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias);
-            }
-        } else {
-            abort('404');
-        }
-    }
     private function checkRedirectCategory($categoryId, $categoryAlias)
     {
         $category = Category::getCategory($categoryId);
         if (!empty($category)) {
             if ($categoryAlias != $category->alias) {
-                redirect()->to('/street/' . $categoryId . '-' . $category->alias);
+                return redirect()->to('/street/' . $categoryId . '-' . $category->alias);
             }
         } else {
             abort('404');

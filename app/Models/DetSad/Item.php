@@ -8,6 +8,9 @@ use ReCaptcha\ReCaptcha;
 
 class Item extends Model
 {
+    const CREATED_AT = 'created';
+    const UPDATED_AT = 'modified';
+
     protected $table = 'i1il4_detsad_items';
     protected $primaryKey = 'id';
     protected $fillable = [
@@ -85,6 +88,45 @@ class Item extends Model
         }
 
         return $addresses;
+    }
+
+    public static function AjaxMapGeoShow(float $geo_lat, float $geo_long): array
+    {
+        $result = array();
+
+        $address = DB::table('i1il4_detsad_items AS t1')
+            ->select(
+                't1.id', 't1.name', 't2.title AS category_title', 't4.geo_lat', 't4.geo_long',
+                DB::raw('CONCAT_WS("-", t1.id, t1.alias) AS item_alias'),
+                DB::raw('CONCAT_WS("-", t2.id, t2.alias) AS category_alias'),
+                DB::raw('CONCAT_WS("-", t3.id, t3.alias) AS section_alias')
+            )
+            ->join('i1il4_detsad_categories AS t2', 't1.category_id', 't2.id')
+            ->join('i1il4_detsad_sections AS t3', 't1.section_id', 't3.id')
+            ->join('i1il4_detsad_address AS t4', 't1.id', 't4.item_id')
+            ->whereBetween('t4.geo_long', [DB::raw($geo_long - 0.01), DB::raw($geo_long + 0.01)])
+            ->whereBetween('t4.geo_lat', [DB::raw($geo_lat - 0.01), DB::raw($geo_lat + 0.01)])
+            ->orderBy('t2.id')
+            ->orderBy('t1.name')
+            ->limit(300)
+            ->get();
+
+        if(!empty($address))
+        {
+            foreach($address as $item)
+            {
+                $result[] = array(
+                    'item_id' => $item->id,
+                    'geo_lat' => $item->geo_lat,
+                    'geo_long' => $item->geo_long,
+                    'url' => env('APP_URL').'/'.$item->section_alias.'/'.$item->category_alias.'/'.$item->item_alias,
+                    'geo_code' => $item->name,
+                    'category_title' => $item->category_title
+                );
+            }
+        }
+
+        return $result;
     }
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
