@@ -39,6 +39,12 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 Route::get('/verification-success', function () {return view('users.verificationSuccess', ['title' => 'Регистрация подтверждена!',]);})->name('verification.verified');
 Auth::routes(['verify' => true]);
 
+//Обмен местами в детских садах
+Route::get('/obmen-mest', [ExchangeDetSadController::class, 'exchange']);
+Route::any('/obmen-add', [ExchangeDetSadController::class, 'add']);
+Route::get('/obmen-mest/{city_id}-{city_alias}', [ExchangeDetSadController::class, 'exchange']);
+Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeDetSadController::class, 'exchange']);
+
 //Садики
 Route::get('/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);
 Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}', [DetSadController::class, 'category'])->where(['section_id' => '[0-9]+','category_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+', 'category_alias' => '[a-z0-9-]+']);
@@ -57,9 +63,6 @@ Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id
 Route::get('/registration-agent', [DetSadController::class, 'registrationAgentGet']);
 Route::post('/registration-agent', [RegisterController::class, 'register'])->name('registrationAgentPost');
 Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/geoshow', [DetSadController::class, 'sadGeoShow'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
-
-//Обмен местами в детских садах
-Route::get('/obmen-mest', [ExchangeDetSadController::class, 'main']);
 
 //aiax запросы
 Route::any('/ajax', [AjaxController::class, 'getResponse']);

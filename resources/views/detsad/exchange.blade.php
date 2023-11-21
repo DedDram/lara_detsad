@@ -10,6 +10,7 @@
 @section('scripts')
     @parent
     <script src="{{ mix('/js/simpleModal.js') }}" defer></script>
+    <script src="{{ mix('/js/recaptchaAdsAndSelect.js') }}" defer></script>
 @endsection
 @section('content')
     <!--beforecontent-->
@@ -59,18 +60,26 @@
             .
             Добавляйте свои объявления, описывайте куда хотите поменяться и возможно,
             Вам ответят заинтересованные родители.</p>
-        <span style="text-align: center"><a href="/obmen&format=raw" class="simplemodal button" data-width="530"
+        <span style="text-align: center"><a href="/obmen-add" class="simplemodal button" data-width="530"
                                             data-height="420">Добавить объявление</a></span>
     </div>
 
     <br>
     <div style="margin-bottom: 32px;">
         <div style="float: left; margin-right: 14px;">
-            {!! Form::select('city', $city, null, ['class' => 'inputbox', 'size' => '1', 'id' => 'citySelect']) !!}
+            <select id="citySelect" class="inputbox" size="1">
+                @foreach ($city as $item)
+                    <option value="{{ $item['id'] }}">{{ $item['title'] }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div id="mSelect" style="display: none; float: left; margin-right: 14px;">
-            {!! Form::select('metro', $metro, null, ['class' => 'inputbox', 'size' => '1', 'id' => 'metroSelect']) !!}
+            <select id="metroSelect" class="inputbox" size="1">
+                @foreach ($metro as $value)
+                    <option value="{{ $value['id'] }}">{{ $value['title'] }}</option>
+                @endforeach
+            </select>
         </div>
         <a href="#" id="search-obmen" style="float: left; margin-right: 14px;" class="button">Поиск</a>
     </div>
@@ -91,14 +100,14 @@
                         @if(!empty($item->phone))
                             <b> Телефон:</b> <span class="show-popup-recaptcha">
                             {{substr($item->phone, 0, 7)}}...<a rel="nofollow" data-id="{{$item->id}}"
-                                                                data-task="getPhone" href="#">показать</a></span><br>
+                                                                data-task="phoneAds" href="#">показать</a></span><br>
                         @endif
 
                         @if(!empty($item->fullname))
                             <b> Контактное лицо:</b> {{$item->fullname}}
                             @if(!empty($item->email))
                                 (<span class="show-popup-recaptcha"><a rel="nofollow" data-id="{{$item->id}}"
-                                                                       data-task="getMail" href="#">показать e-mail</a></span>
+                                                                       data-task="mailAds" href="#">показать e-mail</a></span>
                                 )
                             @endif
                             <br>
@@ -120,12 +129,11 @@
             <hr>
         @endforeach
         <br>
-        <div class="pagination" style="border-top: 1px solid #d6dadd;">
-                <?php echo $pagination->getPagesLinks(); ?>
-        </div>
+        @if(!empty($items))
+            {{ $items->links('vendor.pagination.custom-pagination') }}
+        @endif
     @else
         Объявлений нет
     @endif
-
 @endsection
 
