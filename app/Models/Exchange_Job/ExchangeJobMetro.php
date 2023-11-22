@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models\Exchange;
+namespace App\Models\Exchange_Job;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ExchangeCity extends Model
+class ExchangeJobMetro extends Model
 {
-    protected $table = 'i1il4_ads_city';
+    protected $table = 'i1il4_ads_metro';
     protected $primaryKey = 'id';
 
     protected $fillable =

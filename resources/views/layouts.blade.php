@@ -16,7 +16,7 @@
                 var toggleMenu = document.querySelector(".toggleMenu");
                 var nav = document.querySelector(".nav");
                 toggleMenu.addEventListener("click", function(event) {
-                    event.preventDefault(); // Предотвращаем переход по ссылке
+                    event.preventDefault();
                     if (nav.style.display === "block") {
                         nav.style.display = "none";
                     } else {
@@ -87,7 +87,7 @@
                 <a href="/obmen-mest">Обмен мест в садиках</a>
             </li>
             <li>
-                <a href="/rabota-vsadu">Работа в детском саду</a>
+                <a href="/rabota">Работа в детском саду</a>
             </li>
             <li>
                 <a href="/zanyatiya-v-detskom-sadu">Занятия в детском саду</a>

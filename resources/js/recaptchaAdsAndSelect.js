@@ -73,23 +73,66 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.getElementById('search-obmen').addEventListener('click', function(event) {
-        event.preventDefault();
+    var searchObmenButton = document.getElementById('search-obmen');
+    if(searchObmenButton){
+        document.getElementById('search-obmen').addEventListener('click', function(event) {
+            event.preventDefault();
 
-        var citySelect = document.getElementById('citySelect');
-        var metroSelect = document.getElementById('metroSelect');
+            var citySelect = document.getElementById('citySelect');
+            var metroSelect = document.getElementById('metroSelect');
 
-        var city = citySelect.options[citySelect.selectedIndex].value;
-        var metro = metroSelect.options[metroSelect.selectedIndex].value;
+            var city = citySelect.options[citySelect.selectedIndex].value;
+            var metro = metroSelect.options[metroSelect.selectedIndex].value;
 
-        if (city !== '0') {
-            var url = '/obmen-mest/' + city;
+            if (city !== '0') {
+                var url = '/obmen-mest/' + city;
 
-            if (metro !== '0') {
-                url += '/' + metro;
+                if (metro !== '0') {
+                    url += '/' + metro;
+                }
+
+                location.href = url;
+            }
+        });
+    }
+
+
+    var searchRabotaButton = document.getElementById('search-rabota');
+
+    if(searchRabotaButton){
+        document.getElementById('search-rabota').addEventListener('click', function(event) {
+            event.preventDefault();
+
+            var city = document.getElementById("citySelect").value;
+            var metro = document.getElementById("metroSelect").value;
+            var sType = document.getElementById("type").value;
+            var teachers = document.getElementById("teachers").value;
+            var req = [];
+            var request = '';
+
+            if (sType !== "0") {
+                req.push('type=' + sType);
             }
 
-            location.href = url;
-        }
-    });
+            if (teachers !== "0") {
+                req.push('teachers=' + teachers);
+            }
+
+            if (req.length > 0) {
+                request = '/?' + req.join('&');
+            }
+
+            if (city !== "0") {
+                if (metro !== "0") {
+                    location.href = '/rabota/' + city + '/' + metro + request;
+                } else {
+                    location.href = '/rabota/' + city + request;
+                }
+            } else {
+                if (req.length > 0) {
+                    location.href = '/rabota' + request;
+                }
+            }
+        });
+    }
 });

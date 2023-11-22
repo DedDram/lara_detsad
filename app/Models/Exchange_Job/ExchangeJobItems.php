@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Exchange;
+namespace App\Models\Exchange_Job;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class ExchangeItems extends Model
+class ExchangeJobItems extends Model
 {
     protected $table = 'i1il4_ads_items';
     protected $primaryKey = 'id';
@@ -29,73 +29,33 @@ class ExchangeItems extends Model
             'text',
             'teach',
         ];
-    protected object $city;
-    protected object $metro;
 
-    public function __construct(array $attributes = [], int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+
+    public function getCity(int $cityId)
     {
-        parent::__construct($attributes);
-        // Redirect alias
-        if(!empty($cityId) || !empty($metroId))
-        {
-            if(!empty($cityId))
-            {
-                $this->city = ExchangeCity::selectRaw("CONCAT_WS('-', id, alias) AS alias, name")
-                    ->where('id', $cityId)
-                    ->first();
-
-                if (empty($this->city->alias)) {
-                    abort(404);
-                }
-            }
-            if(!empty($metroId))
-            {
-                $this->metro = ExchangeMetro::selectRaw("CONCAT_WS('-', id, alias) AS alias, name")
-                    ->where('id', $metroId)
-                    ->first();
-
-                if (empty($this->metro->alias)) {
-                    abort(404);
-                }
-            }
-            if(!empty($this->metro) && ($metroId. '-' .$metroAlias != $this->metro->alias || $cityId. '-' .$cityAlias != $this->city->alias)){
-                redirect()->to('/obmen-mest/' . $this->city->alias . '/' . $this->metro->alias)->send();
-                exit();
-            }
-            if(!empty($this->city) &&  $cityId. '-' .$cityAlias != $this->city->alias){
-                redirect()->to('/obmen-mest/' . $this->city->alias)->send();
-                exit();
-            }
-        }
+        return ExchangeJobCity::selectRaw("CONCAT_WS('-', id, alias) AS alias, name")
+            ->where('id', $cityId)
+            ->first();
     }
 
-    public function getCityName()
+    public function getMetro(int $metroId)
     {
-        if(!empty($this->city->name))
-        {
-            return $this->city->name;
-        }
-    }
-
-    public function getMetroName()
-    {
-        if(!empty($this->metro->name))
-        {
-            return $this->metro->name;
-        }
+        return ExchangeJobMetro::selectRaw("CONCAT_WS('-', id, alias) AS alias, name")
+            ->where('id', $metroId)
+            ->first();
     }
 
     public function city(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ExchangeCity::class, 'city_id');
+        return $this->belongsTo(ExchangeJobCity::class, 'city_id');
     }
     public function metro(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ExchangeMetro::class, 'metro_id');
+        return $this->belongsTo(ExchangeJobMetro::class, 'metro_id');
     }
     public function teachers(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(ExchangeTeachers::class, 'teacher_id');
+        return $this->belongsTo(ExchangeJobTeachers::class, 'teacher_id');
     }
 
     public function getItems(int $city_id, int $metro_id): \Illuminate\Contracts\Pagination\LengthAwarePaginator
@@ -190,7 +150,7 @@ class ExchangeItems extends Model
 
     public static function getPhone(int $id)
     {
-        $exchangeItem = ExchangeItems::find($id);
+        $exchangeItem = ExchangeJobItems::find($id);
         if($exchangeItem !== null){
             return $exchangeItem->phone;
         }
@@ -198,7 +158,7 @@ class ExchangeItems extends Model
 
     public static function getEmail(int $id)
     {
-        $exchangeItem = ExchangeItems::find($id);
+        $exchangeItem = ExchangeJobItems::find($id);
         if($exchangeItem !== null){
             return $exchangeItem->email;
         }

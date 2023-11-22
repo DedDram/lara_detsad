@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-
-
-
-use App\Models\Exchange\ExchangeItems;
+use App\Models\Exchange_Job\ExchangeJobItems;
+use App\Models\Exchange_Job\ExchangeJobTeachers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class ExchangeDetSadController
+class ExchangeJobController
 {
+    public object $city;
+    public object $metro;
+
+    public string $cityName = '';
+    public string $metroName = '';
+
     public function exchange(int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
     {
-        $exchange = new ExchangeItems($attributes = [], $cityId, $cityAlias, $metroId, $metroAlias);
+        $exchange = new ExchangeJobItems();
+
+        // Redirect alias
+        self::RedirectAlias($exchange, 'obmen-mest', $cityId, $cityAlias, $metroId, $metroAlias);
 
         $items = $exchange->getItems($cityId, $metroId);
         $city = $exchange->getCitySearch();
         $metro = $exchange->getMetroSearch();
-        $cityName = $exchange->getCityName();
-        $metroName = $exchange->getMetroName();
 
         if(!empty($cityName)){
             if(!empty($metroName)){
@@ -43,8 +47,8 @@ class ExchangeDetSadController
                 'city' => $city,
                 'metro' => $metro,
                 'title' => $title,
-                'cityName' => $cityName,
-                'metroName' => $metroName,
+                'cityName' => $this->cityName,
+                'metroName' => $this->metroName,
                 'metaDesc' => $metaDesc,
                 'metaKey' => $metaKey,
             ]);
@@ -53,7 +57,7 @@ class ExchangeDetSadController
     public function add(Request $request)
     {
         if ($request->isMethod('get')) {
-            $exchange = new ExchangeItems();
+            $exchange = new ExchangeJobItems();
             $city = $exchange->getCitySearch();
             $metro = $exchange->getMetroSearch();
 
@@ -70,7 +74,7 @@ class ExchangeDetSadController
             } else {
                 $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
                 $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
-                $exchangeItem = new ExchangeItems();
+                $exchangeItem = new ExchangeJobItems();
                 $exchangeItem->status = 1;
                 $exchangeItem->ip = $request->ip();
                 $exchangeItem->city_id = $city_id;
@@ -123,6 +127,85 @@ class ExchangeDetSadController
             return [
                 'status' => 1
             ];
+        }
+    }
+
+
+    public function job(int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+    {
+        $exchange = new ExchangeJobItems();
+        // Redirect alias
+        self::RedirectAlias($exchange, 'rabota', $cityId, $cityAlias, $metroId, $metroAlias);
+
+        $items = $exchange->getItems($cityId, $metroId);
+        $city = $exchange->getCitySearch();
+        $teachers = ExchangeJobTeachers::getTeachersSearch();
+        $metro = $exchange->getMetroSearch();
+
+        if(!empty($cityName)){
+            if(!empty($metroName)){
+                $metaKey = 'детские, сады, работа, вакансии, '.$cityName. ', '.$metroName;
+                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅'.$cityName. ' метро '.$metroName;
+                $title = 'Работа в детских садах '.$cityName. ' метро '.$metroName;
+            }else{
+                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅'.$cityName;
+                $metaKey = 'детские, сады, обмен, мест, '.$cityName;
+                $title = 'Работа в детских садах '.$cityName;
+            }
+        }else{
+            $title = 'Работа в детских садах';
+            $metaKey = 'детские, сады, работа, объявления';
+            $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅';
+        }
+        return view('detsad.job',
+            [
+                'items' => $items,
+                'city' => $city,
+                'metro' => $metro,
+                'title' => $title,
+                'teachers' => $teachers,
+                'cityName' => $this->cityName,
+                'metroName' => $this->metroName,
+                'metaDesc' => $metaDesc,
+                'metaKey' => $metaKey,
+            ]);
+    }
+
+    private function RedirectAlias(object $exchange, string $firstAlias, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+    {
+        // Redirect alias
+        if(!empty($cityId) || !empty($metroId))
+        {
+            if(!empty($cityId))
+            {
+                $this->city = $exchange->getCity($cityId)
+                    ->where('id', $cityId)
+                    ->first();
+
+                if (empty($this->city->alias)) {
+                    abort(404);
+                }
+                $this->cityName = $this->city->name;
+            }
+            if(!empty($metroId))
+            {
+                $this->metro = $exchange->getMetro($metroId)
+                    ->where('id', $cityId)
+                    ->first();
+
+                if (empty($this->metro->alias)) {
+                    abort(404);
+                }
+                $this->metroName = $this->metro->name;
+            }
+            if(!empty($this->city) &&  $cityId. '-' .$cityAlias != $this->city->id.'-'.$this->city->alias){
+                redirect()->to("/$firstAlias/" . $this->city->id.'-'.$this->city->alias)->send();
+                exit();
+            }
+            if(!empty($this->metro) && ($metroId. '-' .$metroAlias != $this->metro->id.'-'.$this->metro->alias || $cityId. '-' .$cityAlias != $this->city->id.'-'.$this->city->alias)){
+                redirect()->to("/$firstAlias/" . $this->city->id.'-'.$this->city->alias . '/' . $this->metro->id.'-'.$this->metro->alias)->send();
+                exit();
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\DetSadController;
 use App\Http\Controllers\DiplomController;
 use App\Http\Controllers\ErrorController;
-use App\Http\Controllers\ExchangeDetSadController;
+use App\Http\Controllers\ExchangeJobController;
 use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -40,10 +40,15 @@ Route::get('/verification-success', function () {return view('users.verification
 Auth::routes(['verify' => true]);
 
 //Обмен местами в детских садах
-Route::get('/obmen-mest', [ExchangeDetSadController::class, 'exchange']);
-Route::any('/obmen-add', [ExchangeDetSadController::class, 'add']);
-Route::get('/obmen-mest/{city_id}-{city_alias}', [ExchangeDetSadController::class, 'exchange']);
-Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeDetSadController::class, 'exchange']);
+Route::get('/obmen-mest', [ExchangeJobController::class, 'exchange']);
+Route::any('/obmen-add', [ExchangeJobController::class, 'add']);
+Route::get('/obmen-mest/{city_id}-{city_alias}', [ExchangeJobController::class, 'exchange']);
+Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'exchange']);
+
+//Работа в детских садах
+Route::get('/rabota', [ExchangeJobController::class, 'job']);
+Route::get('/rabota/{city_id}-{city_alias}', [ExchangeJobController::class, 'job']);
+Route::get('/rabota/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'job']);
 
 //Садики
 Route::get('/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);
@@ -64,7 +69,7 @@ Route::get('/registration-agent', [DetSadController::class, 'registrationAgentGe
 Route::post('/registration-agent', [RegisterController::class, 'register'])->name('registrationAgentPost');
 Route::get('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/geoshow', [DetSadController::class, 'sadGeoShow'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'sad_id' => '[0-9]+', 'sad_alias' => '[a-z0-9-]+']);
 
-//aiax запросы
+//ajax запросы
 Route::any('/ajax', [AjaxController::class, 'getResponse']);
 
 //Нашли ошибку
