@@ -20,7 +20,7 @@
         <p>Ниже представлены резюме соискателей и вакансии детских садов {{ !empty($cityName) ? 'г.'.$cityName : '' }}</p>
         <p>Все мы хоть раз сталкивались с проблемой поиска работы. На этой странице мы хотим помочь Вам найти работу в дошкольных учреждения.
             Соискатели могут добавить свое мини резюме, а работодатели - данные о свободной вакансии.</p>
-        <span style="text-align: center"><a href="/rabota_add" class="simplemodal button" data-width="530" data-height="680">Добавить Резюме/Вакансию</a></span>
+        <span style="text-align: center"><a href="/rabota-add" class="simplemodal button" data-width="530" data-height="680">Добавить Резюме/Вакансию</a></span>
     </div>
 
     <br>

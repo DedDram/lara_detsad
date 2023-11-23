@@ -83,14 +83,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var city = citySelect.options[citySelect.selectedIndex].value;
             var metro = metroSelect.options[metroSelect.selectedIndex].value;
-
             if (city !== '0') {
                 var url = '/obmen-mest/' + city;
 
                 if (metro !== '0') {
                     url += '/' + metro;
                 }
-
+                console.log(location.href)
                 location.href = url;
             }
         });

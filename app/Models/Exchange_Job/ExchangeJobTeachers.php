@@ -26,7 +26,6 @@ class ExchangeJobTeachers extends Model
             return (array) $item;
         }, $objects);
 
-        array_unshift($teachers, array('title' => '- Специальность -', 'id' => 0));
         return $teachers;
     }
 }

@@ -47,6 +47,7 @@ Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [Excha
 
 //Работа в детских садах
 Route::get('/rabota', [ExchangeJobController::class, 'job']);
+Route::any('/rabota-add', [ExchangeJobController::class, 'addJob']);
 Route::get('/rabota/{city_id}-{city_alias}', [ExchangeJobController::class, 'job']);
 Route::get('/rabota/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'job']);
 

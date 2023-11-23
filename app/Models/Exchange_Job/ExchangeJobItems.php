@@ -58,7 +58,7 @@ class ExchangeJobItems extends Model
         return $this->belongsTo(ExchangeJobTeachers::class, 'teacher_id');
     }
 
-    public function getItems(int $city_id, int $metro_id): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getItems($request, string $exchange_or_job, int $city_id, int $metro_id): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         if(!empty($city_id))
         {
@@ -71,9 +71,20 @@ class ExchangeJobItems extends Model
                     )
                     ->join('i1il4_ads_city AS t2', 't1.city_id', 't2.id')
                     ->leftJoin('i1il4_ads_metro AS t3', 't1.metro_id', 't3.id')
+                    ->when($request->filled('teachers'), function ($query) use ($request) {
+                        $teacherName = DB::table('i1il4_ads_teachers')->select('name')->where('id', '=', $request->query('teachers'))->first();
+                        return $query->where('t1.teach', 'LIKE', '%' . $teacherName->name . '%');
+                    })
                     ->where('t1.city_id', $city_id)
                     ->where('t1.metro_id', $metro_id)
-                    ->where('t1.type', 0)
+                    ->when($exchange_or_job == 'job', function ($query) {
+                        return $query->where('t1.type', '>', 0);
+                    }, function ($query) {
+                        return $query->where('t1.type', 0);
+                    })
+                    ->when($request->filled('teachers'), function ($query) use ($request) {
+                        return $query->where('t1.teach', 'LIKE', "%t4.name%");
+                    })
                     ->where('t1.status', 1)
                     ->orderBy('t1.id', 'desc')
                     ->paginate(50);
@@ -85,8 +96,19 @@ class ExchangeJobItems extends Model
                     )
                     ->join('i1il4_ads_city AS t2', 't1.city_id', 't2.id')
                     ->leftJoin('i1il4_ads_metro AS t3', 't1.metro_id', 't3.id')
+                    ->when($request->filled('teachers'), function ($query) use ($request) {
+                        $teacherName = DB::table('i1il4_ads_teachers')->select('name')->where('id', '=', $request->query('teachers'))->first();
+                        return $query->where('t1.teach', 'LIKE', '%' . $teacherName->name . '%');
+                    })
                     ->where('t1.city_id', $city_id)
-                    ->where('t1.type', 0)
+                    ->when($exchange_or_job == 'job', function ($query) {
+                        return $query->where('t1.type', '>', 0);
+                    }, function ($query) {
+                        return $query->where('t1.type', 0);
+                    })
+                    ->when($request->filled('type'), function ($query) use ($request) {
+                        return $query->where('t1.type', '=', $request->query('type'));
+                    })
                     ->where('t1.status', 1)
                     ->orderBy('t1.id', 'desc')
                     ->paginate(50);
@@ -99,21 +121,36 @@ class ExchangeJobItems extends Model
                 )
                 ->join('i1il4_ads_city AS t2', 't1.city_id', 't2.id')
                 ->leftJoin('i1il4_ads_metro AS t3', 't1.metro_id', 't3.id')
-                ->where('t1.type', 0)
+                ->when($request->filled('teachers'), function ($query) use ($request) {
+                    $teacherName = DB::table('i1il4_ads_teachers')->select('name')->where('id', '=', $request->query('teachers'))->first();
+                    return $query->where('t1.teach', 'LIKE', '%' . $teacherName->name . '%');
+                })
+                ->when($exchange_or_job == 'job', function ($query) {
+                    return $query->where('t1.type', '>', 0);
+                }, function ($query) {
+                    return $query->where('t1.type', 0);
+                })
+                ->when($request->filled('type'), function ($query) use ($request) {
+                    return $query->where('t1.type', '=', $request->query('type'));
+                })
                 ->where('t1.status', 1)
                 ->orderBy('t1.id', 'desc')
                 ->paginate(50);
         }
     }
 
-    public function getCitySearch(): array
+    public function getCitySearch(string $exchange_or_job): array
     {
         $cityObjects = DB::table('i1il4_ads_city AS t1')
             ->select('t1.name AS title',
                 DB::raw("CONCAT_WS('-', t1.id, t1.alias) AS id"),
             )
             ->join('i1il4_ads_items AS t2', 't1.id', 't2.city_id')
-            ->where('t2.type', 0)
+            ->when($exchange_or_job == 'job', function ($query) {
+                return $query->where('t2.type', '>', 0);
+            }, function ($query) {
+                return $query->where('t2.type', 0);
+            })
             ->groupBy('t1.id', 't1.name', 't1.alias')
             ->orderBy('t1.name', 'asc')
             ->get()
@@ -126,7 +163,7 @@ class ExchangeJobItems extends Model
         return $city;
     }
 
-    public function getMetroSearch(): array
+    public function getMetroSearch(string $exchange_or_job): array
     {
         $metroObjects = DB::table('i1il4_ads_metro AS t1')
             ->select('t1.name AS title',
@@ -134,7 +171,11 @@ class ExchangeJobItems extends Model
             )
             ->join('i1il4_ads_items AS t2', 't1.id', 't2.metro_id')
             ->where('t2.city_id', 4)
-            ->where('t2.type', 0)
+            ->when($exchange_or_job == 'job', function ($query) {
+                return $query->where('t2.type', '>', 0);
+            }, function ($query) {
+                return $query->where('t2.type', 0);
+            })
             ->groupBy('t1.id', 't1.name', 't1.alias')
             ->orderBy('t1.name', 'asc')
             ->get()

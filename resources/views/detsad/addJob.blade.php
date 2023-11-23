@@ -6,8 +6,9 @@
 </head>
 <body>
 <script>
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     document.addEventListener('DOMContentLoaded', function () {
-       let form = document.getElementById('form');
+        let form = document.getElementById('form');
         if (form) {
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
@@ -25,8 +26,9 @@
                 submitBtn.style.display = 'none';
 
                 let xhr = new XMLHttpRequest();
-                xhr.open('POST', '/obmen-add', true);
+                xhr.open('POST', '/rabota-add', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
                 xhr.responseType = 'json';
                 xhr.onload = function () {
                     if (xhr.status === 200) {
@@ -60,8 +62,8 @@
 </script>
 
 <div id="msg" style="color: red; font-weight: bold;"></div>
-<h3>Добавить объявление</h3>
-<form id="form" method="POST">
+<h3>Добавить резюме/вакансию</h3>
+<form id="form" method="POST" enctype="multipart/form-data">
     @csrf
     <div>
         <select id="citySelect" class="inputbox" size="1">
@@ -78,15 +80,27 @@
             @endforeach
         </select>
     </div>
+
     <input type="text" name="phone" id="phone" placeholder="Телефон" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
-    <input type="text" name="email" id="email" placeholder="E-mail" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%" required>
     <br>
-    <input type="text" name="username" id="username" placeholder="Контактное лицо" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%" required>
+    <input type="text" name="email" id="email" placeholder="E-mail" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
+    <br>
+    <input type="text" name="username" id="fullname" placeholder="Контактное лицо" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
 
     <div style="height: 10px;"></div>
 
-    <label>Укажите какой садик Вы предлагаете к обмену и на какой хотите поменять.</label>
-    <textarea name="text" class="ui-corner-all" style="width: 98%;height: 100px;" required></textarea>
+    <label>Фотография</label>
+    <input type="file" name="file" id="file">
+    <div style="height: 10px;"></div>
+    <label>Выберите предметы преподавания</label>
+    <div style="overflow: auto; width: 98%; height: 150px; border: 2px solid #ccc;">
+        @foreach($teachers as $teacher):
+        <input type="checkbox" value="{{ $teacher['id'] }}" name="teacher[{{ $teacher['id'] }}]" /> {{ $teacher['title'] }}<br/>
+        @endforeach
+    </div>
+    <div style="height: 10px;"></div>
+    <label>Комментарии</label>
+    <textarea name="text" style="width: 98%;height: 100px;"></textarea>
     <input type="hidden" name="city_id" id="hiddenCity" value="">
     <input type="hidden" name="metro_id" id="hiddenMetro" value="">
     <input type="submit" name="submit" id="submit" value="Добавить">
