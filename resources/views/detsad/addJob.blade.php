@@ -27,7 +27,6 @@
 
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', '/rabota-add', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
                 xhr.responseType = 'json';
                 xhr.onload = function () {
@@ -37,6 +36,7 @@
 
                         if (msgElement) {
                             msgElement.innerHTML = data.msg;
+                            form.remove();
                         }
 
                         if (data.msg !== 'Объявление будет опубликовано после проверки модератором') {
@@ -45,7 +45,7 @@
                     }
                 };
 
-                xhr.send(new URLSearchParams(new FormData(form)).toString());
+                xhr.send(new FormData(form));
             });
         }
 
@@ -62,9 +62,16 @@
 </script>
 
 <div id="msg" style="color: red; font-weight: bold;"></div>
-<h3>Добавить резюме/вакансию</h3>
 <form id="form" method="POST" enctype="multipart/form-data">
     @csrf
+    <h3>Добавить резюме/вакансию</h3>
+    <div style="margin-bottom: 10px">
+    <select name="type" id="type" required>
+        <option value="0">- Вакансия/Резюме -</option>
+        <option value="1">Вакансия (я предлагаю работу)</option>
+        <option value="2">Резюме (я ищу работу)</option>
+    </select>
+    </div>
     <div>
         <select id="citySelect" class="inputbox" size="1">
             @foreach ($city as $item)
@@ -82,9 +89,9 @@
     </div>
 
     <input type="text" name="phone" id="phone" placeholder="Телефон" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
-    <br>
+
     <input type="text" name="email" id="email" placeholder="E-mail" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
-    <br>
+
     <input type="text" name="username" id="fullname" placeholder="Контактное лицо" class="ui-corner-all postform" style="width: 98%; margin-bottom: 2%; margin-top: 3%" required>
 
     <div style="height: 10px;"></div>
@@ -93,12 +100,12 @@
     <input type="file" name="file" id="file">
     <div style="height: 10px;"></div>
     <label>Выберите предметы преподавания</label>
-    <div style="overflow: auto; width: 98%; height: 150px; border: 2px solid #ccc;">
+    <div style="overflow: auto; width: 98%; height: 150px; border: 2px solid #ccc;margin-bottom: 10px">
         @foreach($teachers as $teacher):
         <input type="checkbox" value="{{ $teacher['id'] }}" name="teacher[{{ $teacher['id'] }}]" /> {{ $teacher['title'] }}<br/>
         @endforeach
     </div>
-    <div style="height: 10px;"></div>
+
     <label>Комментарии</label>
     <textarea name="text" style="width: 98%;height: 100px;"></textarea>
     <input type="hidden" name="city_id" id="hiddenCity" value="">

@@ -37,6 +37,9 @@
                             msgElement.innerHTML = data.msg;
                         }
 
+                        if (data.msg === 'Объявление будет опубликовано после проверки модератором') {
+                            form.remove();
+                        }
                         if (data.msg !== 'Объявление будет опубликовано после проверки модератором') {
                             submitBtn.style.display = 'block';
                         }
@@ -60,9 +63,9 @@
 </script>
 
 <div id="msg" style="color: red; font-weight: bold;"></div>
-<h3>Добавить объявление</h3>
 <form id="form" method="POST">
     @csrf
+    <h3>Добавить объявление</h3>
     <div>
         <select id="citySelect" class="inputbox" size="1">
             @foreach ($city as $item)

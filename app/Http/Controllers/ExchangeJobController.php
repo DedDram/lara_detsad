@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Exchange_Job\ExchangeJobItems;
 use App\Models\Exchange_Job\ExchangeJobTeachers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -27,15 +28,15 @@ class ExchangeJobController
         $city = $exchange->getCitySearch('exchange');
         $metro = $exchange->getMetroSearch('exchange');
 
-        if(!empty($cityName)){
-            if(!empty($metroName)){
-                $metaKey = 'детские, сады, обмен, мест, '.$cityName. ', '.$metroName;
-                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$cityName. ' метро '.$metroName;
-                $title = 'Обмен местами в детских садах '.$cityName. ' метро '.$metroName;
+        if(!empty($this->cityName)){
+            if(!empty($this->metroName)){
+                $metaKey = 'детские, сады, обмен, мест, '.$this->cityName. ', '.$this->metroName;
+                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$this->cityName. ' метро '.$this->metroName;
+                $title = 'Обмен местами в детских садах '.$this->cityName. ' метро '.$this->metroName;
             }else{
-                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$cityName;
-                $metaKey = 'детские, сады, обмен, мест, '.$cityName;
-                $title = 'Обмен местами в детских садах '.$cityName;
+                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$this->cityName;
+                $metaKey = 'детские, сады, обмен, мест, '.$this->cityName;
+                $title = 'Обмен местами в детских садах '.$this->cityName;
             }
         }else{
             $title = 'Обмен местами в детских садах';
@@ -154,6 +155,7 @@ class ExchangeJobController
                 ]);
         } else {
             //валидация данных формы
+
             $validatorData = $this->validateUserData($request);
             $teachers = $request->input('teacher', []);
 
@@ -164,7 +166,6 @@ class ExchangeJobController
                 // если есть фото
                 if ($request->hasFile('file')) {
                     $file = $request->file('file');
-
                     if ($file->isValid()) {
                         // Генерация уникального имени файла
                         $originalFileName = md5(uniqid(rand(), 1)) . '.' . $file->getClientOriginalExtension();
@@ -223,7 +224,7 @@ class ExchangeJobController
                 $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
                 $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
 
-                $exchangeItem->status = 1;
+                $exchangeItem->status = 0;
                 $exchangeItem->ip = $request->ip();
                 $exchangeItem->city_id = $city_id;
                 $exchangeItem->metro_id = $metro_id;
@@ -239,10 +240,59 @@ class ExchangeJobController
                     'status' => 1,
                     'msg' => 'Объявление будет опубликовано после проверки модератором'
                 );
+                $lastInsertedId = $exchangeItem->id;
+
+                if(!empty($exchangeItem->photo))
+                {
+                    $src = 'https://detskysad.com/images/rabota/'.$exchangeItem->photo;
+                }else{
+                    $src = 'https://detskysad.com/images/stories/user.jpg';
+                }
+                $title = 'Резюме/вакансии - новое объявление';
+                $messageText = '<img style="float: left; margin-right: 10px;" src="'.$src.'">
+                <p>Имя: '.$request->input('username').'</p>
+                <p>E-mail: '.$request->input('email').'</p>
+                <p>Телефон: '.$request->input('phone').'</p>
+                <p>Специальность: '.implode(', ', $teach).'</p>
+                <p>Текст: '.$request->input('text').'</p>
+                <a href="'.env('APP_URL').'/rabota/publish/'.$lastInsertedId.'">опубликовать</a>
+                <a href="'.env('APP_URL').'/rabota/delete/'.$lastInsertedId.'">удалить</a>';
+
+                Mail::send([], [], function ($message) use ($messageText, $title) {
+                    $message->to(config('mail.from.address'))
+                        ->subject($title)
+                        ->setBody($messageText, 'text/html');
+                });
             }
             return response()->json($data);
         }
 
+    }
+
+    public function publishJob(int $id): \Illuminate\Http\RedirectResponse
+    {
+        $result = ExchangeJobItems::find($id);
+        if($result !== null)
+        {
+            $result->status = 1;
+            $result->save();
+            return redirect()->to('/rabota')->with('publish', 'Объявление опубликовано');
+        }
+        return redirect()->to('/rabota')->with('publish', 'Объявление не найдено!');
+    }
+
+    public function deleteJob(int $id): \Illuminate\Http\RedirectResponse
+    {
+        $result = ExchangeJobItems::find($id);
+        if($result !== null)
+        {
+            if (!empty($result->photo) && file_exists(public_path('/images/rabota/' . $result->photo))) {
+                unlink(public_path('/images/rabota/' . $result->photo));
+            }
+            $result->delete();
+            return redirect()->to('/rabota')->with('remove', 'Объявление удалено');
+        }
+        return redirect()->to('/rabota')->with('remove', 'Объявление не найдено!');
     }
 
     private function validateUserData(Request $request): array

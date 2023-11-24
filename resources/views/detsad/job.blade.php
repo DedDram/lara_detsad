@@ -14,6 +14,21 @@
 @endsection
 @section('content')
     <!--beforecontent-->
+    @if (Auth::check() &&  session('publish') || session('remove'))
+    @if (Auth::user()->isAdmin())
+        <div id="system-message">
+            <div class="alert alert-message">
+                <div>
+                    @if (session('publish'))
+                        <div class="alert-message">{{ session('publish') }}</div>
+                    @elseif (session('remove'))
+                        <div class="alert-message">{{ session('remove') }}</div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+    @endif
     <div>
         <h1>Работа в детских садах {{ !empty($cityName) ? 'г.'.$cityName : '' }}</h1>
         <br>
@@ -28,8 +43,8 @@
         <div style="float: left; margin-right: 14px;">
             <select name="type" id="type">
                 <option value="0">- Вакансия/Резюме -</option>
-                <option value="1">Вакансия (я предлагаю работу)</option>
-                <option value="2">Резюме (я ищу работу)</option>
+                <option value="1">показать вакансии (я ищу работу)</option>
+                <option value="2">показать резюме (я работодатель)</option>
             </select>
         </div>
         <div style="float: left; margin-right: 14px;">
