@@ -7,6 +7,26 @@ use Illuminate\Support\Facades\DB;
 
 class Content extends Model
 {
+    protected $table = 'i1il4_content';
+    protected $primaryKey = 'id';
+
+    protected $fillable =
+        [
+            'title',
+            'alias',
+            'introtext',
+            'fulltext',
+            'catid',
+            'created',
+            'modified',
+            'metakey',
+            'metadesc',
+            'rate',
+            'vote',
+            'average',
+            'comments',
+        ];
+
     public static function getUrl(int $objectId): ?string
     {
         $result = DB::table('i1il4_content as t1')

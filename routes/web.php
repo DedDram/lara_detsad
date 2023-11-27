@@ -27,6 +27,9 @@ Route::middleware('redirect.old')->group(function () {
 });
 
 Route::get('/', [Controller::class, 'main']);
+//Прочите страниц и разделы
+Route::get('/zanyatiya-v-detskom-sadu', [Controller::class, 'ClassesMain']);
+Route::get('/zanyatiya/{category_id}-{category_alias}', [Controller::class, 'ClassesCategory'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+']);
 
 //Авторизация, регистрация
 Route::get('/agent', [UserController::class, 'agent'])->middleware('is.admin');
