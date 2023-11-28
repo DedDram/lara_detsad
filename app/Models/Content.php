@@ -37,4 +37,13 @@ class Content extends Model
 
         return $result ? $result->url : '';
     }
+
+    public function getContent(int $id)
+    {
+        return DB::table('i1il4_content as t1')
+            ->select("t1.*", "t2.id as cat_id", "t2.alias as cat_alias")
+            ->join('i1il4_categories as t2', 't2.id', '=', 't1.catid')
+            ->where('t1.id', $id)
+            ->first();
+    }
 }

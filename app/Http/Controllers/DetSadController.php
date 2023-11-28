@@ -8,6 +8,7 @@ use App\Models\DetSad\AdsCity;
 use App\Models\DetSad\Category;
 use App\Models\DetSad\DetsadGallery;
 use App\Models\DetSad\Item;
+use App\Models\DetSad\Metro;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
 use Illuminate\Support\Facades\Auth;
@@ -354,6 +355,53 @@ class DetSadController
     public function registrationAgentGet(Request $request)
     {
         return view('detsad.registrationAgent',['request' => $request]);
+    }
+
+    public function metroMain()
+    {
+        return view('metro.main', ['title' => 'Детские сады у метро', 'metaDesc' => 'Детские сады у метро', 'metaKey' => 'Детские, сады, метро',]);
+    }
+
+    public function metroCategory(int $categoryId, string $categoryAlias)
+    {
+        $cities = array(
+        '1-moskva' => 'Москва',
+        '2-sankt-peterburg' => 'Санкт-Петербург',
+        '3-ekaterinburg' => 'Екатеринбург',
+        '4-kazan' => 'Казань',
+        '5-nizhniy-novgorod' => 'Нижний Новгород',
+        '6-novosibirsk' => 'Новосибирск',
+        '7-samara' => 'Самара'
+         );
+        //Страницы городов
+        if(!empty($cities[$categoryId.'-'.$categoryAlias])){
+            $allMetroCity = Metro::where('city', $cities[$categoryId.'-'.$categoryAlias])->get();
+            return view('metro.category',
+                [
+                    'title' => 'Детские сады у метро г. '.$cities[$categoryId.'-'.$categoryAlias],
+                    'metaDesc' => 'Детские сады у метро г. '.$cities[$categoryId.'-'.$categoryAlias],
+                    'metaKey' => 'Детские, сады, метро, '.$cities[$categoryId.'-'.$categoryAlias],
+                    'city' => $cities[$categoryId.'-'.$categoryAlias],
+                    'allMetroCity' => $allMetroCity,
+                    ]);
+        }
+        //страницы метро
+        else{
+            $metro = new Metro();
+            $address = $metro->getAddress($categoryId);
+
+            if($address != null){
+                return view('metro.metro',
+                    [
+                        'title' => 'Детские сады у метро '.$address[0]->metroName.' г.'.$address[0]->city,
+                        'metaDesc' => 'Детские сады  в районе метро '.$address[0]->metroName.' г.'.$address[0]->city.', ❤ отзывы о детских садах ✎ телефоны ✆ адреса, рейтинг ☑',
+                        'metaKey' => 'Детские, сады, метро, '.$address[0]->metroName.' г.'.$address[0]->city,
+                        'address' => $address,
+                    ]);
+            }else{
+                abort(404);
+            }
+        }
     }
 
     private function getSadikItem(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): object

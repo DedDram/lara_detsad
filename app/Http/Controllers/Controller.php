@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Content;
 use App\Models\ContentCategory;
 use Illuminate\Routing\Controller as BaseController;
 
@@ -25,7 +26,7 @@ class Controller extends BaseController
         $title = 'Конспекты занятий для детского сада';
         $metaKey = 'занятия, детский, сад, конспекты, скачать, 2-3, лет, года';
         $metaDesc = 'Конспекты занятий для детского сада 🧒, занятия с детьми 2-3 лет 👶';
-        return view('detsad.classes',
+        return view('content.classes',
             [
                 'title' => $title,
                 'metaKey' => $metaKey,
@@ -33,7 +34,7 @@ class Controller extends BaseController
             ]);
     }
 
-    public function ClassesCategory($category_id, $category_alias)
+    public function ClassesCategory(int $category_id, string $category_alias)
     {
         $category = ContentCategory::find($category_id);
         if(!empty($category) && $category->alias !== $category_alias)
@@ -41,12 +42,31 @@ class Controller extends BaseController
             return redirect()->to("/zanyatiya/$category->id-$category->alias");
         }
         $contentCategory = $category->contents;
-        return view('detsad.categoryClasses',
+        return view('content.categoryClasses',
             [
                 'title' => $category->title,
-                'metaKey' => $category->metakey,
-                'metaDesc' => $category->metadesc,
+                'category_id' => $category_id,
+                'category_alias' => $category_alias,
+                'metaKey' => trim($category->metakey) ?: $category->title,
+                'metaDesc' => trim($category->metadesc) ?: $category->title,
                 'items' => $contentCategory,
+            ]);
+    }
+
+    public function ClassesContent(int $category_id, string $category_alias, int $id, string  $alias)
+    {
+        $content = new Content();
+        $article = $content->getContent($id);
+        if(!empty($article) && ($article->alias !== $alias || $category_id.'-'.$category_alias !== $article->cat_id.'-'.$article->cat_alias))
+        {
+            return redirect()->to("$article->cat_id.'-'.$article->cat_alias/$article->id.'-'.$article->alias");
+        }
+        return view('content.classesContent',
+            [
+                'title' => $article->title,
+                'metaKey' => $article->metakey,
+                'metaDesc' => $article->metadesc,
+                'article' => $article,
             ]);
     }
 }

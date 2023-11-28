@@ -4,13 +4,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function displayItems(items) {
         const tableBody = document.getElementById('cattable').getElementsByTagName('tbody')[0];
         tableBody.innerHTML = ''; // Очистить таблицу
+        if (items[0] && items[0].okrug !== undefined) {
+            // Сортируем данные по полю 'okrug'
+            items.sort((a, b) => {
+                if (a.okrug < b.okrug) return -1;
+                if (a.okrug > b.okrug) return 1;
+                return 0;
+            });
+        }
 
-        // Сортируем данные по полю 'okrug'
-        items.sort((a, b) => {
-            if (a.okrug < b.okrug) return -1;
-            if (a.okrug > b.okrug) return 1;
-            return 0;
-        });
 
         let lastGroup = null;
 
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
             row.appendChild(commentsCell);
 
             // Добавляем строку группировки, если значение 'okrug' изменилось
-            if (item.okrug !== lastGroup) {
+            if (item.okrug !== undefined && item.okrug !== lastGroup) {
                 const groupRow = document.createElement('tr');
                 groupRow.className = 'group';
                 const groupCell = document.createElement('td');

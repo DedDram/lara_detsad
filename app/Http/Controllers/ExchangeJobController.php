@@ -24,9 +24,9 @@ class ExchangeJobController
         // Redirect alias
         self::RedirectAlias($exchange, 'obmen-mest', $cityId, $cityAlias, $metroId, $metroAlias);
 
-        $items = $exchange->getItems($request, 'exchange', $cityId, $metroId);
-        $city = $exchange->getCitySearch('exchange');
-        $metro = $exchange->getMetroSearch('exchange');
+        $items = $exchange->getItems($request, 'exchangeJob', $cityId, $metroId);
+        $city = $exchange->getCitySearch('exchangeJob');
+        $metro = $exchange->getMetroSearch('exchangeJob');
 
         if(!empty($this->cityName)){
             if(!empty($this->metroName)){
@@ -43,7 +43,7 @@ class ExchangeJobController
             $metaKey = 'детские, сады, обмен, мест';
             $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅';
         }
-        return view('detsad.exchange',
+        return view('exchangeJob.exchange',
             [
                 'items' => $items,
                 'city' => $city,
@@ -60,10 +60,10 @@ class ExchangeJobController
     {
         if ($request->isMethod('get')) {
             $exchange = new ExchangeJobItems();
-            $city = $exchange->getCitySearch('exchange');
-            $metro = $exchange->getMetroSearch('exchange');
+            $city = $exchange->getCitySearch('exchangeJob');
+            $metro = $exchange->getMetroSearch('exchangeJob');
 
-            return view('detsad.addExchange',
+            return view('exchangeJob.addExchange',
                 [
                     'city' => $city,
                     'metro' => $metro,
@@ -125,7 +125,7 @@ class ExchangeJobController
             $metaKey = 'детские, сады, работа, объявления';
             $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅';
         }
-        return view('detsad.job',
+        return view('exchangeJob.job',
             [
                 'items' => $items,
                 'city' => $city,
@@ -143,11 +143,11 @@ class ExchangeJobController
     {
         if ($request->isMethod('get')) {
             $exchange = new ExchangeJobItems();
-            $city = $exchange->getCitySearch('exchange');
-            $metro = $exchange->getMetroSearch('exchange');
+            $city = $exchange->getCitySearch('exchangeJob');
+            $metro = $exchange->getMetroSearch('exchangeJob');
             $teachers = ExchangeJobTeachers::getTeachersSearch();
 
-            return view('detsad.addJob',
+            return view('exchangeJob.addJob',
                 [
                     'city' => $city,
                     'metro' => $metro,
