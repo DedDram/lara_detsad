@@ -33,7 +33,7 @@
 <div class="old">
     <div class="container">
         <div class="composition"></div>
-        <a href="https://test.med-otzyv.com/">
+        <a href="https://detskysad.com/">
             <div class="logo">
                 <div class="logo1">Отзывы</div>
                 <div class="logo2">о детских садах</div>

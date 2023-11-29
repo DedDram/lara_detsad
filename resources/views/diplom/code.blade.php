@@ -31,7 +31,7 @@ function show_vars()
 </style>
 HTML-код для вставки диплома на ваш сайт:<br/>
 <textarea>
-<script type="text/javascript" src="https://test.med-otzyv.com/diplom/code?<?php show_vars(); ?>"></script>
+<script type="text/javascript" src="https://detskysad.com/diplom/code?<?php show_vars(); ?>"></script>
 </textarea>
 <br/>
 <span style="font-size:12px">Этот диплом автообновляем. Если место садика в рейтинге измениться, то и информация на дипломе автоматически поменяется, без вашего участия.
@@ -41,7 +41,7 @@ HTML-код для вставки диплома на ваш сайт:<br/>
 Результат:
 <div id="diploma_demo">
     <script type="text/javascript"
-            src="https://test.med-otzyv.com/diplom/default?<?php show_vars(); ?>&topx-size=300"></script>
+            src="https://detskysad.com/diplom/default?<?php show_vars(); ?>&topx-size=300"></script>
 </div>
 </body>
 </html>

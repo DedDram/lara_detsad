@@ -26,7 +26,7 @@ class UserController
                 $sadik->user_id_agent = $user->id; // Обновим поле user_id_agent в таблице садиков
                 $sadik->save();
                 $data = [
-                    'url' => 'https://test.med-otzyv.com',
+                    'url' => env('APP_URL'),
                 ];
 
                 $subject = 'Представитель Садика активирован';
@@ -43,7 +43,7 @@ class UserController
             if ($user) {
                 $data = [
                     'text' => 'Мы не смогли идентифицировать ваш e-mail с нужным садиком (не нашли его на сайте) и вынуждены удалить представителя. При регистрации вы должны указать e-mail, который указан на официальном сайте садика.',
-                    'url' => 'https://test.med-otzyv.com',
+                    'url' => env('APP_URL'),
                 ];
                 Mail::send('mail.agentNotification', $data, function ($message) use ($user) {
                     $message->to($user->email)
