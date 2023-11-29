@@ -11,7 +11,7 @@
     <link rel="dns-prefetch" href="//api-maps.yandex.ru">
 @endsection
 @section('content')
-    <h1>Детские сады {{$address[0]->metroName.' г.'.$address[0]->city}}</h1>
+    <h1>Детские сады возле метро {{$address[0]->metroName.' г.'.$address[0]->city}}</h1>
     <script>
         window.address = @json($address);
         window.items = @json($address);

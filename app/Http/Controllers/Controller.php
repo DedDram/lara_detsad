@@ -21,6 +21,18 @@ class Controller extends BaseController
             ]);
     }
 
+    public function addSad()
+    {
+        $title = 'Добавить детский сад';
+        return view('detsad.add',['title' => $title]);
+    }
+
+    public function contact()
+    {
+        $title = 'Обратная связь';
+        return view('detsad.contact',['title' => $title]);
+    }
+
     public function ClassesMain()
     {
         $title = 'Конспекты занятий для детского сада';
