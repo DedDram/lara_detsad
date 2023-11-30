@@ -66,8 +66,7 @@ class AfterCreatCommentGeoLocation implements ShouldQueue
 
     private static function YandexLocation($ip): object
     {
-        // $yandex_api_keyLocator = 'ABvrmkwBAAAAMG8HdwIAOuIhmdroVhAsutIPfPXaWNwDDqMAAAAAAAAAAACYaQU04MKqqq7kiXYPr1nN2z0P8w==';
-        $yandex_api_key = '7b8c5fa1-500f-48a5-875c-b253bb7b347c';
+        $yandex_api_key = '067bbf35-de27-4de2-bb1c-72d958556cad';
         $yandex_api_keyLocator = 'b952c57b-98c2-439d-bd6d-71aebc47849f';
         $data = (object) array(
             'common' => (object) array(
