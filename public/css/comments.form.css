@@ -2,7 +2,7 @@
 	margin-top: 9px;
 }
 .scomments-form textarea {
- width: 100%; 
+ width: 100%;
  height: 150px;
  border: 1px solid #ccc;
 }
@@ -17,7 +17,7 @@
       width: 180px;
        }
 .scomments-form textarea {
- width: 98%; 
+ width: 98%;
    }
  .subscribe
               {
@@ -148,7 +148,7 @@
   margin: 4px;
   width: 16px;
   height: 16px;
-  background-image: url('/media/com_comments/html/images/remove.png');
+  background-image: url('/images/remove.png');
 }
 
 .scomments-form .row-slide {
@@ -182,12 +182,12 @@
 .scomments-form #percent {
   display: none;
   padding-left: 20px;
-  background: url('/media/com_comments/html/images/loader.gif') left center no-repeat;
+  background: url('/images/loader.gif') left center no-repeat;
 }
 
 .scomments-form .loader {
   display: none;
-  background: url('/media/com_comments/html/images/loader.gif') left center no-repeat;
+  background: url('/images/loader.gif') left center no-repeat;
   padding-left: 20px;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .scomments-form h4 {
-  margin: 11px;		
+  margin: 11px;
 }
 
 .scomments-form .notice {

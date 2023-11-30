@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: *?*
+Disallow: /news/*
+Disallow: */geoshow
+Disallow: */agent
+Disallow: */gallery

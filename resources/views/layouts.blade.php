@@ -28,6 +28,8 @@
     @show
     @section('robots')
     @show
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
 </head>
 <body>
 <div class="old">
@@ -109,6 +111,15 @@
         <div id="content">
             <div class="breadcrumb">
                 @yield('breadcrumb')
+                <div id="yandex_rtb_R-A-66213-4" style="max-height: 250px;"></div>
+                <script>
+                    window.yaContextCb.push(()=>{
+                        Ya.Context.AdvManager.render({
+                            "blockId": "R-A-66213-4",
+                            "renderTo": "yandex_rtb_R-A-66213-4"
+                        })
+                    })
+                </script>
             </div>
             @yield('message')
             @if(session('success'))
@@ -133,7 +144,7 @@
                 {!! Debugbar::render() !!}
             @endif
         </div>
-{{--        <script type="text/javascript" >
+       <script type="text/javascript" >
             (function (d, w, c) {
                 (w[c] = w[c] || []).push(function() {
                     try {
@@ -156,7 +167,7 @@
                 } else { f(); }
             })(document, window, "yandex_metrika_callbacks");
         </script>
-        <noscript><div><img src="https://mc.yandex.ru/watch/11397493" style="position:absolute; left:-9999px;" alt="" /></div></noscript>--}}
+        <noscript><div><img src="https://mc.yandex.ru/watch/11397493" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     </footer>
 </div>
 </body>
