@@ -48,7 +48,15 @@
                                 <div>
                                 </div>
                                 <div class="scomments-text">
-                                    <!-- module-comments -->
+                                    <div id="yandex_rtb_R-A-66213-5"></div>
+                                    <script>
+                                        window.yaContextCb.push(()=>{
+                                            Ya.Context.AdvManager.render({
+                                                "blockId": "R-A-66213-5",
+                                                "renderTo": "yandex_rtb_R-A-66213-5"
+                                            })
+                                        })
+                                    </script>
                                 </div>
                             </div>
                         </div>
@@ -168,7 +176,15 @@
     </div>
     <div style="margin-top: 5px;"></div>
     @if($countComments >= 5)
-        <!-- reklama-over-10 -->
+        <div id="yandex_rtb_R-A-66213-3"></div>
+        <script>
+            window.yaContextCb.push(()=>{
+                Ya.Context.AdvManager.render({
+                    "blockId": "R-A-66213-3",
+                    "renderTo": "yandex_rtb_R-A-66213-3"
+                })
+            })
+        </script>
     @endif
 @endif
 <div class="scomments-anchor"></div>

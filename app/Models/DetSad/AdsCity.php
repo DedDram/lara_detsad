@@ -21,7 +21,7 @@ class AdsCity extends Model
             ->where('alias', $ads_city);
 
         if (!empty($ads_city_)) {
-            $query->orWhere($ads_city_);
+            $query->orWhere('alias', $ads_city_);
         }
 
         return $query->first();

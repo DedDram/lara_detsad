@@ -158,9 +158,9 @@
                 @foreach($addresses as $address)
                     @if (!empty($address->district_link))
                         <div style="margin-bottom: 13px;">
-                    <span
-                        style="color:#E86500;font-weight: bold;">Округ/район:</span> {!! $address->district_link !!}
+                            <span style="color:#E86500;font-weight: bold;">Округ/район:</span> {!! $address->district_link !!}
                         </div>
+                            @break
                     @endif
                 @endforeach
 
@@ -249,7 +249,17 @@
                     </div>
             </div>
             <div id="panel-m"></div>
-            <!-- user2 -->
+            <div id="yaMiddle">
+            <div id="yandex_rtb_R-A-66213-2"></div>
+            <script>
+                window.yaContextCb.push(()=>{
+                    Ya.Context.AdvManager.render({
+                        "blockId": "R-A-66213-2",
+                        "renderTo": "yandex_rtb_R-A-66213-2"
+                    })
+                })
+            </script>
+            </div>
             <div style="padding-top: 9px; text-align: left;">
                 <a href="/post/error?id={{$item->id}}"
                    class="simplemodal find_error_btn" data-width="450" data-height="430"
@@ -259,6 +269,7 @@
 
             </div>
         </div>
+
         <div itemscope itemtype="https://schema.org/Review">
             <meta itemprop="itemReviewed" itemscope itemtype="https://schema.org/Organization">
             <meta itemprop="itemReviewed" content="{{$item->name}}">
