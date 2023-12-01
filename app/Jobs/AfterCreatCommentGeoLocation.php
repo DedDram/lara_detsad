@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -84,24 +85,38 @@ class AfterCreatCommentGeoLocation implements ShouldQueue
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_ENCODING, 'identity');
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, 'json='.json_encode($data));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'json=' . json_encode($data));
         $response = curl_exec($ch);
         curl_close($ch);
 
         $geo = json_decode($response, true);
-        if(!empty($geo['position'])){
-            $content = file_get_contents('https://geocode-maps.yandex.ru/1.x/?apikey='.$yandex_api_key.'&format=json&geocode='.$geo['position']['longitude'].','.$geo['position']['latitude']);
+
+        try {
+            if (!empty($geo['position'])) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://geocode-maps.yandex.ru/1.x/?apikey=' . $yandex_api_key . '&format=json&geocode=' . $geo['position']['longitude'] . ',' . $geo['position']['latitude']);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_REFERER, 'https://detskysad.com');
+                $content = curl_exec($ch);
+                curl_close($ch);
+            } else {
+                return (object)array();
+            }
+        } catch (Exception $e) {
+            return (object)array();
+        }
+
+        if (!empty($content)) {
             $data = json_decode($content, true);
 
-            if(!empty($data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['LocalityName']))
-            {
+            if (!empty($data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['LocalityName'])) {
                 $city = $data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['LocalityName'];
-            }else{
+            } else {
                 $city = $data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName'];
             }
-            return (object) array('country' => $data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['CountryName'] ?? '', 'city' => $city ?? '');
-        }else{
-            return (object) array();
+            return (object)array('country' => $data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails']['Country']['CountryName'], 'city' => $city);
+        } else {
+            return (object)array();
         }
     }
 }
