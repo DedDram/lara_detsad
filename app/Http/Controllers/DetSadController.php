@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
 
 class DetSadController
@@ -55,9 +56,9 @@ class DetSadController
                 return response()->json($data);
             }
         }
-
+        return response()->json(['empty']);
     }
-    public function section(int $sectionId, string $sectionAlias)
+    public function section(int $sectionId, string $sectionAlias): View|\Illuminate\Http\RedirectResponse
     {
         $section = Section::query()->find($sectionId);
         if ($section !== null) {
@@ -79,7 +80,7 @@ class DetSadController
             ]);
     }
 
-    public function category(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $district = '')
+    public function category(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $district = ''): View|\Illuminate\Http\RedirectResponse
     {
         $category = Category::getCategory($categoryId);
         if ($category !== null) {
@@ -149,7 +150,7 @@ class DetSadController
             ]);
     }
 
-    public function streets(int $categoryId, string $categoryAlias)
+    public function streets(int $categoryId, string $categoryAlias): View
     {
         self::checkRedirectCategory($categoryId, $categoryAlias);
         $streets = Streets::getStreets($categoryId, $categoryAlias);
@@ -165,7 +166,7 @@ class DetSadController
             ]);
     }
 
-    public function street(int $categoryId, string $categoryAlias, string $street_alias)
+    public function street(int $categoryId, string $categoryAlias, string $street_alias): View
     {
         $category = self::checkRedirectCategory($categoryId, $categoryAlias);
         $street = Streets::getStreet($categoryId, $street_alias);
@@ -287,7 +288,7 @@ class DetSadController
             ]);
     }
 
-    public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
@@ -304,7 +305,7 @@ class DetSadController
     }
 
 
-    public function addGallery(Request $request)
+    public function addGallery(Request $request): View
     {
         $total = Item::getCountImage($request->query('id'));
         return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
@@ -331,14 +332,14 @@ class DetSadController
         return redirect()->to(config('app.url').$linkSadik->url.'/gallery')->with('publishImgOk', $with);
     }
 
-    public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
         return view('detsad.agent',['url'=>$url, 'item' => $sadik,'title' => 'Представитель '.$sadik->name]);
 
     }
-    public function sadGeoShow(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    public function sadGeoShow(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
@@ -352,12 +353,12 @@ class DetSadController
             ]);
     }
 
-    public function registrationAgentGet(Request $request)
+    public function registrationAgentGet(Request $request): View
     {
         return view('detsad.registrationAgent',['request' => $request]);
     }
 
-    public function metroMain()
+    public function metroMain(): View
     {
         return view('metro.main', ['title' => 'Детские сады у метро', 'metaDesc' => 'Детские сады у метро', 'metaKey' => 'Детские, сады, метро',]);
     }

@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class ErrorController
 {
-    public function getResponse(Request $request)
+    public function getResponse(Request $request): View|\Illuminate\Http\JsonResponse
     {
         if ($request->isMethod('get')) {
             return view('detsad.error', ['id'=> $request->query('id')]);

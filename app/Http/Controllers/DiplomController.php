@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\DetSad\Diplom;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+
 class DiplomController
 {
     private object $item;
@@ -19,12 +21,12 @@ class DiplomController
             $this->item = $diplom->getItem($id, $city, $district);
         }
     }
-    public function code()
+    public function code(): View
     {
         return view('diplom.code');
     }
 
-    public function default()
+    public function default(): View
     {
         return view('diplom.default', ['item' => $this->item]);
     }

@@ -7,6 +7,7 @@ use App\Models\Exchange_Job\ExchangeJobTeachers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class ExchangeJobController
@@ -17,7 +18,7 @@ class ExchangeJobController
     public string $cityName = '';
     public string $metroName = '';
 
-    public function exchange(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+    public function exchange(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
     {
         $exchange = new ExchangeJobItems();
 
@@ -56,7 +57,7 @@ class ExchangeJobController
             ]);
     }
 
-    public function add(Request $request)
+    public function add(Request $request): View|\Illuminate\Http\JsonResponse
     {
         if ($request->isMethod('get')) {
             $exchange = new ExchangeJobItems();
@@ -99,7 +100,7 @@ class ExchangeJobController
     }
 
 
-    public function job(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+    public function job(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
     {
         $exchange = new ExchangeJobItems();
         // Redirect alias
@@ -139,7 +140,7 @@ class ExchangeJobController
             ]);
     }
 
-    public function addJob(Request $request)
+    public function addJob(Request $request): View|\Illuminate\Http\JsonResponse|array
     {
         if ($request->isMethod('get')) {
             $exchange = new ExchangeJobItems();
@@ -329,7 +330,7 @@ class ExchangeJobController
         }
     }
 
-    private function RedirectAlias(object $exchange, string $firstAlias, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = '')
+    private function RedirectAlias(object $exchange, string $firstAlias, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): void
     {
         // Redirect alias
         if(!empty($cityId) || !empty($metroId))
