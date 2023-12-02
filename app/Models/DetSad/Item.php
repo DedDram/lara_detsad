@@ -185,7 +185,7 @@ class Item extends Model
 
     public static function showTelephoneOrEmail($request): array
     {
-        $recaptcha = new ReCaptcha('6LdECbcoAAAAAAdNzZnIrlu1Mb-m46jbLx-7Nslo');
+        $recaptcha = new ReCaptcha(env('APP_ReCaptcha'));
 
         $response = $recaptcha->verify($request->input('code'), $request->ip());
 
