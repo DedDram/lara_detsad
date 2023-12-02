@@ -352,7 +352,7 @@ class Comments extends Model
         );
     }
 
-    private function subscribe(string $object_group, int $object_id, int  $user_id)
+    private function subscribe(string $object_group, int $object_id, int  $user_id): void
     {
         DB::table('i1il4_comments_subscribers')->updateOrInsert(
             [
@@ -417,7 +417,7 @@ class Comments extends Model
         );
     }
 
-    private function setNotification(string $object_group, int $object_id, int $item_id, int $type)
+    private function setNotification(string $object_group, int $object_id, int $item_id, int $type): void
     {
         $temp = self::getItem($object_group, $object_id);
         $title = $temp['name'];
@@ -467,7 +467,7 @@ class Comments extends Model
         return trim($comment);
     }
 
-    private function YandexWebmasterOverride(string $url)
+    private function YandexWebmasterOverride(string $url): void
     {
         $item = DB::table('i1il4_comments_webmaster')
             ->select('*')
@@ -492,7 +492,7 @@ class Comments extends Model
         }
     }
 
-    private function parseCurseWords(int $comment_id)
+    private function parseCurseWords(int $comment_id): void
     {
         $values = array();
         $words = array();
@@ -548,7 +548,7 @@ class Comments extends Model
         }
     }
 
-    private function _clearNotifications(int $comment_id)
+    private function _clearNotifications(int $comment_id): void
     {
         if (!empty($comment_id)) {
             DB::table('i1il4_comments_cron')
@@ -557,7 +557,7 @@ class Comments extends Model
         }
     }
 
-    private function _rate(string $object_group, int $object_id, int $value)
+    private function _rate(string $object_group, int $object_id, int $value): void
     {
         $rate = 0;
         $vote = 0;

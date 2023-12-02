@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use App\Models\ContentCategory;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\View\View;
 
 class Controller extends BaseController
 {
-    public function main()
+    public function main(): View
     {
         $title = 'Детские сады Москвы - отзывы, адреса, рейтинг';
         $metaKey = 'детские, сады, сад, отзывы, Москвы, детский';
@@ -21,19 +22,19 @@ class Controller extends BaseController
             ]);
     }
 
-    public function addSad()
+    public function addSad(): View
     {
         $title = 'Добавить детский сад';
         return view('detsad.add',['title' => $title]);
     }
 
-    public function contact()
+    public function contact(): View
     {
         $title = 'Обратная связь';
         return view('detsad.contact',['title' => $title]);
     }
 
-    public function ClassesMain()
+    public function ClassesMain(): View
     {
         $title = 'Конспекты занятий для детского сада';
         $metaKey = 'занятия, детский, сад, конспекты, скачать, 2-3, лет, года';
@@ -46,7 +47,7 @@ class Controller extends BaseController
             ]);
     }
 
-    public function ClassesCategory(int $category_id, string $category_alias)
+    public function ClassesCategory(int $category_id, string $category_alias): View|\Illuminate\Http\RedirectResponse
     {
         $category = ContentCategory::find($category_id);
         if(!empty($category) && $category->alias !== $category_alias)
@@ -65,7 +66,7 @@ class Controller extends BaseController
             ]);
     }
 
-    public function ClassesContent(int $category_id, string $category_alias, int $id, string  $alias)
+    public function ClassesContent(int $category_id, string $category_alias, int $id, string  $alias): View|\Illuminate\Http\RedirectResponse
     {
         $content = new Content();
         $article = $content->getContent($id);
