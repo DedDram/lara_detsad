@@ -444,6 +444,7 @@ class DetSadController
         if ($city_ !== null) {
             $sadik->ads_url = '/obmen-mest/' . $city_->id . '-' . $city_->alias;
         }
+
         return $sadik;
     }
 
