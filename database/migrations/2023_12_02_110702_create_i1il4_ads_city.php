@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('i1il4_ads_city', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('alias', 255);
+            $table->string('name', 100);
         });
     }
 
