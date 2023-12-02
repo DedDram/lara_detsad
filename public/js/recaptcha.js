@@ -1,8 +1,6 @@
 /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
-/*!***********************************!*\
-  !*** ./resources/js/recaptcha.js ***!
-  \***********************************/
+
 var widgetId1;
 var widgetId2;
 var el1, el2;
@@ -12,7 +10,7 @@ window.onloadCallback = function () {
   el2 = document.querySelector('#popup-recaptcha-telephone');
   if (el1) {
     widgetId1 = grecaptcha.render('popup-recaptcha', {
-      'sitekey': '6LdECbcoAAAAADRa7I10HGtK7kt5R46u9VRXWR8T',
+      'sitekey': '6LctRwwTAAAAAGTlZjgZPmyTKsJBPdM6UspsaVmw',
       'callback': function callback(code) {
         var item_id = document.querySelector('#show-mail a').getAttribute('data-id');
         var type_id = document.querySelector('#show-mail a').getAttribute('data-type');
@@ -38,7 +36,7 @@ window.onloadCallback = function () {
   }
   if (el2) {
     widgetId2 = grecaptcha.render('popup-recaptcha-telephone', {
-      'sitekey': '6LdECbcoAAAAADRa7I10HGtK7kt5R46u9VRXWR8T',
+      'sitekey': '6LctRwwTAAAAAGTlZjgZPmyTKsJBPdM6UspsaVmw',
       'callback': function callback(code) {
         var item_id = document.querySelector('#show-telephone a').getAttribute('data-id');
         var type_id = document.querySelector('#show-telephone a').getAttribute('data-type');
@@ -84,5 +82,5 @@ document.querySelector('#show-telephone a').addEventListener('click', function (
     document.querySelector('#popup-recaptcha-telephone').style.display = 'block';
   };
 });
-/******/ })()
+ })()
 ;

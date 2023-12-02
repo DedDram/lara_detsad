@@ -8,7 +8,7 @@ window.onloadCallback = function () {
 
     if (el1) {
         widgetId1 = grecaptcha.render('popup-recaptcha', {
-            'sitekey': '6LdECbcoAAAAADRa7I10HGtK7kt5R46u9VRXWR8T',
+            'sitekey': '6LctRwwTAAAAAGTlZjgZPmyTKsJBPdM6UspsaVmw',
             'callback': function (code) {
                 var item_id = document.querySelector('#show-mail a').getAttribute('data-id');
                 var type_id = document.querySelector('#show-mail a').getAttribute('data-type');
@@ -34,7 +34,7 @@ window.onloadCallback = function () {
     }
     if (el2) {
         widgetId2 = grecaptcha.render('popup-recaptcha-telephone', {
-            'sitekey': '6LdECbcoAAAAADRa7I10HGtK7kt5R46u9VRXWR8T',
+            'sitekey': '6LctRwwTAAAAAGTlZjgZPmyTKsJBPdM6UspsaVmw',
             'callback': function (code) {
                 var item_id = document.querySelector('#show-telephone a').getAttribute('data-id');
                 var type_id = document.querySelector('#show-telephone a').getAttribute('data-type');

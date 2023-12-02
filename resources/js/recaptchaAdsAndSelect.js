@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (el && !recaptchaLoaded) { // Проверка флага перед загрузкой Recaptcha
             widgetId = grecaptcha.render('popup-recaptcha', {
-                'sitekey': '6LdECbcoAAAAADRa7I10HGtK7kt5R46u9VRXWR8T',
+                'sitekey': '6LctRwwTAAAAAGTlZjgZPmyTKsJBPdM6UspsaVmw',
                 'callback': function (code) {
                     if (currentShowLink) {
                         sendAjaxRequest(currentShowLink.getAttribute('data-task'), currentShowLink.getAttribute('data-id'));
