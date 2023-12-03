@@ -29,9 +29,9 @@ class SiteMap
     {
         $items = DB::table('i1il4_detsad_items AS t1')
             ->select('t1.modified',
-                DB::raw('CONCAT_WS('-', t1.id, t1.alias) AS item_alias'),
-                DB::raw('CONCAT_WS('-', t2.id, t2.alias) AS category_alias'),
-                DB::raw('CONCAT_WS('-', t3.id, t3.alias) AS section_alias'),
+                DB::raw("CONCAT_WS('-', t1.id, t1.alias) AS item_alias"),
+                DB::raw("CONCAT_WS('-', t2.id, t2.alias) AS category_alias"),
+                DB::raw("CONCAT_WS('-', t3.id, t3.alias) AS section_alias"),
             )
             ->join('i1il4_detsad_categories AS t2', 't1.category_id', 't2.id')
             ->join('i1il4_detsad_sections AS t3', 't1.section_id', 't3.id')
