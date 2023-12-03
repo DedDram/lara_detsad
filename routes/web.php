@@ -11,6 +11,7 @@ use App\Http\Controllers\DiplomController;
 use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\ExchangeJobController;
 use App\Http\Controllers\PostCommentsController;
+use App\Http\Controllers\SiteMapController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,9 @@ Route::get('/zanyatiya/{category_id}-{category_alias}', [Controller::class, 'Cla
 Route::get('/zanyatiya/{category_id}-{category_alias}/{id}-{alias}', [Controller::class, 'ClassesContent'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'id' => '[0-9]+', 'alias' => '[a-z0-9-]+']);
 Route::get('/dobavit-sad', [Controller::class, 'addSad']);
 Route::get('/svyaz', [Controller::class, 'contact']);
+
+//SiteMap
+Route::get('/sitemap', [SiteMapController::class, 'makeSiteMap']);
 
 //Метро
 Route::get('/metro', [DetSadController::class, 'metroMain']);

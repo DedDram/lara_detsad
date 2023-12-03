@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class UserController
 {
@@ -55,7 +56,7 @@ class UserController
         }
     }
 
-    public function profile()
+    public function profile(): View
     {
         $allComments = CommentsSadik::getAllComments();
         if(!empty(Auth::user()->sad_id)){
@@ -72,7 +73,7 @@ class UserController
         ]);
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request): \Illuminate\Http\RedirectResponse
     {
         $user = User::find(Auth::id());
 
