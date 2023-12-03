@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'redirect.old' =>  \App\Http\Middleware\RedirectOldDetSadUrls::class,
         'admin.or.agent' => \App\Http\Middleware\AdminOrAgent::class,
         'is.admin' => \App\Http\Middleware\IsAdmin::class,
+        'only.this.server' => \App\Http\Middleware\OnlyThisServer::class,
     ];
 }

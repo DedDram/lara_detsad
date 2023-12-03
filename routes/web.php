@@ -36,7 +36,7 @@ Route::get('/dobavit-sad', [Controller::class, 'addSad']);
 Route::get('/svyaz', [Controller::class, 'contact']);
 
 //SiteMap
-Route::get('/sitemap', [SiteMapController::class, 'makeSiteMap']);
+Route::get('/sitemap', [SiteMapController::class, 'makeSiteMap'])->middleware('only.this.server');
 
 //Метро
 Route::get('/metro', [DetSadController::class, 'metroMain']);
