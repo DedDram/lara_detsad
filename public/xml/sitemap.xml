@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://detskysad.com/xml/sitemap_detsad_0.xml</loc>
+    <lastmod>2023-12-03T07:12:01+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://detskysad.com/xml/sitemap_detsad_dm.xml</loc>
+    <lastmod>2023-12-03T07:13:03+00:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://detskysad.com/xml/sitemap_detsad_str.xml</loc>
+    <lastmod>2023-12-03T07:13:03+00:00</lastmod>
+  </sitemap>
+</sitemapindex>
