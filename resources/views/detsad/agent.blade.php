@@ -31,7 +31,7 @@
     <div style="margin-bottom: 10px;">
         <div style="overflow: hidden;">
             @if(!empty($agent))
-                Для данного ВУЗа уже зарегистрирован представитель - {{$agent->name}}
+                Для данного садика уже зарегистрирован представитель - {{$agent->name}}
             @else
                 <h1><a href="/registration-agent?item_id={{$item->id}}"
                    class="simplemodal" data-width="550" data-height="350">Зарегистрироваться</a></h1>

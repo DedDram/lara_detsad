@@ -35,7 +35,7 @@ class Item extends Model
         'count_img',
         'sid'
     ];
-    public function getItem(int $sadId)
+    public function getItem(int $sadId): ?object
     {
         return DB::table('i1il4_detsad_items AS t1')
             ->select(
@@ -203,6 +203,13 @@ class Item extends Model
         } else {
             return $response->getErrorCodes();
         }
+    }
 
+    public static function getAgent(int $sad_id): ?object
+    {
+        return DB::table('users')
+            ->select('*')
+            ->where('sad_id', $sad_id)
+            ->first();
     }
 }
