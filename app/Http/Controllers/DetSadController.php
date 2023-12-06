@@ -66,7 +66,7 @@ class DetSadController
                 return redirect()->to('/' . $sectionId . '-' . $section->alias);
             }
         } else {
-            abort('404');
+            abort(404);
         }
         $categories = Category::query()->where('section_id', $sectionId)->get();
         $address = Section::getAddress($sectionId, $sectionAlias);
@@ -88,7 +88,7 @@ class DetSadController
                 return redirect()->to('/' . $category->section_alias . '/' . $category->category_alias);
             }
         } else {
-            abort('404');
+            abort(404);
         }
         $itemsCollection = Category::getItems($categoryId, $district);
         $districts = Category::getDistricts($categoryId);
@@ -457,7 +457,7 @@ class DetSadController
                 return redirect()->to('/street/' . $categoryId . '-' . $category->alias);
             }
         } else {
-            abort('404');
+            abort(404);
         }
         return $category;
     }
