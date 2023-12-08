@@ -14,10 +14,10 @@ class RegistrationTest extends TestCase
     /** @test */
     public function user_can_register()
     {
-        // тестовые данные
+        // Ваши тестовые данные
         $userData = [
             'name' => 'John Doe',
-            'email' => 'ltpm@ya.ru',
+            'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ];
@@ -25,9 +25,10 @@ class RegistrationTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/register', $userData);
 
-        // проверки
+        // Ваши проверки
         $response->assertStatus(302);
         $this->assertAuthenticated();
-    }
 
+        // Дополнительные проверки, если необходимо
+    }
 }
