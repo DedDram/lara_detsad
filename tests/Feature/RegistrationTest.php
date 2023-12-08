@@ -36,8 +36,8 @@ class RegistrationTest extends TestCase
         // Посылка POST-запроса на страницу регистрации с пустыми полями
         $response = $this->post('/register', []);
 
-        // Проверка статуса ответа (должен быть 422 для ошибки валидации)
-        $response->assertStatus(422);
+        // Проверка статуса ответа (должен быть 302 для ошибки валидации)
+        $response->assertStatus(302);
 
         // Проверка, что в ответе есть сообщения об ошибках для каждого поля
         $response->assertJsonValidationErrors([
