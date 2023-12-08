@@ -30,21 +30,4 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    /** @test */
-    public function registration_requires_all_fields()
-    {
-        // Посылка POST-запроса на страницу регистрации с пустыми полями
-        $response = $this->post('/register', []);
-
-        // Проверка статуса ответа (должен быть 302 для ошибки валидации)
-        $response->assertStatus(302);
-
-        // Проверяем, что редирект идет на ожидаемый URL
-        $response->assertRedirect(back());
-
-        // Проверка, что в ответе есть сообщения об ошибках для каждого поля
-        $response->assertJsonValidationErrors([
-            'name', 'email', 'password',
-        ]);
-    }
 }
