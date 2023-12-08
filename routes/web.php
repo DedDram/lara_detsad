@@ -49,7 +49,7 @@ Route::get('/verification-notice', function () {return view('users.notice', ['ti
 Route::get('/profile', [UserController::class, 'profile'])->middleware('auth', 'verified');
 Route::post('/update-profile', [UserController::class, 'updateProfile'])->middleware('auth', 'verified');
 Route::get('/log-out', [LoginController::class, 'logout'])->name('log-out');
-Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify']);
 Route::get('/verification-success', function () {return view('users.verificationSuccess', ['title' => 'Регистрация подтверждена!',]);})->name('verification.verified');
 Auth::routes(['verify' => true]);
 
