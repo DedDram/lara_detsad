@@ -35,15 +35,13 @@ class RegistrationTest extends TestCase
     /** @test */
     public function registration_requires_all_fields()
     {
-        // Посылка POST-запроса на страницу регистрации с пустыми полями
-        $response = $this->post('/register', []);
+        $response = $this->post('/registration-agent', []);
 
-        // Проверка, что в ответе есть сообщения об ошибках для каждого поля
-        $response->assertJsonValidationErrors([
-            'name', 'email', 'password',
-        ]);
+        $response->assertStatus(302)
+            ->assertSessionHasErrors(['name', 'email', 'password'])
+            ->assertSessionHasInput(['name', 'email']); // Проверка, что введенные данные сохранены
 
-        // Проверяем, что редирект идет на ожидаемый URL
-        $response->assertRedirect(back());
+        // Проверка, что ошибки отображаются на странице
+        $response->assertSessionHasErrorsIn('default', ['name', 'email', 'password']);
     }
 }
