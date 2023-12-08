@@ -40,8 +40,6 @@ class RegistrationTest extends TestCase
 
         $response->assertStatus(302)
             ->assertSessionHasErrors(['name', 'email', 'password'])
-            ->assertSessionHas('name', null)
-            ->assertSessionHas('password', null)
-            ->assertSessionHas('email', null);
+            ->assertSessionHasInput([]);
     }
 }
