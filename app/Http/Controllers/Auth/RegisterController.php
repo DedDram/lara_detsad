@@ -77,7 +77,7 @@ class RegisterController extends Controller
                 return redirect('/verification-message'); // Перенаправление после успешной регистрации
             }
         }else{
-            dd(444);
+            dd($validator);
             return redirect()
                 ->back()
                 ->withErrors($validator)
