@@ -39,6 +39,9 @@ class RegistrationTest extends TestCase
         // Проверка статуса ответа (должен быть 302 для ошибки валидации)
         $response->assertStatus(302);
 
+        // Проверяем, что редирект идет на ожидаемый URL
+        $response->assertRedirect('/register');
+
         // Проверка, что в ответе есть сообщения об ошибках для каждого поля
         $response->assertJsonValidationErrors([
             'name', 'email', 'password',
