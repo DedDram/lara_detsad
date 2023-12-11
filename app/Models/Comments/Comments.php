@@ -478,7 +478,10 @@ class Comments extends Model
             $data = json_encode(array(
                 "url" => $url
             ));
+
+            $mh = curl_multi_init();
             $ch = curl_init();
+
             curl_setopt($ch, CURLOPT_URL, "https://api.webmaster.yandex.net/v4/user/" . $item->user_id . "/hosts/" . $item->host_id . "/recrawl/queue/");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
@@ -487,8 +490,25 @@ class Comments extends Model
             curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: OAuth " . $item->access_token, "Accept: application/json", "Content-type: application/json"));
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-            $response = curl_exec($ch);
-            curl_close($ch);
+
+            curl_multi_add_handle($mh, $ch);
+
+            $active = null;
+            do {
+                $mrc = curl_multi_exec($mh, $active);
+            } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+
+            while ($active && $mrc == CURLM_OK) {
+                if (curl_multi_select($mh) != -1) {
+                    do {
+                        $mrc = curl_multi_exec($mh, $active);
+                    } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+                }
+            }
+
+            // Закрыть все дескрипторы
+            curl_multi_remove_handle($mh, $ch);
+            curl_multi_close($mh);
         }
     }
 
