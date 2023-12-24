@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,5 +20,5 @@ Route::group([
     'prefix' => 'v1',
 ], function () {
     // Ваши маршруты API здесь
-    Route::get('/example', 'ExampleController@index');
+    Route::get('/test',  [ApiController::class, 'test']);
 });
