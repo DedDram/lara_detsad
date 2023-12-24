@@ -7,6 +7,18 @@ use Illuminate\Http\Request;
 class ApiController extends Controller
 {
     /**
+     * @OA\Info(
+     *     title="Название вашего API",
+     *     version="1.0.0",
+     *     description="Описание вашего API",
+     *     @OA\Contact(
+     *         email="ваш.email@example.com"
+     *     ),
+     *     @OA\License(
+     *         name="Лицензия",
+     *         url="http://www.example.com/license"
+     *     )
+     * )
      * @OA\Get(
      *     path="/api/test",
      *     summary="Test endpoint",
