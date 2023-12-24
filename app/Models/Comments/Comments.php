@@ -480,7 +480,7 @@ class Comments extends Model
             ));
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://api.webmaster.yandex.net/v4/user/" . $item->user_id . "/hosts/" . $item->host_id . "/recrawl/queue/");
-            //curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
             curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
@@ -488,8 +488,8 @@ class Comments extends Model
             curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: OAuth " . $item->access_token, "Accept: application/json", "Content-type: application/json"));
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-            curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'do_nothing');
+            curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
             curl_exec($ch);
             curl_close($ch);
         }
