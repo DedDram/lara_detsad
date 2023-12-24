@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    'middleware' => 'auth:api',
     'prefix' => 'v1',
 ], function () {
     // Ваши маршруты API здесь
