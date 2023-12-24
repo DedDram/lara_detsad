@@ -8,11 +8,11 @@ class ApiController extends Controller
 {
     /**
      * @OA\Info(
-     *     title="Название вашего API",
+     *     title="DetskySad.com API",
      *     version="1.0.0",
-     *     description="Описание вашего API",
+     *     description="",
      *     @OA\Contact(
-     *         email="ваш.email@example.com"
+     *         email="info@detskysad.com"
      *     ),
      *     @OA\License(
      *         name="Лицензия",
