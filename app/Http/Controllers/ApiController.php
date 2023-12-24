@@ -20,7 +20,7 @@ class ApiController extends Controller
      *     )
      * )
      * @OA\Get(
-     *     path="/api/v1/test",
+     *     path="/v1/test",
      *     summary="Test endpoint",
      *     tags={"Test"},
      *     @OA\Response(
