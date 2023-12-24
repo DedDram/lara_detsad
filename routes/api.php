@@ -15,9 +15,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group([
-    'prefix' => 'v1',
-], function () {
-    // Ваши маршруты API здесь
-    Route::get('/test',  [ApiController::class, 'test']);
-});
+Route::get('/test',  [ApiController::class, 'test']);
+
