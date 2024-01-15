@@ -202,7 +202,7 @@ class DetSadController
             ]);
     }
 
-    public function sadik(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    public function sadik(Request $request, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         // Проверка на редирект
@@ -221,7 +221,7 @@ class DetSadController
         } else {
             $street = '';
         }
-        $items = Comments::getItems(request(), 'com_detsad', $sadik->id, 10);
+        $items = Comments::getItems($request, 'com_detsad', $sadik->id, 10);
         $user = Auth::user();
         //(показ только плохих или только хороших комментов + JS
         $procentGood = $procentNeutrally = $procentBad = $modulePosition = $good = $neutrally = $bad = 0;
@@ -234,7 +234,7 @@ class DetSadController
             $neutrally = $items[0]->neutrally;
             $bad = $items[0]->bad;
         }
-        $request = FacadesRequest::instance();
+
         $num = $request->input('num');
         $ratingCount = explode(" ", $commentsTitle);
         if(!empty($sadik->preview_src)){

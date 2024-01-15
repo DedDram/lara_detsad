@@ -57,15 +57,30 @@ class Comments extends Model
 
     public static function getItems($request, string $objectGroup, int $objectId, int $limit)
     {
+
         if (Auth::check() && User::isAdmin()) {
+            $rateQuery = DB::table('i1il4_comments_items')
+                ->select('rate')
+                ->where('object_group', '=', $objectGroup)
+                ->where('object_id', '=', $objectId)
+                ->get();
+
             $items = self::select('i1il4_comments_items.*', 'i1il4_comments_items.username AS guest_name', 'users.name AS user_name', 'users.id AS registered')
                 ->selectRaw('IF(NOW() < DATE_ADD(i1il4_comments_items.created, INTERVAL 15 MINUTE), 1, 0) AS edit')
                 ->leftJoin('users', 'i1il4_comments_items.user_id', '=', 'users.id')
                 ->where('i1il4_comments_items.object_group', $objectGroup)
                 ->where('i1il4_comments_items.object_id', $objectId)
                 ->orderBy('i1il4_comments_items.created', 'desc')
-                ->paginate($limit);
+                ->paginate($limit, ['*'], 'page', $request->query('page'))
+                ->withPath($request->url());
         } else {
+            $rateQuery = DB::table('i1il4_comments_items')
+                ->select('rate')
+                ->where('object_group', '=', $objectGroup)
+                ->where('object_id', '=', $objectId)
+                ->where('status', '=', 1)
+                ->get();
+
             $items = self::select('i1il4_comments_items.*', 'i1il4_comments_items.username AS guest_name', 'users.name AS user_name', 'users.id AS registered')
                 ->selectRaw('IF(NOW() < DATE_ADD(i1il4_comments_items.created, INTERVAL 15 MINUTE), 1, 0) AS edit')
                 ->leftJoin('users', 'i1il4_comments_items.user_id', '=', 'users.id')
@@ -73,13 +88,19 @@ class Comments extends Model
                 ->where('i1il4_comments_items.object_id', $objectId)
                 ->where('i1il4_comments_items.status', '1')
                 ->orderBy('i1il4_comments_items.created', 'desc')
-                ->paginate($limit);
+                ->paginate($limit, ['*'], 'page', $request->query('page'))
+                ->withPath($request->url());
         }
 
         if ($items->isNotEmpty()) {
             $bad = $neutrally = $good = 0;
-            $n = $items->total();
-            $items->each(function ($item) use (&$good, &$neutrally, &$bad, &$n) {
+            if ($request->has('page')) {
+                $start = $request->input('page');
+            }else{
+                $start = 1;
+            }
+            $n = count($rateQuery) - $limit * ($start - 1);
+            $rateQuery->each(function ($item) use (&$good, &$neutrally, &$bad, &$n) {
                 // Добавляем номер отзыва к каждой записи
                 $item->n = $n--;
                 if ($item->rate > 3) {
@@ -688,13 +709,11 @@ class Comments extends Model
             ->where('t1.status', '=', 1);
 
         if ($votes == 'good') {
-            $query->where('t1.rate', '>=', 4);
+            $query->where('t1.rate', '>', 3);
         } elseif ($votes == 'neutrally') {
-            $query->where(function ($query) {
-                $query->where('t1.rate', 3)->orWhere('t1.rate', '');
-            });
+            $query->where('t1.rate', '=', 3);
         } elseif ($votes == 'bad') {
-            $query->where('t1.rate', '<=', 2)->where('t1.rate', '!=', '');
+            $query->where('t1.rate', '<', 3);
         }
 
         return $query->orderBy('t1.created', 'DESC')->get();
