@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta name=viewport content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? $_SERVER['HTTP_HOST'] }}</title>
-    <meta name='keywords' content='{{ $metaKey ?? $_SERVER['HTTP_HOST'] }}'/>
-    <meta name='description' content='{{ $metaDesc ?? $_SERVER['HTTP_HOST'] }}'/>
+    <title>{{ $title ?? env('APP_NAME') }}</title>
+    <meta name='keywords' content='{{ $metaKey ?? env('APP_NAME') }}'/>
+    <meta name='description' content='{{ $metaDesc ?? env('APP_NAME') }}'/>
     @section('meta')
     @show
     @section('styles')
