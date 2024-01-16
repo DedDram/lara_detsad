@@ -93,29 +93,33 @@ class Comments extends Model
         }
 
         if ($items->isNotEmpty()) {
-            $bad = $neutrally = $good = 0;
+
             if ($request->has('page')) {
                 $start = $request->input('page');
             }else{
                 $start = 1;
             }
             $n = count($rateQuery) - $limit * ($start - 1);
-            $rateQuery->each(function ($item) use (&$good, &$neutrally, &$bad, &$n) {
-                // Добавляем номер отзыва к каждой записи
-                $item->n = $n--;
-                if ($item->rate > 3) {
+            $bad = $neutrally = $good = 0;
+            $rateQuery->each(function ($value) use (&$good, &$neutrally, &$bad) {
+                if ($value->rate > 3) {
                     $good++;
-                } elseif ($item->rate === 3) {
+                } elseif ($value->rate === 3 || $value->rate === 0) {
                     $neutrally++;
                 } else {
                     $bad++;
                 }
+            });
+            $items->each(function ($item) use (&$n) {
+                // Добавляем номер отзыва к каждой записи
+                $item->n = $n--;
             });
 
             $items[0]->blacklist = Blacklist::getBlacklist($request->ip());
             $items[0]->neutrally = $neutrally;
             $items[0]->bad = $bad;
             $items[0]->good = $good;
+            $items[0]->rateQuery = $rateQuery;
         }
 
         return $items;
@@ -709,11 +713,13 @@ class Comments extends Model
             ->where('t1.status', '=', 1);
 
         if ($votes == 'good') {
-            $query->where('t1.rate', '>', 3);
+            $query->where('t1.rate', '>=', 4);
         } elseif ($votes == 'neutrally') {
-            $query->where('t1.rate', '=', 3);
+            $query->where(function ($query) {
+                $query->where('t1.rate', 3)->orWhere('t1.rate', '');
+            });
         } elseif ($votes == 'bad') {
-            $query->where('t1.rate', '<', 3);
+            $query->where('t1.rate', '<=', 2)->where('t1.rate', '!=', '');
         }
 
         return $query->orderBy('t1.created', 'DESC')->get();
