@@ -128,10 +128,10 @@ class Comments extends Model
 
     public function create($request): array
     {
-        $rate = (int)$request->input('star');
+        $rate = (int) $request->input('star');
         if (empty($this->user)) {
             $username = self::input($request->input('username'));
-            $email = (string)$request->input('email');
+            $email = (string) $request->input('email');
         } else {
             $username = $this->user->name;
             $email = $this->user->email;
@@ -196,12 +196,22 @@ class Comments extends Model
                 self::subscribe($request->input('object_group'), $request->input('object_id'), $this->user_id);
             }
         }
+
         // Уведомление админу
-        self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
-        // Добавления задания в очередь (геолокация)
-        dispatch(new AfterCreatCommentGeoLocation());
-        // Добавления задания в очередь (рассылки-уведомления)
-        dispatch(new AfterCreatCommentNotifications());
+        if($request->has('object_group') && ($request->input('object_group') === 'com_content' ||
+                $request->input('object_group') === 'com_detsad') && !empty($request->input('object_id'))){
+            self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
+            // Добавления задания в очередь (геолокация)
+            dispatch(new AfterCreatCommentGeoLocation());
+            // Добавления задания в очередь (рассылки-уведомления)
+            dispatch(new AfterCreatCommentNotifications());
+        } else{
+            return array(
+                'status' => 2,
+                'msg' => 'Не передан object_group или object_group'
+            );
+        }
+
 
         if (!empty($this->user_id)) {
             return array(
@@ -445,8 +455,8 @@ class Comments extends Model
     private function setNotification(string $object_group, int $object_id, int $item_id, int $type): void
     {
         $temp = self::getItem($object_group, $object_id);
-        $title = $temp['name'];
-        $url = $temp['url'];
+        $title = $temp['name'] ?? '';
+        $url = $temp['url'] ?? '';
 
         if ($type == 1) {
             $subscribers = DB::table('i1il4_comments_subscribers')
@@ -646,9 +656,10 @@ class Comments extends Model
                 ->where('t1.id', '=', $object_id)
                 ->first();
 
-            $item['name'] = preg_replace('@ - отзывы.*@smi', '', $content->title);
-
-            $item['url'] = '/' . $content->section_alias . '/' . $object_id . '/' . $content->contentAlias;
+            if(!empty($content)){
+                $item['name'] = preg_replace('@ - отзывы.*@smi', '', $content->title);
+                $item['url'] = '/' . $content->section_alias . '/' . $object_id . '/' . $content->contentAlias;
+            }
         }
         return $item;
     }

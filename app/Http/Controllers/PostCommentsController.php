@@ -26,13 +26,13 @@ class PostCommentsController
 
     function __construct(Request $request)
     {
-        if (!empty($request->input('object_group') && ($request->input('object_group') === 'com_content' || $request->input('object_group') === 'com_detsad'))) {
+        if ($request->has('object_group') && ($request->input('object_group') === 'com_content' || $request->input('object_group') === 'com_detsad')) {
             $this->object_group = $request->input('object_group');
         }
-        if (!empty($request->input('object_id'))) {
+        if ($request->has('object_id') && !empty($request->input('object_id'))) {
             $this->object_id = (int) $request->input('object_id');
         }
-        if (!empty($request->input('item_id'))) {
+        if ($request->has('item_id') && !empty($request->input('item_id'))) {
             $this->comment_id = (int) $request->input('item_id');
         }
     }
@@ -102,7 +102,7 @@ class PostCommentsController
         return response()->json($data);
     }
 
-    private function validateUserData(Request $request): array
+    public function validateUserData(Request $request): array
     {
         $rules = [
             'description' => 'required|string|min:100|latin_characters|no_spam_links',
