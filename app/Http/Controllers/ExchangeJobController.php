@@ -77,6 +77,9 @@ class ExchangeJobController
             } else {
                 $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
                 $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
+                // Проверяем, что $metro_id является числом
+                $metro_id = is_numeric($metro_id) ? (int) $metro_id : 0;
+
                 $exchangeItem = new ExchangeJobItems();
                 $exchangeItem->status = 1;
                 $exchangeItem->ip = $request->ip();
@@ -299,10 +302,11 @@ class ExchangeJobController
     private function validateUserData(Request $request): array
     {
         $rules = [
+            'city_id' => 'required|numeric',
             'text' => 'required|string|min:50|latin_characters|no_spam_links',
             'username' => 'required',
             'email' => 'required|email',
-            'phone' => 'required|string',
+            'phone' => 'required',
         ];
 
         $messages = [
@@ -314,6 +318,8 @@ class ExchangeJobController
             'phone.required' => 'Пожалуйста, введите Телефон',
             'email.required' => 'Пожалуйста, введите E-mail',
             'email.email' => 'Пожалуйста, введите корректный E-mail',
+            'city_id.required' => 'Пожалуйста, выберите город',
+            'city_id.numeric' => 'ID города должен быть числом',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);

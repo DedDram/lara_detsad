@@ -18,7 +18,7 @@ class CustomValidationServiceProvider extends ServiceProvider
         });
 
         Validator::extend('no_spam_links', function ($attribute, $value, $parameters, $validator) {
-            return !preg_match('/\[url/m', $value);
+            return !preg_match('/\[url|<a/m', $value);
         });
     }
 }
