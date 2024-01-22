@@ -1,0 +1,32 @@
+{
+    "authHost": "https://detskysad.com",
+    "authEndpoint": "https://detskysad.com/laravel-echo-server.json",
+    "clients": [],
+    "database": "sqlite",
+    "databaseConfig": {
+        "redis": {},
+        "sqlite": {
+            "databasePath": "/database/laravel-echo-server.sqlite"
+        }
+    },
+    "devMode": true,
+    "host": null,
+    "port": "6001",
+    "protocol": "https",
+    "socketio": {},
+    "secureOptions": 67108864,
+    "sslCertPath": "/etc/letsencrypt/live/detskysad.com/fullchain.pem",
+    "sslKeyPath": "/etc/letsencrypt/live/detskysad.com/privkey.pem",
+    "sslCertChainPath": "/etc/letsencrypt/live/detskysad.com/chain.pem",
+    "sslPassphrase": "",
+    "subscribers": {
+        "http": true,
+        "redis": false
+    },
+    "apiOriginAllow": {
+        "allowCors": false,
+        "allowOrigin": "",
+        "allowMethods": "",
+        "allowHeaders": ""
+    }
+}

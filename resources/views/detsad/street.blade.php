@@ -5,9 +5,7 @@
 @endsection
 @section('scripts')
     @parent
-    <script src="{{ mix('/vue.js') }}" defer></script>
-    <script src="{{ mix('js/yandex-map-vue.js') }}" defer></script>
-    <script src="{{ mix('js/search-sadik-in-table.js') }}" defer></script>
+    <script src="{{ mix('js/yandex-map.js') }}" defer></script>
     <link rel="preconnect" href="//api-maps.yandex.ru">
     <link rel="dns-prefetch" href="//api-maps.yandex.ru">
 @endsection
@@ -23,15 +21,11 @@
         <div id="app">
             <script>
                 window.address = @json($address);
-                window.items = @json($items->unique('id')->values());
             </script>
-            <yandex-map></yandex-map>
+            <div id="yandex-map" style="width: 100%; height: 400px;"></div>
+            <div id="cluster-count"></div>
         </div>
-        <div id="filter">
-            <label>Поиск: (начните вводить название)
-                <search-sadik-in-table></search-sadik-in-table>
-            </label>
-        </div>
+
     @else
         <br>
         <a href="https://detskysad.com/dobavit-sad">Добавить садик</a>

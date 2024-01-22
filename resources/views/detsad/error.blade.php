@@ -51,10 +51,16 @@
 </script>
 
 <div id="msg" class="postmsg"></div>
+<?php if (empty($item_id)): ?>
 <h3>Укажите ошибку</h3>
+<?php else: ?>
+<h3>Опишите, что не так в отзыве?</h3>
+<?php endif; ?>
+
 <form id="form" method="POST">
     @csrf
     <input type="hidden" name="id" value="<?php echo $id; ?>">
+    <input type="hidden" name="item_id" value="<?php echo $item_id; ?>">
     <input type="text" name="mailfrom" value="" placeholder="Ваш E-mail адрес" class="postform" required>
     <br>
     <textarea name="description" style="width: 95%;height: 200px" placeholder="Опишите где и что у нас неправильно" class="postform" required></textarea>

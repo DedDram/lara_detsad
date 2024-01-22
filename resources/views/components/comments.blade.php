@@ -4,7 +4,7 @@
 @if(!empty($items))
     <div class="scomments">
         @if(!empty($countComments))
-        {{ $items->links('vendor.pagination.custom-pagination') }}
+            {{ $items->links('vendor.pagination.custom-pagination') }}
         @endif
 
         <div class="scomments-items">
@@ -50,7 +50,7 @@
                                 <div class="scomments-text">
                                     <div id="yandex_rtb_R-A-66213-5"></div>
                                     <script>
-                                        window.yaContextCb.push(()=>{
+                                        window.yaContextCb.push(() => {
                                             Ya.Context.AdvManager.render({
                                                 "blockId": "R-A-66213-5",
                                                 "renderTo": "yandex_rtb_R-A-66213-5"
@@ -81,7 +81,8 @@
                             $smile = '😡';
                         @endphp
                     @endif
-                        <div class="scomments-item {{$styleComments}}"{!! !empty($item->status) ? '' : ' style="background-color: #ffebeb;"' !!}>
+                    <div
+                        class="scomments-item {{$styleComments}}"{!! !empty($item->status) ? '' : ' style="background-color: #ffebeb;"' !!}>
                         @if(!empty($item->registered))
                             <div class="comments-avatar-registered"
                                  title="{{$text_title}} зарегистрированного пользователя"></div>
@@ -113,9 +114,13 @@
                             <div>
                                 <span class="scomments-date" itemprop="datePublished"
                                       content="{{$item->created}}">{{$item->created}}</span>
-                                @if(!empty($item->country) && $item->country != 'unknown')
-                                    <span class="scomments-marker"></span><span
-                                        class="scomments-country">{{$item->country}}</span>
+                                @if($item->ip == '13.13.13.100')
+                                    <span class="scomments-marker"></span> <span class="scomments-country"><!--noindex-->источник отзыва - Яндекс карты<!--/noindex--></span>
+                                @else
+                                    @if(!empty($item->country) && $item->country != 'unknown')
+                                        <span class="scomments-marker"></span>
+                                        <span class="scomments-country">{{$item->country}}</span>
+                                    @endif
                                 @endif
                             </div>
                             <div class="scomments-text"
@@ -135,9 +140,15 @@
                                         Редактировать отзыв</a>
                                 </div>
                             @endif
-                            <div class="scomments-button-quote"><a
-                                    href="?num={{$item->n}}"
+                            <!--noindex-->
+                            <div class="scomments-button-quote">
+                                <a href="/post/error?id=<?php echo $item->object_id; ?>&item_id=<?php echo $item->id; ?>"
+                                    class="simplemodal" data-width="450" data-height="380"
+                                    rel="nofollow">Пожаловаться</a> /
+                                <a href="?num={{$item->n}}"
                                     class="scomments-form-toogle scomments-reply">Ответить</a></div>
+                            <!--/noindex-->
+
                             @if (Auth::check() && Auth::user()->isAdmin())
                                 <div class="scomments-control">
                                     <div class="scomments-control-msg"></div>
@@ -170,15 +181,15 @@
                 @endforeach
             </div>
         </div>
-            @if(!empty($countComments))
-                {{ $items->links('vendor.pagination.custom-pagination') }}
-            @endif
+        @if(!empty($countComments))
+            {{ $items->links('vendor.pagination.custom-pagination') }}
+        @endif
     </div>
     <div style="margin-top: 5px;"></div>
     @if($countComments >= 5)
         <div id="yandex_rtb_R-A-66213-3"></div>
         <script>
-            window.yaContextCb.push(()=>{
+            window.yaContextCb.push(() => {
                 Ya.Context.AdvManager.render({
                     "blockId": "R-A-66213-3",
                     "renderTo": "yandex_rtb_R-A-66213-3"

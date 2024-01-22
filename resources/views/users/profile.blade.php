@@ -3,6 +3,12 @@
     @parent
     <meta name="robots" content="noindex, nofollow" />
 @endsection
+@section('scripts')
+    <!-- Подключение bootstrap.js -->
+    <script src="{{ asset('js/bootstrap.js') }}"></script>
+    <!-- Ваш собственный JavaScript файл -->
+    <script src="{{ asset('js/channel.js') }}"></script>
+@endsection
 @section('content')
     <h1>Личный кабинет</h1>
     <form method="POST" action="/update-profile">

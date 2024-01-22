@@ -45,7 +45,7 @@ class Comments extends Model
     }
 
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -205,6 +205,9 @@ class Comments extends Model
             dispatch(new AfterCreatCommentGeoLocation());
             // Добавления задания в очередь (рассылки-уведомления)
             dispatch(new AfterCreatCommentNotifications());
+            // Создание экземпляра события
+            $temp = self::getItem($request->input('object_group'), $request->input('object_id'));
+            broadcast(new \App\Events\ReviewAdded($temp['name'], $temp['url']))->toOthers();
         } else{
             return array(
                 'status' => 2,

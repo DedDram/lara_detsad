@@ -63,7 +63,7 @@ class DetSadController
         $section = Section::query()->find($sectionId);
         if ($section !== null) {
             if ($sectionAlias != $section->alias) {
-                return redirect()->to('/' . $sectionId . '-' . $section->alias);
+                return redirect()->to('/' . $sectionId . '-' . $section->alias, 301);
             }
         } else {
             abort(404);
@@ -85,7 +85,7 @@ class DetSadController
         $category = Category::getCategory($categoryId);
         if ($category !== null) {
             if ($sectionId . '-' . $sectionAlias != $category->section_alias || $categoryId . '-' . $categoryAlias != $category->category_alias) {
-                return redirect()->to('/' . $category->section_alias . '/' . $category->category_alias);
+                return redirect()->to('/' . $category->section_alias . '/' . $category->category_alias, 301);
             }
         } else {
             abort(404);
@@ -329,7 +329,7 @@ class DetSadController
         $gallery = new DetsadGallery();
         $with = $gallery->publish($request);
         $linkSadik = Item::getUrlSadik($request->query('id'));
-        return redirect()->to(config('app.url').$linkSadik->url.'/gallery')->with('publishImgOk', $with);
+        return redirect()->to(config('app.url').$linkSadik->url.'/gallery', 301)->with('publishImgOk', $with);
     }
 
     public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
@@ -415,15 +415,14 @@ class DetSadController
         return self::adsCity($sadik, $sectionId);
     }
 
-    private function redirectWrongAlias(object $sadik, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
+    private function redirectWrongAlias(object $sadik, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
     {
         if (!empty($sadik)) {
             if ($sectionId . '-' . $sectionAlias != $sadik->section_alias ||
                 $categoryId . '-' . $categoryAlias != $sadik->category_alias ||
                 $sadId . '-' . $sadAlias != $sadik->item_alias
             ) {
-                redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias)->send();
-                exit();
+              return redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias)->send();
             }
         } else {
             abort(404);
@@ -454,7 +453,7 @@ class DetSadController
         $category = Category::getCategory($categoryId);
         if (!empty($category)) {
             if ($categoryAlias != $category->alias) {
-                return redirect()->to('/street/' . $categoryId . '-' . $category->alias);
+                return redirect()->to('/street/' . $categoryId . '-' . $category->alias, 301);
             }
         } else {
             abort(404);

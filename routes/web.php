@@ -91,6 +91,7 @@ Route::any('/ajax', [AjaxController::class, 'getResponse']);
 
 //Нашли ошибку
 Route::any('/post/error', [ErrorController::class, 'getResponse']);
+
 //Комменты
 Route::post('/post/comment', [PostCommentsController::class, 'getResponse']);
 Route::get('/admin/comments', [AdminCommentsController::class, 'getResponse']);
