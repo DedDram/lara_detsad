@@ -55,13 +55,15 @@ Auth::routes(['verify' => true]);
 
 //Обмен местами в детских садах
 Route::get('/obmen-mest', [ExchangeJobController::class, 'exchange']);
-Route::any('/obmen-add', [ExchangeJobController::class, 'add']);
+Route::get('/obmen-add', [ExchangeJobController::class, 'addExchangeGet']);
+Route::post('/obmen-add', [ExchangeJobController::class, 'addExchangePost']);
 Route::get('/obmen-mest/{city_id}-{city_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
 Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
 
 //Работа в детских садах
 Route::get('/rabota', [ExchangeJobController::class, 'job']);
-Route::any('/rabota-add', [ExchangeJobController::class, 'addJob']);
+Route::get('/rabota-add', [ExchangeJobController::class, 'addJobGet']);
+Route::post('/rabota-add', [ExchangeJobController::class, 'addJobPost']);
 Route::get('/rabota/{city_id}-{city_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
 Route::get('/rabota/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
 Route::get('/rabota/publish/{id}', [ExchangeJobController::class, 'publishJob'])->where(['id' => '[0-9]+'])->middleware('is.admin');

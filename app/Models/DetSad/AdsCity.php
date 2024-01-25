@@ -28,3 +28,4 @@ class AdsCity extends Model
     }
 
 }
+

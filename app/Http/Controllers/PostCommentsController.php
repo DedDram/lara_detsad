@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateCommentRequest;
 use App\Models\Comments\Comments;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -39,7 +40,7 @@ class PostCommentsController
 
     public function getResponse(Request $request): \Illuminate\Http\JsonResponse
     {
-        if(!empty($request->input('task'))){
+        if($request->has('task')){
             $task = (string) $request->input('task');
         }else{
             abort(404);
@@ -101,6 +102,12 @@ class PostCommentsController
 
         return response()->json($data);
     }
+
+    public function createComment(CreateCommentRequest $request)
+    {
+
+    }
+
 
     public function validateUserData(Request $request): array
     {

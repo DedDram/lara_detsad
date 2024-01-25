@@ -41,7 +41,7 @@ class DetSadController
                 Mail::send([], [], function ($message) use ($subject, $messageText, $file) {
                     $message->to(config('mail.from.address'))
                         ->subject($subject)
-                        ->setBody($messageText, 'text/html');
+                        ->html($messageText);
 
                     if ($file) {
                         // Прикрепляем файл к письму

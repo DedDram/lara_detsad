@@ -19,7 +19,7 @@ class UserController
     {
 
         if ($request->query('activation') && $request->query('user_id')) {
-            $user = User::find($request->query('user_id')); // Найдем пользователя по его идентификатору
+            $user = User::find($request->query('user_id'));
             $sadik = Item::find($user->sad_id);
             if ($user) {
                 $user->status = 1; // Обновим поле status

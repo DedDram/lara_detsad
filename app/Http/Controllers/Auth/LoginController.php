@@ -9,27 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
     protected $redirectTo = '/profile';
-    protected $rules = [
-        'email' => 'required|string|email',
-        'password' => 'required|string',
-    ];
+
     /**
      * Create a new controller instance.
      *
@@ -42,9 +28,8 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout(); // Разлогиниваем пользователя
-        return redirect('/'); // Перенаправляем пользователя, куда угодно после разлогинивания
+        return redirect('/');
     }
-
 
     // Метод для показа формы входа
     public function showLoginForm()
@@ -55,7 +40,6 @@ class LoginController extends Controller
     // Метод для обработки входа
     public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
-
         // Попытка аутентификации пользователя
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = User::where('email', $request->email)->first();

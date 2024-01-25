@@ -74,7 +74,7 @@ class DetsadGallery extends Model
                     Mail::send([], [], function ($message) use ($subject, $messageText) {
                         $message->to(config('mail.from.address'))
                             ->subject($subject)
-                            ->setBody($messageText, 'text/html');
+                            ->html($messageText);
                     });
 
                     return [

@@ -18,11 +18,11 @@
                 let hiddenCity = document.getElementById('hiddenCity');
                 let city = citySelect.options[citySelect.selectedIndex].value;
                 let metro = metroSelect.options[metroSelect.selectedIndex].value;
+                let msgElement = document.getElementById('msg');
 
                 // Устанавливаем значения скрытых полей city и metro
                 hiddenCity.value = city;
                 hiddenMetro.value = metro;
-                submitBtn.style.display = 'none';
 
                 let xhr = new XMLHttpRequest();
                 xhr.open('POST', '/obmen-add', true);
@@ -30,8 +30,8 @@
                 xhr.responseType = 'json';
                 xhr.onload = function () {
                     if (xhr.status === 200) {
+                        submitBtn.style.display = 'none';
                         let data = xhr.response;
-                        let msgElement = document.getElementById('msg');
 
                         if (msgElement) {
                             msgElement.innerHTML = data.msg;
@@ -42,6 +42,12 @@
                         }
                         if (data.msg !== 'Объявление будет опубликовано после проверки модератором') {
                             submitBtn.style.display = 'block';
+                        }
+                    }else{
+                        let data = xhr.response;
+                        // Обработка ошибок валидации
+                        if (msgElement) {
+                            msgElement.innerHTML = data.errors.join('<br>');
                         }
                     }
                 };

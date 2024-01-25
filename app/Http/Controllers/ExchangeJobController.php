@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExchangeJobRequest;
 use App\Models\Exchange_Job\ExchangeJobItems;
 use App\Models\Exchange_Job\ExchangeJobTeachers;
 use Illuminate\Http\Request;
@@ -29,17 +30,17 @@ class ExchangeJobController
         $city = $exchange->getCitySearch('exchangeJob');
         $metro = $exchange->getMetroSearch('exchangeJob');
 
-        if(!empty($this->cityName)){
-            if(!empty($this->metroName)){
-                $metaKey = 'детские, сады, обмен, мест, '.$this->cityName. ', '.$this->metroName;
-                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$this->cityName. ' метро '.$this->metroName;
-                $title = 'Обмен местами в детских садах '.$this->cityName. ' метро '.$this->metroName;
-            }else{
-                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅'.$this->cityName;
-                $metaKey = 'детские, сады, обмен, мест, '.$this->cityName;
-                $title = 'Обмен местами в детских садах '.$this->cityName;
+        if (!empty($this->cityName)) {
+            if (!empty($this->metroName)) {
+                $metaKey = 'детские, сады, обмен, мест, ' . $this->cityName . ', ' . $this->metroName;
+                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅' . $this->cityName . ' метро ' . $this->metroName;
+                $title = 'Обмен местами в детских садах ' . $this->cityName . ' метро ' . $this->metroName;
+            } else {
+                $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅' . $this->cityName;
+                $metaKey = 'детские, сады, обмен, мест, ' . $this->cityName;
+                $title = 'Обмен местами в детских садах ' . $this->cityName;
             }
-        }else{
+        } else {
             $title = 'Обмен местами в детских садах';
             $metaKey = 'детские, сады, обмен, мест';
             $metaDesc = ' ❤️ Обмен мест в детских садах ✎ телефоны ☎️ объявления ✅';
@@ -57,48 +58,45 @@ class ExchangeJobController
             ]);
     }
 
-    public function add(Request $request): View|\Illuminate\Http\JsonResponse
+    public function addExchangeGet(): View
     {
-        if ($request->isMethod('get')) {
-            $exchange = new ExchangeJobItems();
-            $city = $exchange->getCitySearch('exchangeJob');
-            $metro = $exchange->getMetroSearch('exchangeJob');
+        $exchange = new ExchangeJobItems();
+        $city = $exchange->getCitySearch('exchangeJob');
+        $metro = $exchange->getMetroSearch('exchangeJob');
 
-            return view('exchangeJob.addExchange',
-                [
-                    'city' => $city,
-                    'metro' => $metro,
-                ]);
-        } else {
-            //валидация данных формы
-            $validatorData = $this->validateUserData($request);
-            if ($validatorData['status'] === 2) {
-                return response()->json($validatorData);
-            } else {
-                $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
-                $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
-                // Проверяем, что $metro_id является числом
-                $metro_id = is_numeric($metro_id) ? (int) $metro_id : 0;
+        return view('exchangeJob.addExchange',
+            [
+                'city' => $city,
+                'metro' => $metro,
+            ]);
+    }
 
-                $exchangeItem = new ExchangeJobItems();
-                $exchangeItem->status = 1;
-                $exchangeItem->ip = $request->ip();
-                $exchangeItem->city_id = $city_id;
-                $exchangeItem->metro_id = $metro_id;
-                $exchangeItem->created = now();
-                $exchangeItem->modified = now();
-                $exchangeItem->fullname = $request->input('username');
-                $exchangeItem->phone = $request->input('phone');
-                $exchangeItem->email = $request->input('email');
-                $exchangeItem->text = $request->input('text');
-                $exchangeItem->save();
-                $data = array(
-                    'status' => 1,
-                    'msg' => 'Объявление будет опубликовано после проверки модератором'
-                );
-            }
-            return response()->json($data);
-        }
+    public function addExchangePost(ExchangeJobRequest $request): \Illuminate\Http\JsonResponse
+    {
+
+        $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
+        $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
+        // Проверяем, что $metro_id является числом
+        $metro_id = is_numeric($metro_id) ? (int)$metro_id : 0;
+
+        $exchangeItem = new ExchangeJobItems();
+        $exchangeItem->status = 1;
+        $exchangeItem->ip = $request->ip();
+        $exchangeItem->city_id = $city_id;
+        $exchangeItem->metro_id = $metro_id;
+        $exchangeItem->created = now();
+        $exchangeItem->modified = now();
+        $exchangeItem->fullname = $request->input('username');
+        $exchangeItem->phone = $request->input('phone');
+        $exchangeItem->email = $request->input('email');
+        $exchangeItem->text = $request->input('text');
+        $exchangeItem->save();
+        $data = array(
+            'status' => 1,
+            'msg' => 'Объявление будет опубликовано после проверки модератором'
+        );
+
+        return response()->json($data);
 
     }
 
@@ -114,17 +112,17 @@ class ExchangeJobController
         $teachers = ExchangeJobTeachers::getTeachersSearch();
         $metro = $exchange->getMetroSearch('job');
 
-        if(!empty($this->cityName)){
-            if(!empty($this->metroName)){
-                $metaKey = 'детские, сады, работа, вакансии, '.$this->cityName. ', '.$this->metroName;
-                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅'.$this->cityName. ' метро '.$this->metroName;
-                $title = 'Работа в детских садах '.$this->cityName. ' метро '.$this->metroName;
-            }else{
-                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅'.$this->cityName;
-                $metaKey = 'детские, сады, обмен, мест, '.$this->cityName;
-                $title = 'Работа в детских садах '.$this->cityName;
+        if (!empty($this->cityName)) {
+            if (!empty($this->metroName)) {
+                $metaKey = 'детские, сады, работа, вакансии, ' . $this->cityName . ', ' . $this->metroName;
+                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅' . $this->cityName . ' метро ' . $this->metroName;
+                $title = 'Работа в детских садах ' . $this->cityName . ' метро ' . $this->metroName;
+            } else {
+                $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅' . $this->cityName;
+                $metaKey = 'детские, сады, обмен, мест, ' . $this->cityName;
+                $title = 'Работа в детских садах ' . $this->cityName;
             }
-        }else{
+        } else {
             $title = 'Работа в детских садах';
             $metaKey = 'детские, сады, работа, объявления';
             $metaDesc = '❤️ Работа в детских садах ✎ вакансии ☎️ объявления ✅';
@@ -143,141 +141,128 @@ class ExchangeJobController
             ]);
     }
 
-    public function addJob(Request $request): View|\Illuminate\Http\JsonResponse|array
+    public function addJobGet(): View
     {
-        if ($request->isMethod('get')) {
-            $exchange = new ExchangeJobItems();
-            $city = $exchange->getCitySearch('exchangeJob');
-            $metro = $exchange->getMetroSearch('exchangeJob');
-            $teachers = ExchangeJobTeachers::getTeachersSearch();
+        $exchange = new ExchangeJobItems();
+        $city = $exchange->getCitySearch('exchangeJob');
+        $metro = $exchange->getMetroSearch('exchangeJob');
+        $teachers = ExchangeJobTeachers::getTeachersSearch();
 
-            return view('exchangeJob.addJob',
-                [
-                    'city' => $city,
-                    'metro' => $metro,
-                    'teachers' => $teachers
-                ]);
-        } else {
-            //валидация данных формы
+        return view('exchangeJob.addJob',
+            [
+                'city' => $city,
+                'metro' => $metro,
+                'teachers' => $teachers
+            ]);
+    }
 
-            $validatorData = $this->validateUserData($request);
-            $teachers = $request->input('teacher', []);
+    public function addJobPost(ExchangeJobRequest $request): \Illuminate\Http\JsonResponse|array
+    {
+        $teachers = $request->input('teacher', []);
+        $exchangeItem = new ExchangeJobItems();
+        // если есть фото
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            if ($file->isValid()) {
+                // Генерация уникального имени файла
+                $originalFileName = md5(uniqid(rand(), 1)) . '.' . $file->getClientOriginalExtension();
 
-            if ($validatorData['status'] === 2) {
-                return response()->json($validatorData);
-            } else {
-                $exchangeItem = new ExchangeJobItems();
-                // если есть фото
-                if ($request->hasFile('file')) {
-                    $file = $request->file('file');
-                    if ($file->isValid()) {
-                        // Генерация уникального имени файла
-                        $originalFileName = md5(uniqid(rand(), 1)) . '.' . $file->getClientOriginalExtension();
-
-                        // Проверка разрешенных форматов
-                        $allowedExtensions = ['jpg', 'jpeg', 'png'];
-                        if (!in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
-                            return [
-                                'status' => 2,
-                                'msg' => 'Недопустимый формат файла. Разрешены только JPG и PNG.',
-                            ];
-                        }
-
-                        // Перемещение файла
-                        $file->move(public_path('/images/rabota'), $originalFileName);
-
-                        // Создаем и обрабатываем миниатюру
-                        $image = Image::make(public_path('/images/rabota/' . $originalFileName));
-
-                        // Проверяем ширину изображения и обрезаем, если она больше 80 пикселей
-                        if ($image->width() > 80) {
-                            $image->resize(80, 80, function ($constraint) {
-                                $constraint->aspectRatio();
-                            });
-
-                            // Пересохраняем оригинальное изображение
-                            $image->save(public_path('/images/rabota/' . $originalFileName));
-                        }
-                        //сохраняем в базу
-                        $exchangeItem->photo = $originalFileName;
-                    } else {
-                        return [
-                            'status' => 2,
-                            'msg' => 'Ошибка при загрузке файла.',
-                        ];
-                    }
-                }
-                if(!empty($teachers))
-                {
-                    $rows = ExchangeJobTeachers::whereIn('id', $teachers)->get();
-                    $teach = [];
-                    if(!empty($rows))
-                    {
-                        foreach($rows as $row)
-                        {
-                            $teach[] = $row->name;
-                        }
-                        $exchangeItem->teach = implode(', ', $teach);
-                    }
-                }else{
-                    return array(
+                // Проверка разрешенных форматов
+                $allowedExtensions = ['jpg', 'jpeg', 'png'];
+                if (!in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
+                    return [
                         'status' => 2,
-                        'msg' => 'Укажите специальность'
-                    );
+                        'msg' => 'Недопустимый формат файла. Разрешены только JPG и PNG.',
+                    ];
                 }
-                $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
-                $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
 
-                $exchangeItem->status = 0;
-                $exchangeItem->ip = $request->ip();
-                $exchangeItem->city_id = $city_id;
-                $exchangeItem->metro_id = $metro_id;
-                $exchangeItem->created = now();
-                $exchangeItem->modified = now();
-                $exchangeItem->fullname = $request->input('username');
-                $exchangeItem->phone = $request->input('phone');
-                $exchangeItem->email = $request->input('email');
-                $exchangeItem->text = $request->input('text');
-                $exchangeItem->type = $request->input('type');
-                $exchangeItem->save();
-                $data = array(
-                    'status' => 1,
-                    'msg' => 'Объявление будет опубликовано после проверки модератором'
-                );
-                $lastInsertedId = $exchangeItem->id;
+                // Перемещение файла
+                $file->move(public_path('/images/rabota'), $originalFileName);
 
-                if(!empty($exchangeItem->photo))
-                {
-                    $src = 'https://detskysad.com/images/rabota/'.$exchangeItem->photo;
-                }else{
-                    $src = 'https://detskysad.com/images/stories/user.jpg';
+                // Создаем и обрабатываем миниатюру
+                $image = Image::make(public_path('/images/rabota/' . $originalFileName));
+
+                // Проверяем ширину изображения и обрезаем, если она больше 80 пикселей
+                if ($image->width() > 80) {
+                    $image->resize(80, 80, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+
+                    // Пересохраняем оригинальное изображение
+                    $image->save(public_path('/images/rabota/' . $originalFileName));
                 }
-                $title = 'Резюме/вакансии - новое объявление';
-                $messageText = '<img style="float: left; margin-right: 10px;" src="'.$src.'">
-                <p>Имя: '.$request->input('username').'</p>
-                <p>E-mail: '.$request->input('email').'</p>
-                <p>Телефон: '.$request->input('phone').'</p>
-                <p>Специальность: '.implode(', ', $teach).'</p>
-                <p>Текст: '.$request->input('text').'</p>
-                <a href="'.env('APP_URL').'/rabota/publish/'.$lastInsertedId.'">опубликовать</a>
-                <a href="'.env('APP_URL').'/rabota/delete/'.$lastInsertedId.'">удалить</a>';
-
-                Mail::send([], [], function ($message) use ($messageText, $title) {
-                    $message->to(config('mail.from.address'))
-                        ->subject($title)
-                        ->setBody($messageText, 'text/html');
-                });
+                //сохраняем в базу
+                $exchangeItem->photo = $originalFileName;
+            } else {
+                return [
+                    'status' => 2,
+                    'msg' => 'Ошибка при загрузке файла.',
+                ];
             }
-            return response()->json($data);
         }
+        if (!empty($teachers)) {
+            $rows = ExchangeJobTeachers::whereIn('id', $teachers)->get();
+            $teach = [];
+            if (!empty($rows)) {
+                foreach ($rows as $row) {
+                    $teach[] = $row->name;
+                }
+                $exchangeItem->teach = implode(', ', $teach);
+            }
+        }
+
+        $city_id = preg_replace('~-(.*)~', '', $request->input('city_id'));
+        $metro_id = preg_replace('~-(.*)~', '', $request->input('metro_id'));
+
+        $exchangeItem->status = 0;
+        $exchangeItem->ip = $request->ip();
+        $exchangeItem->city_id = $city_id;
+        $exchangeItem->metro_id = $metro_id;
+        $exchangeItem->created = now();
+        $exchangeItem->modified = now();
+        $exchangeItem->fullname = $request->input('username');
+        $exchangeItem->phone = $request->input('phone');
+        $exchangeItem->email = $request->input('email');
+        $exchangeItem->text = $request->input('text');
+        $exchangeItem->type = $request->input('type');
+        $exchangeItem->save();
+        $data = array(
+            'status' => 1,
+            'msg' => 'Объявление будет опубликовано после проверки модератором'
+        );
+        $lastInsertedId = $exchangeItem->id;
+
+        if (!empty($exchangeItem->photo)) {
+            $src = 'https://detskysad.com/images/rabota/' . $exchangeItem->photo;
+        } else {
+            $src = 'https://detskysad.com/images/stories/user.jpg';
+        }
+        $title = 'Резюме/вакансии - новое объявление';
+        $messageText = '<img style="float: left; margin-right: 10px;" src="' . $src . '">
+                <p>Имя: ' . $request->input('username') . '</p>
+                <p>E-mail: ' . $request->input('email') . '</p>
+                <p>Телефон: ' . $request->input('phone') . '</p>
+                <p>Специальность: ' . implode(', ', $teach) . '</p>
+                <p>Текст: ' . $request->input('text') . '</p>
+                <a href="' . env('APP_URL') . '/rabota/publish/' . $lastInsertedId . '">опубликовать</a>
+                <a href="' . env('APP_URL') . '/rabota/delete/' . $lastInsertedId . '">удалить</a>';
+
+
+        Mail::send([], [], function ($message) use ($messageText, $title) {
+            $message->to(config('mail.from.address'))
+                ->subject($title)
+               ->html($messageText);
+        });
+
+        return response()->json($data);
+
 
     }
 
     public function publishJob(int $id): \Illuminate\Http\RedirectResponse
     {
         $result = ExchangeJobItems::find($id);
-        if($result !== null)
-        {
+        if ($result !== null) {
             $result->status = 1;
             $result->save();
             return redirect()->to('/rabota')->with('publish', 'Объявление опубликовано');
@@ -288,8 +273,7 @@ class ExchangeJobController
     public function deleteJob(int $id): \Illuminate\Http\RedirectResponse
     {
         $result = ExchangeJobItems::find($id);
-        if($result !== null)
-        {
+        if ($result !== null) {
             if (!empty($result->photo) && file_exists(public_path('/images/rabota/' . $result->photo))) {
                 unlink(public_path('/images/rabota/' . $result->photo));
             }
@@ -299,50 +283,11 @@ class ExchangeJobController
         return redirect()->to('/rabota')->with('remove', 'Объявление не найдено!');
     }
 
-    private function validateUserData(Request $request): array
-    {
-        $rules = [
-            'city_id' => 'required|numeric',
-            'text' => 'required|string|min:50|latin_characters|no_spam_links',
-            'username' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required',
-        ];
-
-        $messages = [
-            'text.required' => 'Пожалуйста, введите текст объявления',
-            'text.min' => 'Минимальная длина объявления 50 символов',
-            'text.latin_characters' => 'Объявления на латинице запрещены',
-            'text.no_spam_links' => 'Спам не пройдет!',
-            'username.required' => 'Пожалуйста, введите Ваше имя',
-            'phone.required' => 'Пожалуйста, введите Телефон',
-            'email.required' => 'Пожалуйста, введите E-mail',
-            'email.email' => 'Пожалуйста, введите корректный E-mail',
-            'city_id.required' => 'Пожалуйста, выберите город',
-            'city_id.numeric' => 'ID города должен быть числом',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            return [
-                'status' => 2,
-                'msg' => $validator->errors()->first(),
-            ];
-        } else {
-            return [
-                'status' => 1
-            ];
-        }
-    }
-
     private function RedirectAlias(object $exchange, string $firstAlias, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): void
     {
         // Redirect alias
-        if(!empty($cityId) || !empty($metroId))
-        {
-            if(!empty($cityId))
-            {
+        if (!empty($cityId) || !empty($metroId)) {
+            if (!empty($cityId)) {
                 $this->city = $exchange->getCity($cityId)
                     ->where('id', $cityId)
                     ->first();
@@ -352,8 +297,7 @@ class ExchangeJobController
                 }
                 $this->cityName = $this->city->name;
             }
-            if(!empty($metroId))
-            {
+            if (!empty($metroId)) {
                 $this->metro = $exchange->getMetro($metroId)
                     ->where('id', $metroId)
                     ->first();
@@ -362,12 +306,12 @@ class ExchangeJobController
                 }
                 $this->metroName = $this->metro->name;
             }
-            if(!empty($this->city) &&  $cityId. '-' .$cityAlias != $this->city->id.'-'.$this->city->alias){
-                redirect()->to("/$firstAlias/" . $this->city->id.'-'.$this->city->alias)->send();
+            if (!empty($this->city) && $cityId . '-' . $cityAlias != $this->city->id . '-' . $this->city->alias) {
+                redirect()->to("/$firstAlias/" . $this->city->id . '-' . $this->city->alias)->send();
                 exit();
             }
-            if(!empty($this->metro) && ($metroId. '-' .$metroAlias != $this->metro->id.'-'.$this->metro->alias || $cityId. '-' .$cityAlias != $this->city->id.'-'.$this->city->alias)){
-                redirect()->to("/$firstAlias/" . $this->city->id.'-'.$this->city->alias . '/' . $this->metro->id.'-'.$this->metro->alias)->send();
+            if (!empty($this->metro) && ($metroId . '-' . $metroAlias != $this->metro->id . '-' . $this->metro->alias || $cityId . '-' . $cityAlias != $this->city->id . '-' . $this->city->alias)) {
+                redirect()->to("/$firstAlias/" . $this->city->id . '-' . $this->city->alias . '/' . $this->metro->id . '-' . $this->metro->alias)->send();
                 exit();
             }
         }

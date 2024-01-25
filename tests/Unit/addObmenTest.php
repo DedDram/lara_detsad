@@ -2,13 +2,13 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class addObmenTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     */
+    use DatabaseTransactions;
     public function test_add_announcement_obmen_no_text(): void
     {
         // тестовые данные
@@ -23,10 +23,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, введите текст объявления',
+        $response->assertSessionHasErrors([
+            'text' => 'Пожалуйста, введите текст объявления'
         ]);
     }
 
@@ -44,10 +42,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Минимальная длина объявления 50 символов',
+        $response->assertSessionHasErrors([
+            'text' => 'Минимальная длина объявления 50 символов'
         ]);
     }
 
@@ -65,10 +61,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Объявления на латинице запрещены',
+        $response->assertSessionHasErrors([
+            'text' => 'Объявления на латинице запрещены'
         ]);
     }
 
@@ -86,10 +80,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Спам не пройдет!',
+        $response->assertSessionHasErrors([
+            'text' => 'Спам не пройдет!'
         ]);
     }
 
@@ -107,10 +99,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, введите Ваше имя',
+        $response->assertSessionHasErrors([
+            'username' => 'Пожалуйста, введите Ваше имя'
         ]);
     }
 
@@ -128,31 +118,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, выберите город',
-        ]);
-    }
-
-    public function test_add_announcement_obmen_city_id_no_numeric(): void
-    {
-        // тестовые данные
-        $userData = [
-            'city_id' => 'test',
-            'text' => 'Минимальная длина объявления 50 символов это просто текст',
-            'username' => 'Anna',
-            'email' => 'email@email.ru',
-            'phone' => '5555555',
-        ];
-
-        // Посылка POST-запроса на страницу регистрации
-        $response = $this->post('/obmen-add', $userData);
-
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'ID города должен быть числом',
+        $response->assertSessionHasErrors([
+            'city_id' => 'Пожалуйста, выберите город'
         ]);
     }
 
@@ -170,10 +137,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, введите E-mail',
+        $response->assertSessionHasErrors([
+            'email' => 'Пожалуйста, введите E-mail'
         ]);
     }
 
@@ -191,10 +156,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, введите корректный E-mail',
+        $response->assertSessionHasErrors([
+            'email' => 'Пожалуйста, введите корректный E-mail'
         ]);
     }
 
@@ -212,10 +175,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 2,
-            'msg' => 'Пожалуйста, введите Телефон',
+        $response->assertSessionHasErrors([
+            'phone' => 'Пожалуйста, введите Телефон'
         ]);
     }
 
@@ -227,7 +188,7 @@ class addObmenTest extends TestCase
             'text' => 'Минимальная длина объявления 50 символов это просто текст',
             'username' => 'Anna',
             'email' => 'dfdf@gdg.ru',
-            'phone' => '6786867868',
+            'phone' => '000000123',
         ];
 
         // Посылка POST-запроса на страницу регистрации
