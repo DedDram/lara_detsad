@@ -54,20 +54,26 @@ Route::get('/verification-success', function () {return view('users.verification
 Auth::routes(['verify' => true]);
 
 //Обмен местами в детских садах
-Route::get('/obmen-mest', [ExchangeJobController::class, 'exchange']);
 Route::get('/obmen-add', [ExchangeJobController::class, 'addExchangeGet']);
 Route::post('/obmen-add', [ExchangeJobController::class, 'addExchangePost']);
-Route::get('/obmen-mest/{city_id}-{city_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
-Route::get('/obmen-mest/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
+Route::prefix('obmen-mest')->group(function () {
+    Route::get('/', [ExchangeJobController::class, 'exchange']);
+    Route::get('/{city_id}-{city_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
+    Route::get('/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'exchange'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
+
+});
 
 //Работа в детских садах
-Route::get('/rabota', [ExchangeJobController::class, 'job']);
+
 Route::get('/rabota-add', [ExchangeJobController::class, 'addJobGet']);
 Route::post('/rabota-add', [ExchangeJobController::class, 'addJobPost']);
-Route::get('/rabota/{city_id}-{city_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
-Route::get('/rabota/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
-Route::get('/rabota/publish/{id}', [ExchangeJobController::class, 'publishJob'])->where(['id' => '[0-9]+'])->middleware('is.admin');
-Route::get('/rabota/delete/{id}', [ExchangeJobController::class, 'deleteJob'])->where(['id' => '[0-9]+'])->middleware('is.admin');
+Route::prefix('rabota')->group(function () {
+    Route::get('/', [ExchangeJobController::class, 'job']);
+    Route::get('/{city_id}-{city_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+']);
+    Route::get('/{city_id}-{city_alias}/{metro_id}-{metro_alias}', [ExchangeJobController::class, 'job'])->where(['city_id' => '[0-9]+', 'city_alias' => '[a-z0-9-]+','metro_id' => '[0-9]+', 'metro_alias' => '[a-z0-9-]+']);
+    Route::get('/publish/{id}', [ExchangeJobController::class, 'publishJob'])->where(['id' => '[0-9]+'])->middleware('is.admin');
+    Route::get('/delete/{id}', [ExchangeJobController::class, 'deleteJob'])->where(['id' => '[0-9]+'])->middleware('is.admin');
+});
 
 //Садики
 Route::get('/{section_id}-{section_alias}', [DetSadController::class, 'section'])->where(['section_id' => '[0-9]+', 'section_alias' => '[a-z0-9-]+']);
