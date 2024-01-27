@@ -46,7 +46,7 @@ class RegisterController extends Controller
 
         // Вход после регистрации
         Auth::login($user);
-        if (!$request->has('agent')) {
+        if ($request->has('agent')) {
             $data = ['status' => 1, 'msg' => 'Вам на почту ушло письмо, перейдите по ссылке в нем для подтверждения email.'];
             return response()->json($data);
         } else {

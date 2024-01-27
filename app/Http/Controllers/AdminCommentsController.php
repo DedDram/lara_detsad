@@ -25,30 +25,20 @@ class AdminCommentsController
         }
 
         $task = $request->query('task', '');
-        $session = $text = '';
+        $session = '';
 
         if ($request->filled(['item_id', 'object_group', 'object_id'])) {
-            switch ($task) {
-                case 'unpublish':
-                    $this->commentsService->unpublishItems($request->get('item_id'));
-                    $session = 'unpublish';
-                    $text = 'Комментарий снят с публикации';
-                    break;
-                case 'publish':
-                    $this->commentsService->publishItems($request->get('item_id'));
-                    $session = 'publish';
-                    $text = 'Комментарий опубликован';
-                    break;
-                case 'remove':
-                    $this->commentsService->remove($request->get('item_id'));
-                    $session = 'remove';
-                    $text = 'Комментарий удален';
-                    break;
-                case 'blacklist':
-                    $this->commentsService->blacklist($request->get('item_id'));
-                    $session = 'blacklist';
-                    $text = 'Пользователь заблокирован';
-                    break;
+            $text = match ($task) {
+                'unpublish' => 'Комментарий снят с публикации',
+                'publish' => 'Комментарий опубликован',
+                'remove' => 'Комментарий удален',
+                'blacklist' => 'Пользователь заблокирован',
+                default => ''
+            };
+
+            if ($text !== '') {
+                $session = $task;
+                $this->handleTask($task, $request->get('item_id'));
             }
         } elseif ($task === 'unsubscribe' && $request->filled(['object_group', 'object_id'])) {
             $this->commentsService->unsubscribe($request->get('object_group'), $request->get('object_id'), Auth::id());
@@ -61,5 +51,15 @@ class AdminCommentsController
         $url = ($request->get('object_group') == 'com_content') ? Content::getUrl($request->get('object_id')) : Item::getUrlSadik($request->get('object_id'));
 
         return redirect(env('APP_URL') . $url->url, 301)->with($session, $text);
+    }
+
+    protected function handleTask(string $task, $itemId): void
+    {
+        match ($task) {
+            'unpublish' => $this->commentsService->unpublishItems($itemId),
+            'publish' => $this->commentsService->publishItems($itemId),
+            'remove' => $this->commentsService->remove($itemId),
+            'blacklist' => $this->commentsService->blacklist($itemId),
+        };
     }
 }

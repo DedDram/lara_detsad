@@ -131,8 +131,7 @@
                                     прикрепленное фото</a>
                                 <div class="scomments-item-images"></div>
                             @endif
-
-                            @if (Auth::check() && !empty($item->edit) && auth()->id() == $item->user_id)
+                            @if (Auth::check() && !Auth::user()->isAdmin() && !empty($item->edit) && auth()->id() == $item->user_id)
                                 <div class="scomments-button-edit"><a class="scomments-control-edit" data-task="edit"
                                                                       data-object-group="{{$item->object_group}}"
                                                                       data-object-id="{{$item->object_id}}"

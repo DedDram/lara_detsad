@@ -15,7 +15,7 @@
     <script src="{{ mix('/js/recaptcha.js') }}" defer></script>
     <script src="{{ mix('/js/simpleModal.js') }}" defer></script>
     <script src="{{ mix('/js/comments.js') }}" defer></script>
-    @if(Auth::check() && Auth::user()->isAdmin())
+    @if(Auth::check())
         <script src="{{ asset('/js/moderation.js') }}" defer></script>
     @endif
 @endsection
