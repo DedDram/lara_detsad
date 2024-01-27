@@ -64,7 +64,6 @@ Route::prefix('obmen-mest')->group(function () {
 });
 
 //Работа в детских садах
-
 Route::get('/rabota-add', [ExchangeJobController::class, 'addJobGet']);
 Route::post('/rabota-add', [ExchangeJobController::class, 'addJobPost']);
 Route::prefix('rabota')->group(function () {

@@ -11,6 +11,7 @@ use App\Models\DetSad\Item;
 use App\Models\DetSad\Metro;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -58,7 +59,8 @@ class DetSadController
         }
         return response()->json(['empty']);
     }
-    public function section(int $sectionId, string $sectionAlias): View|\Illuminate\Http\RedirectResponse
+
+    public function section(int $sectionId, string $sectionAlias): View|RedirectResponse
     {
         $section = Section::query()->find($sectionId);
         if ($section !== null) {
