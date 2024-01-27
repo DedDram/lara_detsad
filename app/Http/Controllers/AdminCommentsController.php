@@ -48,7 +48,9 @@ class AdminCommentsController
             return redirect('/login', 301);
         }
 
-        $url = ($request->get('object_group') == 'com_content') ? Content::getUrl($request->get('object_id')) : Item::getUrlSadik($request->get('object_id'));
+        $url = ($request->get('object_group') == 'com_content') ?
+            Content::getUrl($request->get('object_id')) :
+            Item::getUrlSadik($request->get('object_id'));
 
         return redirect(env('APP_URL') . $url->url, 301)->with($session, $text);
     }

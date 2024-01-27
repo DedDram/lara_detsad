@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Content;
 use App\Models\ContentCategory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\View\View;
 
@@ -47,7 +48,7 @@ class Controller extends BaseController
             ]);
     }
 
-    public function ClassesCategory(int $category_id, string $category_alias): View|\Illuminate\Http\RedirectResponse
+    public function ClassesCategory(int $category_id, string $category_alias): View|RedirectResponse
     {
         $category = ContentCategory::find($category_id);
         if(!empty($category) && $category->alias !== $category_alias)
@@ -66,7 +67,7 @@ class Controller extends BaseController
             ]);
     }
 
-    public function ClassesContent(int $category_id, string $category_alias, int $id, string  $alias): View|\Illuminate\Http\RedirectResponse
+    public function ClassesContent(int $category_id, string $category_alias, int $id, string  $alias): View|RedirectResponse
     {
         $content = new Content();
         $article = $content->getContent($id);

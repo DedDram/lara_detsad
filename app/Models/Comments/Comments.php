@@ -76,22 +76,18 @@ class Comments extends Model
             ->where('object_group', '=', $objectGroup)
             ->where('object_id', '=', $objectId);
 
-        if (!Auth::check() || !User::isAdmin()) {
-            $rateQuery->where('status', '=', 1);
-        }
-
-        $rateResult = $rateQuery->get();
-
         $itemsQuery = self::select('i1il4_comments_items.*', 'i1il4_comments_items.username AS guest_name', 'users.name AS user_name', 'users.id AS registered')
+            ->selectRaw('IF(NOW() < DATE_ADD(i1il4_comments_items.created, INTERVAL 15 MINUTE), 1, 0) AS edit')
             ->leftJoin('users', 'i1il4_comments_items.user_id', '=', 'users.id')
             ->where('i1il4_comments_items.object_group', $objectGroup)
             ->where('i1il4_comments_items.object_id', $objectId);
 
-        if (Auth::check() && User::isAdmin()) {
+        if (!Auth::check() || !User::isAdmin()) {
+            $rateQuery->where('status', '=', 1);
             $itemsQuery->where('i1il4_comments_items.status', '1');
-        } else {
-            $itemsQuery->selectRaw('IF(NOW() < DATE_ADD(i1il4_comments_items.created, INTERVAL 15 MINUTE), 1, 0) AS edit');
         }
+
+        $rateResult = $rateQuery->get();
 
         $items = $itemsQuery->orderBy('i1il4_comments_items.created', 'desc')
             ->paginate($limit, ['*'], 'page', $request->query('page'))

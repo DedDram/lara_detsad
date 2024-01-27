@@ -11,50 +11,61 @@ use App\Models\DetSad\Item;
 use App\Models\DetSad\Metro;
 use App\Models\DetSad\Section;
 use App\Models\DetSad\Streets;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Intervention\Image\Facades\Image;
 
+
 class DetSadController
 {
-    public function getResponse(Request $request)
+    public function getTelephoneOrEmail(Request $request): array
     {
-        $task = $request->input('task');
-        if(!empty($task) && ($task == 'telephone' || $task == 'mail'))
+        if($request->filled('task') && ($request->input('task') == 'telephone' || $request->input('task') == 'mail'))
         {
             return Item::showTelephoneOrEmail($request);
+        }else{
+            throw new HttpResponseException(response()->json(['error' => 'Invalid task parameter'], 400));
         }
-        if(!empty($task) && ($task == 'photo')){
+    }
+    public function addPhotoMainPage(Request $request): View|JsonResponse
+    {
+        if($request->filled('task') && ($request->input('task') == 'photo')){
             if ($request->isMethod('get')) {
                 return view('detsad.addPhoto', ['item_id'=> $request->query('item_id')]);
             } else {
                 $id = $request->input('item_id');
                 $file = $request->file('file');
 
-                $messageText = 'Добавлено фото к садику id=' . $id;
-                $subject = 'Добавлено фото к садику id=' . $id;
+                if(!empty($id) && !empty($file)){
+                    $messageText = 'Добавлено фото к садику id=' . $id;
+                    $subject = 'Добавлено фото к садику id=' . $id;
 
-                Mail::send([], [], function ($message) use ($subject, $messageText, $file) {
-                    $message->to(config('mail.from.address'))
-                        ->subject($subject)
-                        ->html($messageText);
+                    Mail::send([], [], function ($message) use ($subject, $messageText, $file) {
+                        $message->to(config('mail.from.address'))
+                            ->subject($subject)
+                            ->html($messageText);
 
-                    if ($file) {
-                        // Прикрепляем файл к письму
-                        $message->attach($file->getRealPath(), [
-                            'as' => $file->getClientOriginalName(),
-                            'mime' => $file->getMimeType(),
-                        ]);
-                    }
-                });
+                        if ($file) {
+                            // Прикрепляем файл к письму
+                            $message->attach($file->getRealPath(), [
+                                'as' => $file->getClientOriginalName(),
+                                'mime' => $file->getMimeType(),
+                            ]);
+                        }
+                    });
 
-                $data = ['msg' => 'Ваше сообщение успешно отправлено'];
-                return response()->json($data);
+                    $data = ['msg' => 'Ваше сообщение успешно отправлено'];
+                    return response()->json($data);
+                }else{
+                    throw new HttpResponseException(response()->json(['error' => 'Invalid task parameter'], 400));
+                }
             }
         }
         return response()->json(['empty']);
@@ -62,31 +73,42 @@ class DetSadController
 
     public function section(int $sectionId, string $sectionAlias): View|RedirectResponse
     {
-        $section = Section::query()->find($sectionId);
-        if ($section !== null) {
-            if ($sectionAlias != $section->alias) {
-                return redirect()->to('/' . $sectionId . '-' . $section->alias, 301);
+        try {
+            $section = Section::query()->find($sectionId);
+            if ($section !== null) {
+                if ($sectionAlias != $section->alias) {
+                    return redirect()->to('/' . $sectionId . '-' . $section->alias, 301);
+                }
+            } else {
+                abort(404);
             }
-        } else {
+        } catch (ModelNotFoundException $e) {
             abort(404);
+        }
+
+        if ($sectionAlias != $section->alias) {
+            return redirect()->route('section', ['sectionId' => $sectionId, 'sectionAlias' => $section->alias])->withStatus(301);
         }
         $categories = Category::query()->where('section_id', $sectionId)->get();
         $address = Section::getAddress($sectionId, $sectionAlias);
-        return view('detsad.section',
-            ['section' => $section,
-                'categories' => $categories,
-                'address' => $address,
-                'title' => $section->title,
-                'metaDesc' => $section->title . ' ❤️ отзывы о детских садах 😊 адреса на карте 🌎',
-                'metaKey' => $section->title . ' отзывы, детские, сады',
-            ]);
+        $data = [
+            'section' => $section,
+            'categories' => $categories,
+            'address' => $address,
+            'title' => $section->title,
+            'metaDesc' => $section->title . ' ❤️ отзывы о детских садах 😊 адреса на карте 🌎',
+            'metaKey' => $section->title . ' отзывы, детские, сады',
+        ];
+
+        return view('detsad.section', $data);
     }
 
-    public function category(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $district = ''): View|\Illuminate\Http\RedirectResponse
+    public function category(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $district = ''): View|RedirectResponse
     {
         $category = Category::getCategory($categoryId);
         if ($category !== null) {
-            if ($sectionId . '-' . $sectionAlias != $category->section_alias || $categoryId . '-' . $categoryAlias != $category->category_alias) {
+            if ($sectionId . '-' . $sectionAlias != $category->section_alias ||
+                $categoryId . '-' . $categoryAlias != $category->category_alias) {
                 return redirect()->to('/' . $category->section_alias . '/' . $category->category_alias, 301);
             }
         } else {
@@ -102,23 +124,7 @@ class DetSadController
         } else {
             $district = '';
         }
-        $address = array();
-        if ($itemsCollection->isNotEmpty()) {
-            $n = 1;
-            foreach ($itemsCollection as $key => $value) {
-                $itemsCollection[$key]->link = '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias;
-                $itemsCollection[$key]->name = $value->name;
-                $itemsCollection[$key]->okrug = $value->okrug;
-                $itemsCollection[$key]->n = $n;
-                $n++;
-                $address[] = array(
-                    'geo_lat' => $value->geo_lat,
-                    'geo_long' => $value->geo_long,
-                    'url' => '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias,
-                    'text' => $value->name
-                );
-            }
-        }
+        $address = self::getAddressForYandexMap($itemsCollection, $category);
         $itemsCollection = $itemsCollection->sortByDesc('average');
         if (!empty($district)) {
             $distr2 = trim(strrchr($district->name, ' '));
@@ -173,23 +179,8 @@ class DetSadController
         $category = self::checkRedirectCategory($categoryId, $categoryAlias);
         $street = Streets::getStreet($categoryId, $street_alias);
         $items = Streets::getItems($categoryId, $street_alias);
-        $address = array();
-        if ($items->isNotEmpty()) {
-            $n = 1;
-            foreach ($items as $key => $value) {
-                $items[$key]->link = '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias;
-                $items[$key]->name = $value->name;
-                $items[$key]->okrug = $value->okrug;
-                $items[$key]->n = $n;
-                $n++;
-                $address[] = array(
-                    'geo_lat' => $value->geo_lat,
-                    'geo_long' => $value->geo_long,
-                    'url' => '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias,
-                    'text' => $value->name
-                );
-            }
-        }
+
+        $address = self::getAddressForYandexMap($items, $category);
         $title = 'Детские сады - ' . $street->name . ' (' . $street->city . ')';
         $metaDesc = 'Детские сады - ' . $street->name . ' (' . $street->city . ') ❤️ отзывы о детских садах ✎ телефоны ☎️ адреса, рейтинг ✅';
         $metaKey = 'Поиск, улица, детский, сад, ' . $street->name . ' (' . $street->city . ')';
@@ -204,20 +195,14 @@ class DetSadController
             ]);
     }
 
-    public function sadik(Request $request, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    public function sadik(Request $request, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        // Проверка на редирект
-        if ($sadik instanceof \Illuminate\Http\RedirectResponse) {
-            return $sadik;
-        }
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
-
         $addresses = Item::getAddress($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadik->section_name, $sadik->category_name, $sadId);
         $statistics = Item::getStatistics($sadId);
         $fields = Item::getFields($sadId);
         $commentsTitle = StringHelper::declension($sadik->comments, ['отзыв', 'отзыва', 'отзывов']);
-
         if (count($addresses) == 1 && $addresses[0]->locality == 'Москва') {
             $street = ' ' . $addresses[0]->street_address;
         } else {
@@ -236,26 +221,9 @@ class DetSadController
             $neutrally = $items[0]->neutrally;
             $bad = $items[0]->bad;
         }
-
         $num = $request->input('num');
         $ratingCount = explode(" ", $commentsTitle);
-        if(!empty($sadik->preview_src)){
-            $imagePath = '/images/detsad/' . $sadik->id . '/' . $sadik->preview_src;
-            $fullPath = public_path($imagePath);
-
-            if (file_exists($fullPath)) {
-                $image = Image::make($fullPath);
-                $widthImage = $image->width();
-                $heightImage = $image->height();
-            } else{
-                $widthImage = 220;
-                $heightImage = 165;
-            }
-        }else{
-            $widthImage = 220;
-            $heightImage = 165;
-        }
-
+        $previewSize = self::getPreviewSize($sadik);
         $title = $sadik->name.$street.' - '.$commentsTitle;
         $metaDesc = $sadik->title.' ❤️ описание садика ✎ телефоны ☎️ адреса, ОТЗЫВЫ, рейтинг ✅';
         $metaKey = $sadik->title.', телефон, адрес, отзывы';
@@ -265,8 +233,8 @@ class DetSadController
                 'url' => $url,
                 'item' => $sadik,
                 'user' => $user,
-                'widthImage' => $widthImage,
-                'heightImage' => $heightImage,
+                'widthImage' => $previewSize['width'],
+                'heightImage' => $previewSize['height'],
                 'countImage' => $sadik->count_img,
                 'addresses' => $addresses,
                 'fields' => $fields,
@@ -306,27 +274,26 @@ class DetSadController
 
     }
 
-
     public function addGallery(Request $request): View
     {
         $total = Item::getCountImage($request->query('id'));
         return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
     }
 
-    public function addGalleryPost(Request $request): \Illuminate\Http\JsonResponse
+    public function addGalleryPost(Request $request): JsonResponse
     {
         $gallery = new DetsadGallery();
         $addImg = $gallery->add($request);
         return response()->json($addImg);
     }
 
-    public function delImageGallery(Request $request): \Illuminate\Http\RedirectResponse
+    public function delImageGallery(Request $request, DetsadGallery $gallery): RedirectResponse
     {
-        $gallery = new DetsadGallery();
         $with = $gallery->remove($request);
         return redirect()->back()->with('removeImgError', $with);
     }
-    public function PublishImageGallery(Request $request): \Illuminate\Http\RedirectResponse
+
+    public function PublishImageGallery(Request $request, DetsadGallery $gallery): RedirectResponse
     {
         $gallery = new DetsadGallery();
         $with = $gallery->publish($request);
@@ -342,6 +309,7 @@ class DetSadController
         return view('detsad.agent',['url'=>$url, 'item' => $sadik,'title' => 'Представитель '.$sadik->name, 'agent' => $agent]);
 
     }
+
     public function sadGeoShow(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
@@ -408,6 +376,43 @@ class DetSadController
         }
     }
 
+
+    private function getAddressForYandexMap(object $itemsCollection, object $category): array
+    {
+        $address = array();
+        $n = 1;
+        foreach ($itemsCollection as $key => $value) {
+            $itemsCollection[$key]->link = '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias;
+            $itemsCollection[$key]->name = $value->name;
+            $itemsCollection[$key]->okrug = $value->okrug;
+            $itemsCollection[$key]->n = $n;
+            $n++;
+            $address[] = array(
+                'geo_lat' => $value->geo_lat,
+                'geo_long' => $value->geo_long,
+                'url' => '/' . $category->section_alias . '/' . $category->category_alias . '/' . $value->id . '-' . $value->alias,
+                'text' => $value->name
+            );
+        }
+        return $address;
+    }
+
+    private function getPreviewSize(object $sadik): array
+    {
+        $widthImage = 220;
+        $heightImage = 165;
+        if(!empty($sadik->preview_src)){
+            $imagePath = '/images/detsad/' . $sadik->id . '/' . $sadik->preview_src;
+            $fullPath = public_path($imagePath);
+            if (file_exists($fullPath)) {
+                $image = Image::make($fullPath);
+                $widthImage = $image->width();
+                $heightImage = $image->height();
+            }
+        }
+        return ['width' => $widthImage, 'height' => $heightImage];
+    }
+
     private function getSadikItem(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): object
     {
         $item = new Item();
@@ -417,14 +422,14 @@ class DetSadController
         return self::adsCity($sadik, $sectionId);
     }
 
-    private function redirectWrongAlias(object $sadik, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias)
+    private function redirectWrongAlias(object $sadik, int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): void
     {
         if (!empty($sadik)) {
             if ($sectionId . '-' . $sectionAlias != $sadik->section_alias ||
                 $categoryId . '-' . $categoryAlias != $sadik->category_alias ||
                 $sadId . '-' . $sadAlias != $sadik->item_alias
             ) {
-              return redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias)->send();
+                redirect()->to('/' . $sadik->section_alias . '/' . $sadik->category_alias . '/' . $sadik->item_alias)->send();
             }
         } else {
             abort(404);
@@ -440,7 +445,7 @@ class DetSadController
         }
         $sadik->ads_url = '';
         $ads_city_ = '';
-        if (strpos($ads_city, 'j') !== false) {
+        if (str_contains($ads_city, 'j')) {
             $ads_city_ = str_replace('j', 'y', $ads_city);
         }
         $city_ = AdsCity::getCity($ads_city, $ads_city_);
@@ -450,7 +455,7 @@ class DetSadController
         return $sadik;
     }
 
-    private function checkRedirectCategory($categoryId, $categoryAlias)
+    private function checkRedirectCategory($categoryId, $categoryAlias): RedirectResponse|null
     {
         $category = Category::getCategory($categoryId);
         if (!empty($category)) {
@@ -460,6 +465,6 @@ class DetSadController
         } else {
             abort(404);
         }
-        return $category;
+        return null;
     }
 }
