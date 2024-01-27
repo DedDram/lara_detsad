@@ -11,47 +11,55 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminCommentsController
 {
+    protected Comments $commentsService;
+
+    public function __construct(Comments $commentsService)
+    {
+        $this->commentsService = $commentsService;
+    }
+
     public function getResponse(Request $request)
     {
+        if (!Auth::check() || !User::isAdmin()) {
+            return redirect('/login', 301);
+        }
+
         $task = $request->query('task', '');
         $session = $text = '';
 
-        if (Auth::check() && User::isAdmin() &&  !empty($task) && $request->filled('item_id') && $request->filled('object_group') && $request->filled('object_id')) {
-            if ($task === 'unpublish') {
-                (new Comments)->unpublishItems($request->get('item_id'));
-                $session = 'unpublish';
-                $text = 'Комментарий снят с публикаци';
+        if ($request->filled(['item_id', 'object_group', 'object_id'])) {
+            switch ($task) {
+                case 'unpublish':
+                    $this->commentsService->unpublishItems($request->get('item_id'));
+                    $session = 'unpublish';
+                    $text = 'Комментарий снят с публикации';
+                    break;
+                case 'publish':
+                    $this->commentsService->publishItems($request->get('item_id'));
+                    $session = 'publish';
+                    $text = 'Комментарий опубликован';
+                    break;
+                case 'remove':
+                    $this->commentsService->remove($request->get('item_id'));
+                    $session = 'remove';
+                    $text = 'Комментарий удален';
+                    break;
+                case 'blacklist':
+                    $this->commentsService->blacklist($request->get('item_id'));
+                    $session = 'blacklist';
+                    $text = 'Пользователь заблокирован';
+                    break;
             }
-            if ($task === 'publish') {
-                (new Comments)->publishItems($request->get('item_id'));
-                $session = 'publish';
-                $text = 'Комментарий опубликован';
-            }
-            if ($task === 'remove') {
-                (new Comments)->remove($request->get('item_id'));
-                $session = 'remove';
-                $text = 'Комментарий удален';
-            }
-            if ($task === 'blacklist') {
-                (new Comments)->blacklist($request->get('item_id'));
-                $session = 'blacklist';
-                $text = 'Пользователь заблокирован';
-            }
-
-        } elseif (Auth::check() && $request->filled('task') && $task == 'unsubscribe' && $request->filled('object_group') && $request->filled('object_id')) {
-            (new Comments)->unsubscribe($request->get('object_group'), $request->get('object_id'), Auth::id());
+        } elseif ($task === 'unsubscribe' && $request->filled(['object_group', 'object_id'])) {
+            $this->commentsService->unsubscribe($request->get('object_group'), $request->get('object_id'), Auth::id());
             $session = 'unsubscribe';
             $text = 'Вы отписались от новых уведомлений';
         } else {
             return redirect('/login', 301);
         }
-        // Получаем ссылку на страницу, где отзыв и редирект туда
-        if ($request->get('object_group') == 'com_content') {
-            $url = Content::getUrl($request->get('object_id'));
-        } else {
-            $url = Item::getUrlSadik($request->get('object_id'));
-        }
 
-        return redirect( env('APP_URL'). $url->url, 301)->with($session, $text);
+        $url = ($request->get('object_group') == 'com_content') ? Content::getUrl($request->get('object_id')) : Item::getUrlSadik($request->get('object_id'));
+
+        return redirect(env('APP_URL') . $url->url, 301)->with($session, $text);
     }
 }

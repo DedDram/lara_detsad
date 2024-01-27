@@ -15,8 +15,22 @@ class Comments extends Model
 {
     protected $table = 'i1il4_comments_items';
     protected $primaryKey = 'id';
-    protected $fillable = ['object_group', 'object_id', 'created', 'ip', 'user_id', 'rate', 'country', 'status', 'username', 'email', 'isgood', 'ispoor', 'description', 'images'];
-
+    protected $fillable = [
+        'object_group',
+        'object_id',
+        'created',
+        'ip',
+        'user_id',
+        'rate',
+        'country',
+        'status',
+        'username',
+        'email',
+        'isgood',
+        'ispoor',
+        'description',
+        'images'
+    ];
     protected object $user;
     protected string $dir;
     protected int $user_id;
@@ -96,7 +110,7 @@ class Comments extends Model
 
             if ($request->has('page')) {
                 $start = $request->input('page');
-            }else{
+            } else {
                 $start = 1;
             }
             $n = count($rateQuery) - $limit * ($start - 1);
@@ -128,10 +142,10 @@ class Comments extends Model
 
     public function create($request): array
     {
-        $rate = (int) $request->input('star');
+        $rate = (int)$request->input('star');
         if (empty($this->user)) {
             $username = self::input($request->input('username'));
-            $email = (string) $request->input('email');
+            $email = (string)$request->input('email');
         } else {
             $username = $this->user->name;
             $email = $this->user->email;
@@ -198,8 +212,8 @@ class Comments extends Model
         }
 
         // Уведомление админу
-        if($request->has('object_group') && ($request->input('object_group') === 'com_content' ||
-                $request->input('object_group') === 'com_detsad') && !empty($request->input('object_id'))){
+        if ($request->has('object_group') && ($request->input('object_group') === 'com_content' ||
+                $request->input('object_group') === 'com_detsad') && !empty($request->input('object_id'))) {
             self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
             // Добавления задания в очередь (геолокация)
             dispatch(new AfterCreatCommentGeoLocation());
@@ -208,7 +222,7 @@ class Comments extends Model
             // Создание экземпляра события
             $temp = self::getItem($request->input('object_group'), $request->input('object_id'));
             broadcast(new \App\Events\ReviewAdded($temp['name'], $temp['url']))->toOthers();
-        } else{
+        } else {
             return array(
                 'status' => 2,
                 'msg' => 'Не передан object_group или object_group'
@@ -390,7 +404,7 @@ class Comments extends Model
         );
     }
 
-    private function subscribe(string $object_group, int $object_id, int  $user_id): void
+    private function subscribe(string $object_group, int $object_id, int $user_id): void
     {
         DB::table('i1il4_comments_subscribers')->updateOrInsert(
             [
@@ -659,7 +673,7 @@ class Comments extends Model
                 ->where('t1.id', '=', $object_id)
                 ->first();
 
-            if(!empty($content)){
+            if (!empty($content)) {
                 $item['name'] = preg_replace('@ - отзывы.*@smi', '', $content->title);
                 $item['url'] = '/' . $content->section_alias . '/' . $object_id . '/' . $content->contentAlias;
             }
@@ -669,8 +683,8 @@ class Comments extends Model
 
     public function vote($request): array
     {
-        $item_id = (int) $request->input('id');
-        $value = (string) $request->input('value');
+        $item_id = (int)$request->input('id');
+        $value = (string)$request->input('value');
 
         $result = DB::table('i1il4_comments_votes')
             ->select(DB::raw('*'))
