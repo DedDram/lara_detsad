@@ -20,10 +20,6 @@ class AdminCommentsController
 
     public function getResponse(Request $request)
     {
-        if (!Auth::check() || !User::isAdmin()) {
-            return redirect('/login', 301);
-        }
-
         $task = $request->query('task', '');
         $session = '';
 

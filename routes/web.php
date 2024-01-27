@@ -101,8 +101,8 @@ Route::any('/post/error', [ErrorController::class, 'getResponse']);
 
 //Комменты
 Route::post('/post/comment', [PostCommentsController::class, 'getResponse']);
-Route::get('/admin/comments', [AdminCommentsController::class, 'getResponse']);
-Route::get('/comments', [AdminCommentsController::class, 'getResponse']);
+Route::get('/admin/comments', [AdminCommentsController::class, 'getResponse'])->middleware('is.admin');
+Route::get('/comments', [AdminCommentsController::class, 'getResponse'])->middleware('is.admin');
 //Диплом
 Route::get('/diplom/code', [DiplomController::class, 'code']);
 Route::get('/diplom/default', [DiplomController::class, 'default']);
