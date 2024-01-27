@@ -28,7 +28,7 @@ Route::prefix('detskie-sady')->group(function (){
 });
 
 Route::get('/', [Controller::class, 'main']);
-//Прочите страниц и разделы
+//Прочие страницы и разделы
 Route::get('/zanyatiya-v-detskom-sadu', [Controller::class, 'ClassesMain']);
 Route::get('/zanyatiya/{category_id}-{category_alias}', [Controller::class, 'ClassesCategory'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+']);
 Route::get('/zanyatiya/{category_id}-{category_alias}/{id}-{alias}', [Controller::class, 'ClassesContent'])->where(['category_id' => '[0-9]+', 'category_alias' => '[a-z0-9-]+', 'id' => '[0-9]+', 'alias' => '[a-z0-9-]+']);
