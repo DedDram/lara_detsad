@@ -127,8 +127,6 @@ class Comments extends Model
             $items[0]->good = $good;
             $items[0]->rateQuery = $rateResult;
         }
-
-
         return $items;
     }
 
