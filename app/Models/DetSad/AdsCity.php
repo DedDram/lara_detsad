@@ -16,9 +16,7 @@ class AdsCity extends Model
 
     public static function getCity(string $ads_city, string $ads_city_ = '')
     {
-        $query = DB::table('i1il4_ads_city')
-            ->select('id', 'alias')
-            ->where('alias', $ads_city);
+        $query = self::select('id', 'alias')->where('alias', $ads_city);
 
         if (!empty($ads_city_)) {
             $query->orWhere('alias', $ads_city_);

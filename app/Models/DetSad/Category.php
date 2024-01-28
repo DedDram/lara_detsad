@@ -2,6 +2,7 @@
 
 namespace App\Models\DetSad;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 class Category extends Model
@@ -10,7 +11,7 @@ class Category extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['section_id', 'name', 'alias', 'title', 'text', 'detsad_addresses'];
 
-    public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
     }

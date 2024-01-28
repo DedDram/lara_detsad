@@ -55,7 +55,6 @@ class Item extends Model
 
     public static function getAddress(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, int $sadId): object
     {
-
         if ($sectionId > 1 && $sectionId < 12) {
             $addresses = DB::table('i1il4_detsad_address AS address')
                 ->select('address.*', 'items.section_id AS section', 'items.category_id AS cat', 'categories.name AS cat_name', 'categories.alias AS cat_alias', 'sections.name AS section_name', 'sections.alias AS section_alias')

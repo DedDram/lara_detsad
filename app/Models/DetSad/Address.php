@@ -3,6 +3,7 @@
 namespace App\Models\DetSad;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Address extends Model
 {
@@ -24,7 +25,7 @@ class Address extends Model
             'metro',
             'nearby'
         ];
-    public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
