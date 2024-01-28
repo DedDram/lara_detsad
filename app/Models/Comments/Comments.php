@@ -400,20 +400,16 @@ class Comments extends Model
 
     private function getRate($request): ?object
     {
+        $query = self::selectRaw('COUNT(*) as itog')
+            ->where('object_group', $request->input('object_group'))
+            ->where('object_id', $request->input('object_id'));
+
         if (!empty($this->user)) {
-            return DB::table('i1il4_comments_items')
-                ->select(DB::raw('COUNT(*) as itog'))
-                ->where('object_group', '=', $request->input('object_group'))
-                ->where('object_id', '=', $request->input('object_id'))
-                ->where('user_id', '=', $this->user_id)
+            return $query->where('user_id', $this->user_id)
                 ->first();
         } else {
-            return DB::table('i1il4_comments_items')
-                ->select(DB::raw('COUNT(*) as itog'))
-                ->where('object_group', '=', $request->input('object_group'))
-                ->where('object_id', '=', $request->input('object_id'))
-                ->where('ip', '=', $this->ip)
-                ->where(DB::raw('DATE_ADD(created, INTERVAL 1 DAY)'), '>', now())
+            return $query->where('ip', $this->ip)
+                ->whereRaw('created > DATE_SUB(NOW(), INTERVAL 1 DAY)')
                 ->first();
         }
     }
@@ -561,8 +557,7 @@ class Comments extends Model
         }
 
         if (!empty($values)) {
-            DB::table('i1il4_comments_items')
-                ->upsert($values, ['id'], ['description' => DB::raw('VALUES(description)')]);
+            self::upsert($values, ['id'], ['description' => DB::raw('VALUES(description)')]);
         }
     }
 
@@ -668,42 +663,49 @@ class Comments extends Model
         $item_id = (int)$request->input('id');
         $value = (string)$request->input('value');
 
-        $result = DB::table('i1il4_comments_votes')
-            ->select(DB::raw('*'))
-            ->where('item_id', '=', $item_id)
-            ->where('ip', '=', $request->ip())
-            ->first();;
-        if ($result === null) {
-            if ($value == 'up') {
-                DB::table('i1il4_comments_votes')
-                    ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => 1]);
-            }
-            if ($value == 'down') {
-                DB::table('i1il4_comments_votes')
-                    ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => -1]);
-            }
+        if(!empty($item_id) && !empty($value)){
+            $result = DB::table('i1il4_comments_votes')
+                ->select(DB::raw('*'))
+                ->where('item_id', '=', $item_id)
+                ->where('ip', '=', $request->ip())
+                ->first();;
+            if ($result === null) {
+                if ($value == 'up') {
+                    DB::table('i1il4_comments_votes')
+                        ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => 1]);
+                }
+                if ($value == 'down') {
+                    DB::table('i1il4_comments_votes')
+                        ->insert(['item_id' => $item_id, 'ip' => $request->ip(), 'value' => -1]);
+                }
 
-            DB::table('i1il4_comments_items')
-                ->where('id', $item_id)
-                ->update([
-                    'isgood' => DB::table('i1il4_comments_votes')
-                        ->where('item_id', $item_id)
-                        ->where('value', '>', 0)
-                        ->sum('value'),
-                    'ispoor' => DB::table('i1il4_comments_votes')
-                        ->where('item_id', $item_id)
-                        ->where('value', '<', 0)
-                        ->sum(DB::raw('-value')),
-                ]);
+                DB::table('i1il4_comments_items')
+                    ->where('id', $item_id)
+                    ->update([
+                        'isgood' => DB::table('i1il4_comments_votes')
+                            ->where('item_id', $item_id)
+                            ->where('value', '>', 0)
+                            ->sum('value'),
+                        'ispoor' => DB::table('i1il4_comments_votes')
+                            ->where('item_id', $item_id)
+                            ->where('value', '<', 0)
+                            ->sum(DB::raw('-value')),
+                    ]);
 
-            return array(
-                'msg' => 'Спасибо, Ваш голос принят!'
-            );
+                return array(
+                    'msg' => 'Спасибо, Ваш голос принят!'
+                );
+            } else {
+                return array(
+                    'msg' => 'Повторное голосование не учитывается!'
+                );
+            }
         } else {
             return array(
-                'msg' => 'Повторное голосование не учитывается!'
+                'msg' => 'Не переданы параметры'
             );
         }
+
     }
 
     public function votes($request): ?object
@@ -750,7 +752,6 @@ class Comments extends Model
 
     public function addImage(Request $request): array
     {
-
         if ($request->hasFile('file') && $request->has('attach')) {
             $file = $request->file('file');
             $attach = $request->input('attach');
@@ -819,6 +820,7 @@ class Comments extends Model
         $item = DB::table('i1il4_comments_images')
             ->select('*')
             ->where('id', $id_img)
+            ->whereRaw('created > DATE_SUB(NOW(), INTERVAL 5 MINUTE)')
             ->first();
 
         if ($item !== null) {
