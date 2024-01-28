@@ -71,8 +71,7 @@ class Comments extends Model
 
     public static function getItems($request, string $objectGroup, int $objectId, int $limit)
     {
-        $rateQuery = DB::table('i1il4_comments_items')
-            ->select('rate')
+        $rateQuery = self::select('rate')
             ->where('object_group', '=', $objectGroup)
             ->where('object_id', '=', $objectId);
 
@@ -129,19 +128,19 @@ class Comments extends Model
 
     public function create($request): array
     {
-        $rate = (int)$request->input('star');
+        $rate = (int) $request->input('star');
         if (empty($this->user)) {
             $username = self::input($request->input('username'));
-            $email = (string)$request->input('email');
+            $email = $request->input('email');
         } else {
             $username = $this->user->name;
             $email = $this->user->email;
         }
-        if (!empty($request->input('subscribe'))) {
+        if ($request->filled('subscribe')) {
             $subscribe = $request->input('subscribe');
         }
-        $description = (string)$request->input('description');
-        $attach = (string)$request->input('attach');
+        $description = $request->input('description');
+        $attach = $request->input('attach');
 
         // Проголосовать можно один раз
         $temp = $this->getRate($request);
@@ -176,18 +175,14 @@ class Comments extends Model
         // Получить последний вставленный ID
         $item_id = DB::getPdo()->lastInsertId();
 
-        DB::table('i1il4_comments_images')
-            ->where('item_id', 0)
-            ->where('attach', $attach)
-            ->update(['item_id' => $item_id]);
-
-        DB::table('i1il4_comments_items')
-            ->where('id', $item_id)
+        self::where('item_id', 0)->where('attach', $attach)->update(['item_id' => $item_id]);
+        self::where('id', $item_id)
             ->update([
                 'images' => DB::table('i1il4_comments_images')
                     ->where('item_id', $item_id)
                     ->count()
             ]);
+
         if (!empty($this->user_id)) {
             // Публикуем
             self::publishItems($item_id);
@@ -199,7 +194,7 @@ class Comments extends Model
 
         // Уведомление админу
         if ($request->has('object_group') && ($request->input('object_group') === 'com_content' ||
-                $request->input('object_group') === 'com_detsad') && !empty($request->input('object_id'))) {
+                $request->input('object_group') === 'com_detsad') && $request->filled('object_id')) {
             self::setNotification($request->input('object_group'), $request->input('object_id'), $item_id, 2);
             // Добавления задания в очередь (геолокация)
             dispatch(new AfterCreatCommentGeoLocation());
@@ -207,14 +202,13 @@ class Comments extends Model
             dispatch(new AfterCreatCommentNotifications());
             // Создание экземпляра события
             $temp = self::getItem($request->input('object_group'), $request->input('object_id'));
-            broadcast(new \App\Events\ReviewAdded($temp['name'], $temp['url']))->toOthers();
+            //broadcast(new \App\Events\ReviewAdded($temp['name'], $temp['url']))->toOthers();
         } else {
             return array(
                 'status' => 2,
                 'msg' => 'Не передан object_group или object_group'
             );
         }
-
 
         if (!empty($this->user_id)) {
             return array(
@@ -231,13 +225,12 @@ class Comments extends Model
 
     public function edit(int $comment_id, Request $request): array
     {
-        $description = (string)$request->input('description');
-        $attach = (string)$request->input('attach');
+        $description = $request->input('description');
+        $attach = $request->input('attach');
 
-        $result = DB::table('i1il4_comments_items')
-            ->select('*')
-            ->where('id', '=', $comment_id)
-            ->where('user_id', '=', $this->user_id)
+        $result = self::select('*')
+            ->where('id', $comment_id)
+            ->where('user_id', $this->user_id)
             ->where(DB::raw('DATE_ADD(created, INTERVAL 15 MINUTE)'), '>', 'NOW()')
             ->first();
 
@@ -246,16 +239,17 @@ class Comments extends Model
             $description = self::_clearComment($description);
             $description = self::input($description);
 
-            DB::table('i1il4_comments_items')
-                ->where('id', '=', $comment_id)
+            self::where('id', $comment_id)
                 ->update(['description' => $description]);
+
             DB::table('i1il4_comments_images')
-                ->where('item_id', '=', 0)
-                ->where('attach', '=', $attach)
+                ->where('item_id', 0)
+                ->where('attach', $attach)
                 ->update(['item_id' => $comment_id]);
-            DB::table('i1il4_comments_items')
-                ->where('id', '=', $comment_id)
+
+            self::where('id', $comment_id)
                 ->update(['images' => DB::table('i1il4_comments_images')->where('item_id', '=', $comment_id)->count()]);
+
             return array(
                 'status' => 1,
                 'msg' => 'Спасибо, ваш отзыв сохранен, перезагрузите страницу.'
@@ -270,15 +264,11 @@ class Comments extends Model
     public function unPublishItems(int $comment_id): array
     {
         if (!empty($comment_id)) {
-            $items = DB::table('i1il4_comments_items')
-                ->select('*')
-                ->where('id', '=', $comment_id)
-                ->first();
+            $items = self::where('id', $comment_id)->first();
+
             self::_clearNotifications($comment_id);
             // Снимаем с публикации
-            DB::table('i1il4_comments_items')
-                ->where('id', '=', $comment_id)
-                ->update(['status' => 0]);
+            self::where('id', $comment_id)->update(['status' => 0]);
 
             if (!empty($items)) {
                 foreach ($items as $item) {

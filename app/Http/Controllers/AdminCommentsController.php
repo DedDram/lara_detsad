@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminCommentsController
 {
-    protected Comments $commentsService;
+    protected Comments $comments;
 
-    public function __construct(Comments $commentsService)
+    public function __construct(Comments $comments)
     {
-        $this->commentsService = $commentsService;
+        $this->comments = $comments;
     }
 
     public function getResponse(Request $request)
@@ -37,7 +37,7 @@ class AdminCommentsController
                 $this->handleTask($task, $request->get('item_id'));
             }
         } elseif ($task === 'unsubscribe' && $request->filled(['object_group', 'object_id'])) {
-            $this->commentsService->unsubscribe($request->get('object_group'), $request->get('object_id'), Auth::id());
+            $this->comments->unsubscribe($request->get('object_group'), $request->get('object_id'), Auth::id());
             $session = 'unsubscribe';
             $text = 'Вы отписались от новых уведомлений';
         } else {
@@ -54,10 +54,10 @@ class AdminCommentsController
     protected function handleTask(string $task, $itemId): void
     {
         match ($task) {
-            'unpublish' => $this->commentsService->unpublishItems($itemId),
-            'publish' => $this->commentsService->publishItems($itemId),
-            'remove' => $this->commentsService->remove($itemId),
-            'blacklist' => $this->commentsService->blacklist($itemId),
+            'unpublish' => $this->comments->unpublishItems($itemId),
+            'publish' => $this->comments->publishItems($itemId),
+            'remove' => $this->comments->remove($itemId),
+            'blacklist' => $this->comments->blacklist($itemId),
         };
     }
 }
