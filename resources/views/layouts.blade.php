@@ -83,7 +83,7 @@
                 <a href="/">Главная</a>
             </li>
             <li>
-                <a href="/detskie-sady/14-privat/131-chastnye-detskie-sady">Частные детские сады</a>
+                <a href="/14-privat/131-chastnye-detskie-sady">Частные детские сады</a>
             </li>
             <li>
                 <a href="/obmen-mest">Обмен мест в садиках</a>

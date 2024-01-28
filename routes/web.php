@@ -16,16 +16,6 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-//Садики старые url
-Route::prefix('detskie-sady')->group(function (){
-    Route::redirect('/{section_id}-{section_alias}', '/{section_id}-{section_alias}');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}', '/{section_id}-{section_alias}/{category_id}-{category_alias}');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}/{district}', '/{section_id}-{section_alias}/{category_id}-{category_alias}/{district}');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}', '/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/gallery', '/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/gallery');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/agent', '/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/agent');
-    Route::redirect('/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/geoshow', '/{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}/geoshow');
-});
 
 Route::get('/', [Controller::class, 'main']);
 //Прочие страницы и разделы
@@ -106,3 +96,12 @@ Route::get('/comments', [AdminCommentsController::class, 'getResponse'])->middle
 //Диплом
 Route::get('/diplom/code', [DiplomController::class, 'code']);
 Route::get('/diplom/default', [DiplomController::class, 'default']);
+//Садики старые url
+Route::prefix('detskie-sady')->group(function () {
+    $path = '{section_id}-{section_alias}/{category_id}-{category_alias}/{sad_id}-{sad_alias}';
+    Route::redirect("/$path", "/$path");
+    Route::redirect("/$path/{district}", "/$path/{district}");
+    Route::redirect("/$path/gallery", "/$path/gallery");
+    Route::redirect("/$path/agent", "/$path/agent");
+    Route::redirect("/$path/geoshow", "/$path/geoshow");
+});
