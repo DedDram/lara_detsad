@@ -175,13 +175,19 @@ class Comments extends Model
         // Получить последний вставленный ID
         $item_id = DB::getPdo()->lastInsertId();
 
-        self::where('item_id', 0)->where('attach', $attach)->update(['item_id' => $item_id]);
-        self::where('id', $item_id)
-            ->update([
-                'images' => DB::table('i1il4_comments_images')
-                    ->where('item_id', $item_id)
-                    ->count()
-            ]);
+        if(!empty($attach)){
+            DB::table('i1il4_comments_images')
+                ->where('item_id', 0)
+                ->where('attach', $attach)
+                ->update(['item_id' => $item_id]);
+            self::where('id', $item_id)
+                ->update([
+                    'images' => DB::table('i1il4_comments_images')
+                        ->where('item_id', $item_id)
+                        ->count()
+                ]);
+        }
+
 
         if (!empty($this->user_id)) {
             // Публикуем

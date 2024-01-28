@@ -32,11 +32,11 @@ class RegistrationTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/register', $userData);
 
-        // проверки
-        $response->assertJson([
-            'status' => 1,
-            'msg' => 'Вам на почту ушло письмо, перейдите по ссылке в нем для подтверждения email.',
-        ]);
+        $response->assertRedirect('/verification-message');
+
+        $response = $this->get('/verification-message');
+        $response->assertStatus(200);
+        $response->assertSeeText('Подтвердите свою почту');
     }
 
     /** @test */

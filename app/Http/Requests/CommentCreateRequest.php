@@ -23,7 +23,9 @@ class CommentCreateRequest extends FormRequest
         $rules = [];
         if(!Auth::check() || (Auth::check() && !User::isAdmin())){
             $rules = [
-                'description' => 'required|string|min:100|latin_characters|no_spam_links'
+                'description' => 'required|string|min:100|latin_characters|no_spam_links',
+                'object_group' => 'required|string',
+                'object_id' => 'required|gt:0',
             ];
 
             if (!Auth::check()) {
@@ -37,19 +39,19 @@ class CommentCreateRequest extends FormRequest
 
     public function messages(): array
     {
-        $messages = [
+        return [
             'description.required' => 'Пожалуйста, введите текст отзыва',
             'description.min' => 'Минимальная длина отзыва - 100 символов',
             'description.latin_characters' => 'Отзывы на латинице запрещены',
             'description.no_spam_links' => 'Спам не пройдет!',
+            'username.required' => 'Пожалуйста, введите Ваше имя',
+            'email.required' => 'Пожалуйста, введите E-mail',
+            'email.email' => 'Пожалуйста, введите корректный E-mail',
+            'object_group.required' => 'Не передан object_group',
+            'object_id.required' => 'Не передан object_id',
+            'object_id.gt' => 'Не передан object_id',
         ];
 
-        if (!Auth::check()) {
-            $messages['username.required'] = 'Пожалуйста, введите Ваше имя';
-            $messages['email.required'] = 'Пожалуйста, введите E-mail';
-            $messages['email.email'] = 'Пожалуйста, введите корректный E-mail';
-        }
-        return $messages;
     }
 
     protected function failedValidation(Validator $validator)

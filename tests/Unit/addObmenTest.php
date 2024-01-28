@@ -23,8 +23,8 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'text' => 'Пожалуйста, введите текст объявления'
+        $response->assertJson([
+            'errors' => ['Пожалуйста, введите текст объявления']
         ]);
     }
 
@@ -33,7 +33,7 @@ class addObmenTest extends TestCase
         // тестовые данные
         $userData = [
             'city_id' => 1,
-            'text' => 'text',
+            'text' => 'текст',
             'username' => 'Anna',
             'email' => 'email@email.ru',
             'phone' => '5555555',
@@ -42,9 +42,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'text' => 'Минимальная длина объявления 50 символов'
-        ]);
+        $response->assertJson(['errors' => ['Минимальная длина объявления 50 символов']]);
     }
 
     public function test_add_announcement_obmen_text_latin(): void
@@ -61,9 +59,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'text' => 'Объявления на латинице запрещены'
-        ]);
+        $response->assertJson(['errors' => ['Объявления на латинице запрещены']]);
     }
 
     public function test_add_announcement_obmen_text_links(): void
@@ -80,9 +76,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'text' => 'Спам не пройдет!'
-        ]);
+        $response->assertJson(['errors' => ['Спам не пройдет!']]);
     }
 
     public function test_add_announcement_obmen_no_username(): void
@@ -99,9 +93,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'username' => 'Пожалуйста, введите Ваше имя'
-        ]);
+        $response->assertJson(['errors' => ['Пожалуйста, введите Ваше имя']]);
     }
 
     public function test_add_announcement_obmen_no_city_id(): void
@@ -118,9 +110,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'city_id' => 'Пожалуйста, выберите город'
-        ]);
+        $response->assertJson(['errors' => ['Пожалуйста, выберите город']]);
     }
 
     public function test_add_announcement_obmen_no_email(): void
@@ -137,9 +127,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'email' => 'Пожалуйста, введите E-mail'
-        ]);
+        $response->assertJson(['errors' => ['Пожалуйста, введите E-mail']]);
     }
 
     public function test_add_announcement_obmen_valid_email(): void
@@ -156,9 +144,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'email' => 'Пожалуйста, введите корректный E-mail'
-        ]);
+        $response->assertJson(['errors' => ['Пожалуйста, введите корректный E-mail']]);
     }
 
     public function test_add_announcement_obmen_no_phone(): void
@@ -175,9 +161,7 @@ class addObmenTest extends TestCase
         // Посылка POST-запроса на страницу регистрации
         $response = $this->post('/obmen-add', $userData);
 
-        $response->assertSessionHasErrors([
-            'phone' => 'Пожалуйста, введите Телефон'
-        ]);
+        $response->assertJson(['errors' => ['Пожалуйста, введите Телефон']]);
     }
 
     public function test_add_announcement_obmen_its_all_ok(): void

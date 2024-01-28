@@ -127,7 +127,7 @@ class PostCommentsControllerTest extends TestCase
 
         $response->assertJson([
             'status' => 2,
-            'msg' => 'Не передан object_group или object_group',
+            'msg' => 'Не передан object_id',
         ]);
     }
 
@@ -135,7 +135,7 @@ class PostCommentsControllerTest extends TestCase
     {
         // Данные формы для добавления отзыва
         $formData = [
-            'object_group' => '------',
+            'object_group' => '',
             'object_id' => 3281,
             'task' => 'create',
             'star' => 4,
@@ -150,7 +150,7 @@ class PostCommentsControllerTest extends TestCase
 
         $response->assertJson([
             'status' => 2,
-            'msg' => 'Не передан object_group или object_group',
+            'msg' => 'Не передан object_group',
         ]);
     }
 }

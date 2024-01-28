@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExchangeJobRequest;
 use App\Models\Exchange_Job\ExchangeJobItems;
 use App\Models\Exchange_Job\ExchangeJobTeachers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -15,14 +16,11 @@ class ExchangeJobController
 {
     public object $city;
     public object $metro;
-
     public string $cityName = '';
     public string $metroName = '';
 
-    public function exchange(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
+    public function exchange(Request $request, ExchangeJobItems $exchange, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
     {
-        $exchange = new ExchangeJobItems();
-
         // Redirect alias
         self::RedirectAlias($exchange, 'obmen-mest', $cityId, $cityAlias, $metroId, $metroAlias);
 
@@ -58,9 +56,8 @@ class ExchangeJobController
             ]);
     }
 
-    public function addExchangeGet(): View
+    public function addExchangeGet(ExchangeJobItems $exchange): View
     {
-        $exchange = new ExchangeJobItems();
         $city = $exchange->getCitySearch('exchangeJob');
         $metro = $exchange->getMetroSearch('exchangeJob');
 
@@ -101,9 +98,8 @@ class ExchangeJobController
     }
 
 
-    public function job(Request $request, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
+    public function job(Request $request, ExchangeJobItems $exchange, int $cityId = 0, string $cityAlias = '', int $metroId = 0, string $metroAlias = ''): View
     {
-        $exchange = new ExchangeJobItems();
         // Redirect alias
         self::RedirectAlias($exchange, 'rabota', $cityId, $cityAlias, $metroId, $metroAlias);
 
@@ -141,9 +137,8 @@ class ExchangeJobController
             ]);
     }
 
-    public function addJobGet(): View
+    public function addJobGet(ExchangeJobItems $exchange): View
     {
-        $exchange = new ExchangeJobItems();
         $city = $exchange->getCitySearch('exchangeJob');
         $metro = $exchange->getMetroSearch('exchangeJob');
         $teachers = ExchangeJobTeachers::getTeachersSearch();
@@ -247,7 +242,6 @@ class ExchangeJobController
                 <a href="' . env('APP_URL') . '/rabota/publish/' . $lastInsertedId . '">опубликовать</a>
                 <a href="' . env('APP_URL') . '/rabota/delete/' . $lastInsertedId . '">удалить</a>';
 
-
         Mail::send([], [], function ($message) use ($messageText, $title) {
             $message->to(config('mail.from.address'))
                 ->subject($title)
@@ -255,11 +249,9 @@ class ExchangeJobController
         });
 
         return response()->json($data);
-
-
     }
 
-    public function publishJob(int $id): \Illuminate\Http\RedirectResponse
+    public function publishJob(int $id): RedirectResponse
     {
         $result = ExchangeJobItems::find($id);
         if ($result !== null) {
@@ -270,7 +262,7 @@ class ExchangeJobController
         return redirect()->to('/rabota')->with('publish', 'Объявление не найдено!');
     }
 
-    public function deleteJob(int $id): \Illuminate\Http\RedirectResponse
+    public function deleteJob(int $id): RedirectResponse
     {
         $result = ExchangeJobItems::find($id);
         if ($result !== null) {
