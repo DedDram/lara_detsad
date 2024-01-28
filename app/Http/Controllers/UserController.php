@@ -18,7 +18,6 @@ class UserController
 {
     public function profile(): View
     {
-        $allComments = CommentsSadik::getAllComments();
         if(!empty(Auth::user()->sad_id)){
             $agent = Item::getUrlSadik(Auth::user()->sad_id);
         }else{
@@ -28,8 +27,9 @@ class UserController
         return view('users.profile', [
             'title' => 'Личный кабинет',
             'user' => Auth::user(),
-            'agent' => $agent, 'comments' => $comments,
-            'allComments' => $allComments
+            'agent' => $agent,
+            'comments' => $comments,
+
         ]);
     }
 
