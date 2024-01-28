@@ -36,7 +36,7 @@ class RegistrationTest extends TestCase
 
         $response = $this->get('/verification-message');
         $response->assertStatus(200);
-        $response->assertSeeText('Подтвердите свою почту');
+        $response->assertSeeText('Активируйте вашу учетную запись, пройдя по ссылке');
     }
 
     /** @test */
