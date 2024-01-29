@@ -258,11 +258,11 @@ class DetSadController
             ]);
     }
 
-    public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
+    public function gallery(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias, Item $item): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
-        $gallery = Item::getGallery($sadId);
+        $gallery = $item->getGallery($sadId);
         return view('detsad.gallery',
             [
                 'url'=>$url,
@@ -274,10 +274,14 @@ class DetSadController
 
     }
 
-    public function addGallery(Request $request): View
+    public function addGallery(Request $request, Item $item): View|RedirectResponse
     {
-        $total = Item::getCountImage($request->query('id'));
-        return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
+        if($request->filled('id')){
+            $total = $item->getCountImage($request->query('id'));
+            return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
+        }else{
+            return redirect()->back();
+        }
     }
 
     public function addGalleryPost(AddImageGalleryRequest $request, DetsadGallery $gallery): JsonResponse
@@ -299,10 +303,10 @@ class DetSadController
         return redirect()->to(config('app.url').$linkSadik->url.'/gallery', 301)->with('publishImgOk', $with);
     }
 
-    public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias): View
+    public function sadAgent(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, int $sadId, string $sadAlias, Item $item): View
     {
         $sadik = self::getSadikItem($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sadId, $sadAlias);
-        $agent = Item::getAgent($sadId);
+        $agent = $item->getAgent($sadId);
         $url = '/' . $sadik->section_alias . '/' .  $sadik->category_alias . '/' . $sadik->item_alias;
         return view('detsad.agent',['url'=>$url, 'item' => $sadik,'title' => 'Представитель '.$sadik->name, 'agent' => $agent]);
 

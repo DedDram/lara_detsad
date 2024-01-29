@@ -20,6 +20,7 @@ class Diplom extends Model
             ->select('items.*')
             ->addSelect(DB::raw(!empty($district) ? 'categories.name AS district' : 'address.locality AS locality'))
             ->first();
+
         $tpl = '/images/diploms/rus.jpg';
         $country = 'России';
         $where = "section_id NOT IN (17,20,21) ORDER BY average DESC";
@@ -93,7 +94,7 @@ class Diplom extends Model
         }
         $i = 1;
         foreach($joined as $element){
-            if(strpos($element.'|', '|'.$id.'|') !== false){
+            if(str_contains($element . '|', '|' . $id . '|')){
                 $rate = $i;
                 break;
             }

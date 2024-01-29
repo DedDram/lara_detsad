@@ -231,12 +231,13 @@ class Comments extends Model
 
     public function edit(int $comment_id, Request $request): array
     {
-        $description = $request->input('description');
-        $attach = $request->input('attach');
+        $description = (string)$request->input('description');
+        $attach = (string)$request->input('attach');
 
-        $result = self::select('*')
-            ->where('id', $comment_id)
-            ->where('user_id', $this->user_id)
+        $result = DB::table('i1il4_comments_items')
+            ->select('*')
+            ->where('id', '=', $comment_id)
+            ->where('user_id', '=', $this->user_id)
             ->where(DB::raw('DATE_ADD(created, INTERVAL 15 MINUTE)'), '>', 'NOW()')
             ->first();
 
@@ -245,17 +246,16 @@ class Comments extends Model
             $description = self::_clearComment($description);
             $description = self::input($description);
 
-            self::where('id', $comment_id)
+            DB::table('i1il4_comments_items')
+                ->where('id', '=', $comment_id)
                 ->update(['description' => $description]);
-
             DB::table('i1il4_comments_images')
-                ->where('item_id', 0)
-                ->where('attach', $attach)
+                ->where('item_id', '=', 0)
+                ->where('attach', '=', $attach)
                 ->update(['item_id' => $comment_id]);
-
-            self::where('id', $comment_id)
+            DB::table('i1il4_comments_items')
+                ->where('id', '=', $comment_id)
                 ->update(['images' => DB::table('i1il4_comments_images')->where('item_id', '=', $comment_id)->count()]);
-
             return array(
                 'status' => 1,
                 'msg' => 'Спасибо, ваш отзыв сохранен, перезагрузите страницу.'
@@ -270,11 +270,15 @@ class Comments extends Model
     public function unPublishItems(int $comment_id): array
     {
         if (!empty($comment_id)) {
-            $items = self::where('id', $comment_id)->first();
-
+            $items = DB::table('i1il4_comments_items')
+                ->select('*')
+                ->where('id', '=', $comment_id)
+                ->first();
             self::_clearNotifications($comment_id);
             // Снимаем с публикации
-            self::where('id', $comment_id)->update(['status' => 0]);
+            DB::table('i1il4_comments_items')
+                ->where('id', '=', $comment_id)
+                ->update(['status' => 0]);
 
             if (!empty($items)) {
                 foreach ($items as $item) {

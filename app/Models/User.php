@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\DetSad\Item;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
+use function Symfony\Component\Translation\t;
 
 class User extends Authenticatable
 {
@@ -44,6 +47,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function agent(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'sad_id');
+    }
 
     public static function isAdmin(): bool
     {

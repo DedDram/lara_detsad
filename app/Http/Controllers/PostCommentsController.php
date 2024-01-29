@@ -32,36 +32,55 @@ class PostCommentsController
 
     public function getResponse(CommentCreateRequest $request): JsonResponse
     {
-        if($request->filled('task')){
+        if($request->has('task')){
             $task = (string) $request->input('task');
         }else{
             abort(404);
         }
+        $data = [];
 
-        $data = match($task) {
-            'create' => $this->comments->create($request),
-            'vote' => $this->comments->vote($request),
-            'votes' => $this->comments->votes($request),
-            'images' => $this->comments->getImagesComment($request),
-            'addImage' => $this->comments->addImage($request),
-            'removeImage' => $this->comments->removeImage($request),
-            default => null
-        };
+        if ($task == 'create') {
+            $data = $this->comments->create($request);
+        }
+        if ($task == 'vote') {
+            $data = $this->comments->vote($request);
+        }
+        if ($task == 'votes') {
+            $data = $this->comments->votes($request);
+        }
+        if ($task == 'images') {
+            $data = $this->comments->getImagesComment($request);
+        }
+        if ($task == 'addImage') {
+            $data = $this->comments->addImage($request);
+        }
+        if ($task == 'removeImage') {
+            $data = $this->comments->removeImage($request);
+        }
 
         if (Auth::check()) {
             if (User::isAdmin()) {
-                $data = match ($task){
-                    'publish' => $this->comments->publishItems($this->comment_id),
-                    'unpublish' => $this->comments->unPublishItems($this->comment_id),
-                    'remove' => $this->comments->remove($this->comment_id),
-                    'blacklist' => $this->comments->blacklist($this->comment_id),
-                };
+                if ($task == 'publish') {
+                    $data = $this->comments->publishItems($this->comment_id);
+                }
+                if ($task == 'unpublish') {
+                    $data = $this->comments->unPublishItems($this->comment_id);
+                }
+                if ($task == 'remove') {
+                    $data = $this->comments->remove($this->comment_id);
+                }
+                if ($task == 'blacklist') {
+                    $data = $this->comments->blacklist($this->comment_id);
+                }
             }
-            $data = match ($task){
-                'unsubscribe' => $this->comments->unsubscribe($this->object_group, $this->object_id, Auth::id()),
-                'edit' => $this->comments->edit($this->comment_id, $request),
-            };
+            if ($task == 'unsubscribe') {
+                $data = $this->comments->unsubscribe($this->object_group, $this->object_id, Auth::id());
+            }
+            if ($task == 'edit') {
+                $data = $this->comments->edit($this->comment_id, $request);
+            }
         }
+
         return response()->json($data);
     }
 

@@ -9,7 +9,7 @@ class DetsadImage extends Model
 {
     protected $table = 'i1il4_detsad_images';
     protected $primaryKey = 'id';
-    public $timestamps = false; // Если в таблице нет полей created_at и updated_at
+    public $timestamps = false;
 
     protected $fillable = [
         'item_id',

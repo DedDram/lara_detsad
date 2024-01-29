@@ -2,7 +2,11 @@
 
 namespace App\Models\DetSad;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 use ReCaptcha\ReCaptcha;
 
@@ -35,6 +39,27 @@ class Item extends Model
         'count_img',
         'sid'
     ];
+
+    public function image(): HasMany
+    {
+        return $this->hasMany(DetsadImage::class,  'item_id', 'id');
+    }
+
+    public function agent(): HasOne
+    {
+        return $this->hasOne(User::class,  'id', 'user_id_agent');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(Section::class, 'section_id');
+    }
+
     public function getItem(int $sadId): ?object
     {
         return DB::table('i1il4_detsad_items AS t1')
@@ -64,9 +89,6 @@ class Item extends Model
                 ->where('address.item_id', $sadId)
                 ->get();
 
-            foreach ($addresses as $address) {
-                $address->district_link = '<a href="/' . $sectionId . '-' . $sectionAlias . '">' . $sectionName . '</a> / <a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '">' . $categoryName . '</a>';
-            }
         } else {
             $addresses = DB::table('i1il4_detsad_address AS address')
                 ->select('address.*', 'items.section_id AS section', 'items.category_id AS cat', 'categories.name AS cat_name', 'categories.alias AS cat_alias', 'sections.name AS section_name', 'sections.alias AS section_alias', 'districts.name AS d_name')
@@ -78,16 +100,15 @@ class Item extends Model
             })
                 ->where('address.item_id', $sadId)
                 ->get();
+        }
 
-            foreach ($addresses as $address) {
-                if ($address->district) {
-                    $address->district_link = '<a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '/' . $address->district . '">' . $address->d_name . '</a>';
-                }
-            }
+        foreach ($addresses as $address) {
+            $address->district_link = self::generateDistrictLink($sectionId, $sectionAlias, $categoryId, $categoryAlias, $sectionName, $categoryName, $address);
         }
 
         return $addresses;
     }
+
 
     public static function AjaxMapGeoShow(float $geo_lat, float $geo_long): array
     {
@@ -128,15 +149,6 @@ class Item extends Model
         return $result;
     }
 
-    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function section(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Section::class, 'section_id');
-    }
 
     public static function getStatistics(int $sadId): ?object
     {
@@ -165,21 +177,18 @@ class Item extends Model
             ->first();
     }
 
-    public static function getGallery(int $sadId): ?object
+    public function getGallery(int $sadId): ?object
     {
-        return DB::table('i1il4_detsad_images')
-            ->select('*')
+        return DetsadImage::with('sadik')
             ->where('item_id', $sadId)
             ->where('verified', '1')
             ->orderBy('id', 'DESC')
             ->get();
     }
 
-    public static function getCountImage(int $sadId): ?int
+    public function getCountImage(int $sadId): ?int
     {
-        return DB::table('i1il4_detsad_images')
-            ->where('item_id', $sadId)
-            ->count();
+        return DetsadImage::with('sadik')->where('item_id', $sadId)->count();
     }
 
     public static function showTelephoneOrEmail($request): array
@@ -204,11 +213,24 @@ class Item extends Model
         }
     }
 
-    public static function getAgent(int $sad_id): ?object
+    public function getAgent(int $sad_id): ?object
     {
         return DB::table('users')
             ->select('*')
             ->where('sad_id', $sad_id)
             ->first();
+    }
+
+    private static function generateDistrictLink(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, object $address): string
+    {
+        $districtLink = '';
+
+        if ($sectionId > 1 && $sectionId < 12) {
+            $districtLink = '<a href="/' . $sectionId . '-' . $sectionAlias . '">' . $sectionName . '</a> / <a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '">' . $categoryName . '</a>';
+        } elseif ($address->district) {
+            $districtLink = '<a href="/' . $sectionId . '-' . $sectionAlias . '/' . $categoryId . '-' . $categoryAlias . '/' . $address->district . '">' . $address->d_name . '</a>';
+        }
+
+        return $districtLink;
     }
 }
