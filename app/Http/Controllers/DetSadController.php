@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\StringHelper;
+use App\Http\Requests\AddImageGalleryRequest;
 use App\Models\Comments\Comments;
 use App\Models\DetSad\AdsCity;
 use App\Models\DetSad\Category;
@@ -279,9 +280,8 @@ class DetSadController
         return view('detsad.addGallery',['item_id'=>$request->query('id'), 'total' => $total]);
     }
 
-    public function addGalleryPost(Request $request): JsonResponse
+    public function addGalleryPost(AddImageGalleryRequest $request, DetsadGallery $gallery): JsonResponse
     {
-        $gallery = new DetsadGallery();
         $addImg = $gallery->add($request);
         return response()->json($addImg);
     }
