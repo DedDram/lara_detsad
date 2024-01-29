@@ -294,7 +294,6 @@ class DetSadController
 
     public function PublishImageGallery(Request $request, DetsadGallery $gallery): RedirectResponse
     {
-        $gallery = new DetsadGallery();
         $with = $gallery->publish($request);
         $linkSadik = Item::getUrlSadik($request->query('id'));
         return redirect()->to(config('app.url').$linkSadik->url.'/gallery', 301)->with('publishImgOk', $with);

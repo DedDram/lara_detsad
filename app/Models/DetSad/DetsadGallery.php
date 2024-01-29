@@ -2,13 +2,11 @@
 
 namespace App\Models\DetSad;
 
-use App\Http\Requests\AddImageGalleryRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Intervention\Image\Facades\Image;
-use PHPUnit\Exception;
 
 class DetsadGallery extends Model
 {
