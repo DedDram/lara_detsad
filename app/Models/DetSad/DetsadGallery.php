@@ -70,8 +70,8 @@ class DetsadGallery extends Model
             if (!empty($image)) {
                 if (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->sad_id == $sad_id)) {
 
-                    $filePath = public_path("images/detsad/{$sad_id}/{$image->original_name}");
-                    $filePath2 = public_path("images/detsad/{$sad_id}/{$image->thumb}");
+                    $filePath = public_path("images/detsad/$sad_id/$image->original_name");
+                    $filePath2 = public_path("images/detsad/$sad_id/$image->thumb");
 
                     if (file_exists($filePath)) {
                         $image->delete();
