@@ -3,6 +3,7 @@
 namespace App\Models\DetSad;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetsadImage extends Model
 {
@@ -18,4 +19,9 @@ class DetsadImage extends Model
         'title',
         'verified',
     ];
+
+    public function sadik(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id');
+    }
 }
