@@ -4,6 +4,7 @@ namespace App\Models\Comments;
 
 use App\Jobs\AfterCreatCommentGeoLocation;
 use App\Jobs\AfterCreatCommentNotifications;
+use App\Models\DetSad\Item;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
@@ -48,6 +49,11 @@ class Comments extends Model
         }
 
         $this->dir = 'images/comments';
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'object_id')->where('object_group', 'com_detsad');
     }
 
     public static function getCommentUser(int $user_id)

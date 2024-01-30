@@ -3,6 +3,7 @@
 namespace App\Models\DetSad;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,11 @@ class Category extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class, 'section_id');
     }
 
     public static function getCategory(int $categoryId): object|null

@@ -2,6 +2,7 @@
 
 namespace App\Models\DetSad;
 
+use App\Models\Comments\Comments;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,7 +43,7 @@ class Item extends Model
 
     public function image(): HasMany
     {
-        return $this->hasMany(DetsadImage::class,  'item_id', 'id');
+        return $this->hasMany(DetsadImage::class,  'item_id');
     }
 
     public function agent(): HasOne
@@ -58,6 +59,10 @@ class Item extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
+    }
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comments::class, 'object_id')->where('object_group', 'com_detsad');
     }
 
     public function getItem(int $sadId): ?object
@@ -179,8 +184,7 @@ class Item extends Model
 
     public function getGallery(int $sadId): ?object
     {
-        return DetsadImage::with('sadik')
-            ->where('item_id', $sadId)
+        return DetsadImage::where('item_id', $sadId)
             ->where('verified', '1')
             ->orderBy('id', 'DESC')
             ->get();
