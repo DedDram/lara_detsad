@@ -46,9 +46,9 @@ class Item extends Model
         return $this->hasMany(DetsadImage::class,  'item_id');
     }
 
-    public function agent(): HasOne
+    public function agent(): BelongsTo
     {
-        return $this->hasOne(User::class,  'id', 'user_id_agent');
+        return $this->belongsTo(User::class,  'user_id_agent');
     }
 
     public function category(): BelongsTo
@@ -114,7 +114,6 @@ class Item extends Model
         return $addresses;
     }
 
-
     public static function AjaxMapGeoShow(float $geo_lat, float $geo_long): array
     {
         $result = array();
@@ -154,12 +153,9 @@ class Item extends Model
         return $result;
     }
 
-
     public static function getStatistics(int $sadId): ?object
     {
-        return DB::table('i1il4_detsad_stat')->select('*')
-            ->where('item_id', '=', $sadId)
-            ->first();
+        return DB::table('i1il4_detsad_stat')->where('item_id',  $sadId)->first();
     }
 
     public static function getFields(int $sadId): ?object
@@ -167,7 +163,7 @@ class Item extends Model
         return DB::table('i1il4_detsad_fields_value AS t1')
             ->select('t1.item_id', 't1.text AS field_text', 't1.type_id', 't2.text AS type_text')
             ->join('i1il4_detsad_fields_type AS t2', 't1.type_id', '=', 't2.id')
-            ->where('t1.item_id', '=', $sadId)
+            ->where('t1.item_id', $sadId)
             ->orderBy('t2.ordering', 'ASC')
             ->get();
     }
@@ -176,8 +172,8 @@ class Item extends Model
     {
         return DB::table('i1il4_detsad_items as t1')
             ->select(DB::raw("CONCAT('/', t3.id, '-', t3.alias, '/', t2.id, '-', t2.alias, '/', t1.id, '-', t1.alias) as url"), "t1.name")
-            ->join('i1il4_detsad_categories as t2', 't2.id', '=', 't1.category_id')
-            ->join('i1il4_detsad_sections as t3', 't3.id', '=', 't1.section_id')
+            ->join('i1il4_detsad_categories as t2', 't2.id',  't1.category_id')
+            ->join('i1il4_detsad_sections as t3', 't3.id', 't1.section_id')
             ->where('t1.id', $sadId)
             ->first();
     }
@@ -219,10 +215,7 @@ class Item extends Model
 
     public function getAgent(int $sad_id): ?object
     {
-        return DB::table('users')
-            ->select('*')
-            ->where('sad_id', $sad_id)
-            ->first();
+        return User::where('sad_id', $sad_id)->first();
     }
 
     private static function generateDistrictLink(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, object $address): string
