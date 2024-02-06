@@ -215,7 +215,7 @@ class Item extends Model
 
     public function getAgent(int $sad_id): ?object
     {
-        return User::where('sad_id', $sad_id)->first();
+        return User::where('sad_id', $sad_id)->whereNotNull('email_verified_at')->first();
     }
 
     private static function generateDistrictLink(int $sectionId, string $sectionAlias, int $categoryId, string $categoryAlias, string $sectionName, string $categoryName, object $address): string

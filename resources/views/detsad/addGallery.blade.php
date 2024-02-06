@@ -2,9 +2,21 @@
 <html>
 <head>
     <meta name="robots" content="noindex, nofollow" />
+    <style>
+        .postform {
+            border: 2px solid #000;
+            margin: 3px 0;
+            padding: 3px;
+        }
+        .postmsg {
+            margin-bottom: 7px;
+            color: blue;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<div id="msg"></div>
+<div id="msg" class="postmsg"></div>
 @if (!empty($total) && $total>=8)
 <div id="msg">К данному садику уже добавлено 8 фотографий, это максимум.</div>
 @else
@@ -42,10 +54,10 @@
                 let data = JSON.parse(xhr.responseText);
 
                 if (data.status === 1) {
-                    showMessage('ui-state-highlight', data.msg);
+                    showMessage('postmsg', data.msg);
                     form.style.display = 'none';
                 } else if (data.status === 2) {
-                    showMessage('ui-state-error', data.msg);
+                    showMessage('postmsg', data.msg);
                 }
                 form.querySelector('.percent').innerHTML = '100%';
                 form.querySelector('.percent').style.display = 'none';

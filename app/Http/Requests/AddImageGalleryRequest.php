@@ -20,7 +20,7 @@ class AddImageGalleryRequest extends FormRequest
             'item_id' => 'required|gt:0',
             'condition' => 'required',
             'description' => 'required|string|min:30|latin_characters|no_spam_links',
-            'myfile' => 'required|file|mimes:jpeg,png,jpeg|max:5120|min:500'
+            'myfile' => 'required|file|mimes:jpeg,png,jpeg|max:5120|min:100'
         ];
     }
 
@@ -38,7 +38,7 @@ class AddImageGalleryRequest extends FormRequest
             'myfile.file' => 'Файл не выбран',
             'myfile.mimes' => 'Поддерживаются только файлы с расширениями .jpg, .jpeg и .png.',
             'myfile.max' => 'Максимальный размер файла 5 МБ',
-            'myfile.min' => 'Минимальный размер файла 500 КБ',
+            'myfile.min' => 'Минимальный размер файла 100 КБ',
         ];
 
     }

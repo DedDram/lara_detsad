@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+        .postform {
+            border: 2px solid #000;
+            margin: 3px 0;
+            padding: 3px;
+        }
+        .postmsg {
+            margin-bottom: 7px;
+            color: blue;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <div id="msg"></div>
@@ -76,12 +88,12 @@
                 .then(data => {
                     let msgElement = document.getElementById('msg');
                     if (data.status === 1) {
-                        msgElement.setAttribute('class', 'ui-state-highlight ui-corner-all');
+                        msgElement.setAttribute('class', 'postmsg');
                         msgElement.innerHTML = data.msg;
                         form.style.display = 'none';
                     }
                     if (data.status === 2) {
-                        msgElement.setAttribute('class', 'ui-state-error ui-corner-all');
+                        msgElement.setAttribute('class', 'postmsg');
                         msgElement.innerHTML = data.msg;
                     }
                 })

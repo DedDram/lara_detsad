@@ -27,6 +27,7 @@ class RegisterController extends Controller
 
     public function register(RegisterUserRequest $request)
     {
+
         // Создание нового пользователя
         if (!$request->has('agent')) {
             $user = User::create([

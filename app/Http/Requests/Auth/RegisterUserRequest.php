@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterUserRequest extends FormRequest
 {
@@ -16,8 +18,14 @@ class RegisterUserRequest extends FormRequest
     {
         return [
             'name' => 'required|min:5',
-            'email' => 'required|string|email|unique:users',
             'password' => 'required|string',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'unique:users',
+                'regex:/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/'
+            ],
         ];
     }
 
@@ -30,6 +38,18 @@ class RegisterUserRequest extends FormRequest
             'email.unique' => 'Пользователь с таким email уже зарегистрирован',
             'email.required' => 'Пожалуйста, введите E-mail',
             'email.email' => 'Пожалуйста, введите корректный E-mail',
+            'email.regex' => 'Пожалуйста, введите корректный E-mail',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        //200 ответ не правильно, но лень переписывать js обработчик
+        throw new HttpResponseException(
+            response()->json([
+                'status' => 2,
+                'msg' => $validator->errors()->first(),
+            ], 200)
+        );
     }
 }
