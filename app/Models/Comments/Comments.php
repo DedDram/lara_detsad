@@ -36,6 +36,7 @@ class Comments extends Model
     protected string $dir;
     protected int $user_id;
     protected object $user;
+    public $timestamps = false;
 
     public function __construct(array $attributes = [])
     {
